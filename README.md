@@ -1,7 +1,7 @@
 # UV Index Card
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
-[![Validate](https://github.com/juju35/ha-uv-card/actions/workflows/validate.yml/badge.svg)](https://github.com/juju35/ha-uv-card/actions/workflows/validate.yml)
+[![HACS Validation](https://github.com/juju35/ha-uv-card/actions/workflows/validate.yml/badge.svg)](https://github.com/juju35/ha-uv-card/actions/workflows/validate.yml)
 [![GitHub release](https://img.shields.io/github/v/release/juju35/ha-uv-card)](https://github.com/juju35/ha-uv-card/releases)
 
 A custom Lovelace card for Home Assistant that displays the current **UV index**
