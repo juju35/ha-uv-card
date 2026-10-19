@@ -3,6 +3,7 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![HACS Validation](https://github.com/juju35/ha-uv-card/actions/workflows/validate.yml/badge.svg)](https://github.com/juju35/ha-uv-card/actions/workflows/validate.yml)
 [![GitHub release](https://img.shields.io/github/v/release/juju35/ha-uv-card)](https://github.com/juju35/ha-uv-card/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A custom Lovelace card for Home Assistant that displays the current **UV index**
 with an animated weather-style icon, the numeric value and the WHO risk level
