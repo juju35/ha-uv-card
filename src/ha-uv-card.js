@@ -29,14 +29,22 @@ function levelFor(value) {
 // Translations. "name" is the default card title; the other keys are the risk
 // labels and the unavailable state. English ("en") is the fallback.
 const TRANSLATIONS = {
-  en: { name: "UV Index", low: "Low", moderate: "Moderate", high: "High", very_high: "Very High", extreme: "Extreme", unavailable: "Unavailable" },
-  fr: { name: "Indice UV", low: "Faible", moderate: "Modéré", high: "Élevé", very_high: "Très élevé", extreme: "Extrême", unavailable: "Indisponible" },
+  en: { name: "UV Index", low: "Low", moderate: "Moderate", high: "High", very_high: "Very High", extreme: "Extreme", unavailable: "Unavailable",
+        ed_entity: "UV index sensor", ed_name: "Name", ed_layout: "Layout", ed_horizontal: "Horizontal", ed_vertical: "Vertical",
+        ed_align: "Alignment", ed_center: "Center", ed_top: "Top", ed_show_value: "Show the value", ed_show_label: "Show the risk level",
+        ed_transparent: "Transparent background", ed_language: "Language" },
+  fr: { name: "Indice UV", low: "Faible", moderate: "Modéré", high: "Élevé", very_high: "Très élevé", extreme: "Extrême", unavailable: "Indisponible",
+        ed_entity: "Capteur d'indice UV", ed_name: "Nom", ed_layout: "Disposition", ed_horizontal: "Horizontale", ed_vertical: "Verticale",
+        ed_align: "Alignement", ed_center: "Centré", ed_top: "En haut", ed_show_value: "Afficher la valeur", ed_show_label: "Afficher le niveau de risque",
+        ed_transparent: "Fond transparent", ed_language: "Langue" },
   de: { name: "UV-Index", low: "Niedrig", moderate: "Mäßig", high: "Hoch", very_high: "Sehr hoch", extreme: "Extrem", unavailable: "Nicht verfügbar" },
   es: { name: "Índice UV", low: "Bajo", moderate: "Moderado", high: "Alto", very_high: "Muy alto", extreme: "Extremo", unavailable: "No disponible" },
   it: { name: "Indice UV", low: "Basso", moderate: "Moderato", high: "Alto", very_high: "Molto alto", extreme: "Estremo", unavailable: "Non disponibile" },
   nl: { name: "UV-index", low: "Laag", moderate: "Matig", high: "Hoog", very_high: "Zeer hoog", extreme: "Extreem", unavailable: "Niet beschikbaar" },
   pt: { name: "Índice UV", low: "Baixo", moderate: "Moderado", high: "Alto", very_high: "Muito alto", extreme: "Extremo", unavailable: "Indisponível" },
 };
+
+const LANGUAGE_NAMES = { en: "English", fr: "Français", de: "Deutsch", es: "Español", it: "Italiano", nl: "Nederlands", pt: "Português" };
 
 // Resolve a translation for the given language, falling back to the base
 // language code (e.g. "fr-CA" -> "fr") and finally to English.
@@ -56,6 +64,38 @@ function iconSvg(index) {
 }
 
 class UvIndexCard extends HTMLElement {
+  // Visual editor: Home Assistant's native form.
+  static getConfigForm() {
+    const ha = document.querySelector("home-assistant");
+    const lang = (ha && ha.hass && ha.hass.language) || "en";
+    const t = (key) => localize(key, lang);
+    return {
+      schema: [
+        { name: "entity", required: true, selector: { entity: { domain: "sensor" } } },
+        { name: "name", selector: { text: {} } },
+        {
+          type: "grid",
+          name: "",
+          schema: [
+            { name: "layout", selector: { select: { mode: "dropdown", options: [
+              { value: "horizontal", label: t("ed_horizontal") },
+              { value: "vertical", label: t("ed_vertical") },
+            ] } } },
+            { name: "align", selector: { select: { mode: "dropdown", options: [
+              { value: "center", label: t("ed_center") },
+              { value: "top", label: t("ed_top") },
+            ] } } },
+          ],
+        },
+        { name: "show_value", default: true, selector: { boolean: {} } },
+        { name: "show_label", default: true, selector: { boolean: {} } },
+        { name: "transparent", default: false, selector: { boolean: {} } },
+        { name: "language", selector: { select: { mode: "dropdown", options: Object.entries(LANGUAGE_NAMES).map(([value, label]) => ({ value, label })) } } },
+      ],
+      computeLabel: (schema) => t(`ed_${schema.name}`),
+    };
+  }
+
   setConfig(config) {
     if (!config.entity) {
       throw new Error("You need to define an 'entity'");
