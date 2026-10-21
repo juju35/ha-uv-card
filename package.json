@@ -1,0 +1,16 @@
+{
+  "name": "ha-uv-card",
+  "version": "1.1.0",
+  "description": "Lovelace card for Home Assistant that shows the UV index with an animated icon and the WHO risk level.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/build.mjs && node --check dist/ha-uv-card.js",
+    "screenshots": "node scripts/screenshots.mjs"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "playwright": "^1.56.1"
+  }
+}
