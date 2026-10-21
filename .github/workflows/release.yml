@@ -1,6 +1,16 @@
 name: Release
 
+# Run it by hand with the version to release (Actions → Release → Run workflow), or publish a release
+# from the GitHub UI: either way the card is stamped with the version and attached to the release.
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. 1.0.1)"
+        required: true
+      notes:
+        description: "Release notes (Markdown)"
+        required: false
   release:
     types:
       - published
@@ -16,12 +26,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Stamp the published version into the card before packaging.
-      - name: Set version
+      - name: Resolve tag
+        id: tag
         run: |
-          sed -i "s/const CARD_VERSION = \".*\";/const CARD_VERSION = \"${GITHUB_REF_NAME#v}\";/" dist/ha-uv-card.js
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ inputs.version }}"
+            echo "tag=v${VERSION#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Upload ha-uv-card.js to the release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/ha-uv-card.js
+      # Stamp the released version into the card before packaging.
+      - name: Set version
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          sed -i "s/const CARD_VERSION = \".*\";/const CARD_VERSION = \"${TAG#v}\";/" dist/ha-uv-card.js
+
+      - name: Create the release or attach ha-uv-card.js to it
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
+          NOTES: ${{ inputs.notes }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/ha-uv-card.js --clobber
+          else
+            gh release create "$TAG" dist/ha-uv-card.js --target "$GITHUB_SHA" --title "$TAG" --notes "${NOTES:-Release $TAG}"
+          fi
