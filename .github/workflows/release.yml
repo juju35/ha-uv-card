@@ -1,56 +1,55 @@
 name: Release
 
-# Run it by hand with the version to release (Actions → Release → Run workflow), or publish a release
-# from the GitHub UI: either way the card is stamped with the version and attached to the release.
+# Publishes a GitHub release whenever main carries a version that has no tag yet:
+# bump "version" in package.json, add its CHANGELOG.md section, push, and the release follows.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
-    inputs:
-      version:
-        description: "Version to release (e.g. 1.0.1)"
-        required: true
-      notes:
-        description: "Release notes (Markdown)"
-        required: false
-  release:
-    types:
-      - published
 
 permissions:
   contents: write
 
 jobs:
   release:
-    name: Attach card to release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Resolve tag
-        id: tag
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Read version
+        id: version
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ inputs.version }}"
-            echo "tag=v${VERSION#v}" >> "$GITHUB_OUTPUT"
+          VERSION="$(node -p "require('./package.json').version")"
+          test -n "$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
           else
-            echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+            echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-      # Stamp the released version into the card before packaging.
-      - name: Set version
-        env:
-          TAG: ${{ steps.tag.outputs.tag }}
+      - name: Check build and notes
+        if: steps.version.outputs.exists == 'false'
         run: |
-          sed -i "s/const CARD_VERSION = \".*\";/const CARD_VERSION = \"${TAG#v}\";/" dist/ha-uv-card.js
+          npm run check
+          .github/scripts/release-notes.sh "${{ steps.version.outputs.version }}" > notes.md
+          test -s notes.md
 
-      - name: Create the release or attach ha-uv-card.js to it
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ steps.tag.outputs.tag }}
-          NOTES: ${{ inputs.notes }}
-        run: |
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" dist/ha-uv-card.js --clobber
-          else
-            gh release create "$TAG" dist/ha-uv-card.js --target "$GITHUB_SHA" --title "$TAG" --notes "${NOTES:-Release $TAG}"
-          fi
+      - name: Publish release
+        if: steps.version.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          files: dist/ha-uv-card.js
+          body_path: notes.md
+          make_latest: true
