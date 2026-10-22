@@ -67,7 +67,7 @@ class UvIndexCard extends HTMLElement {
   // Visual editor: Home Assistant's native form.
   static getConfigForm() {
     const ha = document.querySelector("home-assistant");
-    const lang = (ha && ha.hass && ha.hass.language) || "en";
+    const lang = (ha?.hass?.language) || "en";
     const t = (key) => localize(key, lang);
     return {
       schema: [
@@ -176,12 +176,12 @@ class UvIndexCard extends HTMLElement {
 
     // Language: explicit config wins, otherwise follow the Home Assistant UI.
     const lang =
-      this._config.language || (this._hass && this._hass.language) || "en";
+      this._config.language || (this._hass?.language) || "en";
 
     const level = available ? levelFor(raw) : null;
     const name =
       this._config.name ||
-      (stateObj && stateObj.attributes.friendly_name) ||
+      (stateObj?.attributes.friendly_name) ||
       localize("name", lang);
 
     const valueText = available ? String(Math.round(raw)) : "—";
