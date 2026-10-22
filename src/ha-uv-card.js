@@ -205,8 +205,8 @@ class UvIndexCard extends HTMLElement {
           align-items: ${alignItems};
           justify-content: ${justify};
           text-align: ${vertical ? "center" : "left"};
-          gap: ${vertical ? "8px" : "16px"};
-          padding: 16px;
+          gap: ${vertical ? "8px" : "12px"};
+          padding: 12px;
           box-sizing: border-box;
           ${top ? "height: 100%;" : ""}
           cursor: pointer;
@@ -214,8 +214,8 @@ class UvIndexCard extends HTMLElement {
           ${transparent ? "background: none; box-shadow: none; border: none;" : ""}
         }
         .icon {
-          width: 72px;
-          height: 72px;
+          width: 56px;
+          height: 56px;
           flex: 0 0 auto;
         }
         .icon svg {
@@ -231,7 +231,7 @@ class UvIndexCard extends HTMLElement {
           min-width: 0;
         }
         .name {
-          font-size: 18px;
+          font-size: 16px;
           font-weight: 500;
           line-height: 1.25;
           color: var(--primary-text-color);
@@ -241,7 +241,7 @@ class UvIndexCard extends HTMLElement {
           max-width: 100%;
         }
         .value {
-          font-size: 32px;
+          font-size: 28px;
           font-weight: 500;
           line-height: 1.1;
           color: var(--uv-color);
@@ -249,9 +249,9 @@ class UvIndexCard extends HTMLElement {
         .label {
           display: inline-block;
           margin-top: 2px;
-          padding: 2px 10px;
+          padding: 1px 8px;
           border-radius: 12px;
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 500;
           color: var(--uv-color);
           background: color-mix(in srgb, var(--uv-color) 15%, transparent);
