@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0
+
+### Changes
+- More compact layout with the same information, like the other ha-* cards: 12 px card padding, 36 px header icon, 16 px name and 12 px subtitle, 11 px pills, tighter tiles and sections.
+- Animated icon 72 → 56 px, value 32 → 28 px.
+
 ## 1.2.0
 
 ### What's new
