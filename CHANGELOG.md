@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.4.1
+
+### Changes
+- The card keeps the keyboard focus when its value changes, so Enter or Space still opens the entity dialog; a card without the focus never takes it.
+
+### Maintenance
+- New focus tests (7 in all); the screenshot script renders each capture in its own page, and the duplicate-code check ignores test folders.
+
+## 1.4.0
+
+### Changes
+- The risk level now follows the value shown: a state of 2.4 displays "2" with *Low* (it used to say *Moderate*); the same at 5.4, 7.4 and 10.4.
+- Loading the card twice (HACS and `/local/`, or two `?v=` URLs) no longer breaks it or lists it twice in the card picker.
+- Keyboard access: the card can be focused and Enter or Space opens the entity dialog.
+- Visual editor labels translated in German, Spanish, Italian, Dutch and Portuguese, like the card.
+
+### Maintenance
+- CI: actions pinned by commit SHA, read-only token permissions, Dependabot for GitHub Actions, duplicate-code annotations, and a `node --test` suite run on every push.
+
 ## 1.3.1
 
 ### Maintenance

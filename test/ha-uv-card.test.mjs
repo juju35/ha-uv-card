@@ -16,13 +16,50 @@ function sandbox(shared = { registry: new Map(), customCards: undefined }) {
   const { registry } = shared;
   class HTMLElement {
     attachShadow() {
-      this.shadowRoot = { innerHTML: "", querySelector: () => ({ addEventListener() {} }) };
-      return this.shadowRoot;
+      // Each render (innerHTML) creates a new ha-card, which keeps its listeners
+      // so a test can fire them; focus() makes it the shadow root's activeElement
+      const root = {
+        html: "",
+        card: null,
+        activeElement: null,
+        renders: 0,
+        get innerHTML() {
+          return this.html;
+        },
+        set innerHTML(html) {
+          this.html = html;
+          this.renders++;
+          this.activeElement = null;
+          const card = {
+            listeners: {},
+            addEventListener(type, fn) {
+              this.listeners[type] = fn;
+            },
+            focus(options) {
+              root.activeElement = card;
+              root.focusOptions = options;
+            },
+          };
+          this.card = card;
+        },
+        querySelector() {
+          return this.card;
+        },
+      };
+      this.shadowRoot = root;
+      return root;
+    }
+    dispatchEvent(event) {
+      (this.events ||= []).push(event);
     }
   }
   const context = {
     HTMLElement,
-    Event: class {},
+    CustomEvent: class {
+      constructor(type, init = {}) {
+        Object.assign(this, init, { type });
+      }
+    },
     console: { info() {} },
     document: { querySelector: () => null },
     customElements: {
@@ -80,4 +117,58 @@ test("loading the resource twice does not throw nor duplicate the picker entry",
   const second = sandbox(first.shared);
   assert.doesNotThrow(() => vm.runInContext(source, second));
   assert.equal(second.customCards.filter((c) => c.type === "ha-uv-card").length, 1);
+});
+
+function card(lang = "en") {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const el = new (ctx.customElements.get("ha-uv-card"))();
+  el.setConfig({ entity: "sensor.uv" });
+  el.hass = { language: lang, states: { "sensor.uv": { state: "4", attributes: {} } } };
+  return { ctx, el };
+}
+
+test("the card is a focusable button that opens more-info with Enter or Space", () => {
+  const { el } = card();
+  assert.match(el.shadowRoot.innerHTML, /<ha-card role="button" tabindex="0">/);
+  const { listeners } = el.shadowRoot.card;
+  let prevented = 0;
+  for (const key of ["Enter", " ", "a"]) listeners.keydown({ key, preventDefault: () => prevented++ });
+  listeners.click();
+  assert.equal(prevented, 2);
+  assert.equal(el.events.length, 3);
+  for (const ev of el.events) {
+    assert.equal(ev.type, "hass-more-info");
+    assert.deepEqual({ ...ev.detail }, { entityId: "sensor.uv" });
+    assert.equal(ev.bubbles, true);
+    assert.equal(ev.composed, true);
+  }
+});
+
+test("every language has the editor labels", () => {
+  const ctx = sandbox();
+  vm.runInContext(`${source}\nshared.TRANSLATIONS = TRANSLATIONS;`, ctx);
+  const { TRANSLATIONS } = ctx.shared;
+  const keys = Object.keys(TRANSLATIONS.en).sort();
+  for (const [lang, dict] of Object.entries(TRANSLATIONS)) {
+    assert.deepEqual(Object.keys(dict).sort(), keys, lang);
+  }
+});
+
+test("a focused card keeps the keyboard focus when the value changes", () => {
+  const { el } = card();
+  const before = el.shadowRoot.renders;
+  el.shadowRoot.card.focus();
+  el.hass = { language: "en", states: { "sensor.uv": { state: "8", attributes: {} } } };
+  assert.equal(el.shadowRoot.renders, before + 1);
+  assert.equal(el.shadowRoot.activeElement, el.shadowRoot.card);
+  assert.deepEqual({ ...el.shadowRoot.focusOptions }, { preventScroll: true });
+});
+
+test("an unfocused card does not take the focus when the value changes", () => {
+  const { el } = card();
+  const before = el.shadowRoot.renders;
+  el.hass = { language: "en", states: { "sensor.uv": { state: "8", attributes: {} } } };
+  assert.equal(el.shadowRoot.renders, before + 1);
+  assert.equal(el.shadowRoot.activeElement, null);
 });
