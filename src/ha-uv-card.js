@@ -212,6 +212,11 @@ class UvIndexCard extends HTMLElement {
     const alignItems = !vertical && top ? "flex-start" : "center";
     const justify = vertical && top ? "flex-start" : "center";
 
+    // The rebuild replaces the focusable ha-card: give the focus back to the
+    // new one when the old one had it (keyboard users stay on the card)
+    const prev = this.shadowRoot.querySelector("ha-card");
+    const hadFocus = !!prev && this.shadowRoot.activeElement === prev;
+
     this.shadowRoot.innerHTML = `
       <style>
         ha-card {
@@ -283,6 +288,7 @@ class UvIndexCard extends HTMLElement {
     `;
 
     const card = this.shadowRoot.querySelector("ha-card");
+    if (hadFocus) card.focus({ preventScroll: true });
     card.addEventListener("click", () => this._openMoreInfo(entityId));
     // Keyboard: Enter or Space opens the entity dialog, like a button
     card.addEventListener("keydown", (ev) => {

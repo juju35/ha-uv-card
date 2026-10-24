@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.1
+
+### Changes
+- The card keeps the keyboard focus when its value changes, so Enter or Space still opens the entity dialog; a card without the focus never takes it.
+
+### Maintenance
+- New focus tests (7 in all); the screenshot script renders each capture in its own page, and the duplicate-code check ignores test folders.
+
 ## 1.4.0
 
 ### Changes
