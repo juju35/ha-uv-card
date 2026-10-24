@@ -37,11 +37,26 @@ const TRANSLATIONS = {
         ed_entity: "Capteur d'indice UV", ed_name: "Nom", ed_layout: "Disposition", ed_horizontal: "Horizontale", ed_vertical: "Verticale",
         ed_align: "Alignement", ed_center: "Centré", ed_top: "En haut", ed_show_value: "Afficher la valeur", ed_show_label: "Afficher le niveau de risque",
         ed_transparent: "Fond transparent", ed_language: "Langue" },
-  de: { name: "UV-Index", low: "Niedrig", moderate: "Mäßig", high: "Hoch", very_high: "Sehr hoch", extreme: "Extrem", unavailable: "Nicht verfügbar" },
-  es: { name: "Índice UV", low: "Bajo", moderate: "Moderado", high: "Alto", very_high: "Muy alto", extreme: "Extremo", unavailable: "No disponible" },
-  it: { name: "Indice UV", low: "Basso", moderate: "Moderato", high: "Alto", very_high: "Molto alto", extreme: "Estremo", unavailable: "Non disponibile" },
-  nl: { name: "UV-index", low: "Laag", moderate: "Matig", high: "Hoog", very_high: "Zeer hoog", extreme: "Extreem", unavailable: "Niet beschikbaar" },
-  pt: { name: "Índice UV", low: "Baixo", moderate: "Moderado", high: "Alto", very_high: "Muito alto", extreme: "Extremo", unavailable: "Indisponível" },
+  de: { name: "UV-Index", low: "Niedrig", moderate: "Mäßig", high: "Hoch", very_high: "Sehr hoch", extreme: "Extrem", unavailable: "Nicht verfügbar",
+        ed_entity: "UV-Index-Sensor", ed_name: "Name", ed_layout: "Anordnung", ed_horizontal: "Horizontal", ed_vertical: "Vertikal",
+        ed_align: "Ausrichtung", ed_center: "Zentriert", ed_top: "Oben", ed_show_value: "Wert anzeigen", ed_show_label: "Risikostufe anzeigen",
+        ed_transparent: "Transparenter Hintergrund", ed_language: "Sprache" },
+  es: { name: "Índice UV", low: "Bajo", moderate: "Moderado", high: "Alto", very_high: "Muy alto", extreme: "Extremo", unavailable: "No disponible",
+        ed_entity: "Sensor de índice UV", ed_name: "Nombre", ed_layout: "Disposición", ed_horizontal: "Horizontal", ed_vertical: "Vertical",
+        ed_align: "Alineación", ed_center: "Centrado", ed_top: "Arriba", ed_show_value: "Mostrar el valor", ed_show_label: "Mostrar el nivel de riesgo",
+        ed_transparent: "Fondo transparente", ed_language: "Idioma" },
+  it: { name: "Indice UV", low: "Basso", moderate: "Moderato", high: "Alto", very_high: "Molto alto", extreme: "Estremo", unavailable: "Non disponibile",
+        ed_entity: "Sensore indice UV", ed_name: "Nome", ed_layout: "Disposizione", ed_horizontal: "Orizzontale", ed_vertical: "Verticale",
+        ed_align: "Allineamento", ed_center: "Centrato", ed_top: "In alto", ed_show_value: "Mostra il valore", ed_show_label: "Mostra il livello di rischio",
+        ed_transparent: "Sfondo trasparente", ed_language: "Lingua" },
+  nl: { name: "UV-index", low: "Laag", moderate: "Matig", high: "Hoog", very_high: "Zeer hoog", extreme: "Extreem", unavailable: "Niet beschikbaar",
+        ed_entity: "UV-indexsensor", ed_name: "Naam", ed_layout: "Indeling", ed_horizontal: "Horizontaal", ed_vertical: "Verticaal",
+        ed_align: "Uitlijning", ed_center: "Gecentreerd", ed_top: "Boven", ed_show_value: "Waarde tonen", ed_show_label: "Risiconiveau tonen",
+        ed_transparent: "Transparante achtergrond", ed_language: "Taal" },
+  pt: { name: "Índice UV", low: "Baixo", moderate: "Moderado", high: "Alto", very_high: "Muito alto", extreme: "Extremo", unavailable: "Indisponível",
+        ed_entity: "Sensor de índice UV", ed_name: "Nome", ed_layout: "Disposição", ed_horizontal: "Horizontal", ed_vertical: "Vertical",
+        ed_align: "Alinhamento", ed_center: "Centrado", ed_top: "Em cima", ed_show_value: "Mostrar o valor", ed_show_label: "Mostrar o nível de risco",
+        ed_transparent: "Fundo transparente", ed_language: "Idioma" },
 };
 
 const LANGUAGE_NAMES = { en: "English", fr: "Français", de: "Deutsch", es: "Español", it: "Italiano", nl: "Nederlands", pt: "Português" };
@@ -102,7 +117,6 @@ class UvIndexCard extends HTMLElement {
     }
     this._config = {
       ...config,
-      name: config.name,
       show_label: config.show_label !== false,
       show_value: config.show_value !== false,
       // "horizontal" = text to the right (default), "vertical" = text below.
@@ -258,7 +272,7 @@ class UvIndexCard extends HTMLElement {
           background: color-mix(in srgb, var(--uv-color) 15%, transparent);
         }
       </style>
-      <ha-card>
+      <ha-card role="button" tabindex="0">
         <div class="icon" title="${esc(labelText)}">${iconSvg(index)}</div>
         <div class="info">
           <div class="name">${esc(name)}</div>
@@ -270,12 +284,16 @@ class UvIndexCard extends HTMLElement {
 
     const card = this.shadowRoot.querySelector("ha-card");
     card.addEventListener("click", () => this._openMoreInfo(entityId));
+    // Keyboard: Enter or Space opens the entity dialog, like a button
+    card.addEventListener("keydown", (ev) => {
+      if (ev.key !== "Enter" && ev.key !== " ") return;
+      ev.preventDefault();
+      this._openMoreInfo(entityId);
+    });
   }
 
   _openMoreInfo(entityId) {
-    const event = new Event("hass-more-info", { bubbles: true, composed: true });
-    event.detail = { entityId };
-    this.dispatchEvent(event);
+    this.dispatchEvent(new CustomEvent("hass-more-info", { detail: { entityId }, bubbles: true, composed: true }));
   }
 }
 
