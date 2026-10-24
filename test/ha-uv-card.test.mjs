@@ -16,10 +16,38 @@ function sandbox(shared = { registry: new Map(), customCards: undefined }) {
   const { registry } = shared;
   class HTMLElement {
     attachShadow() {
-      // The ha-card keeps its listeners so a test can fire them
-      const card = { listeners: {}, addEventListener(type, fn) { this.listeners[type] = fn; } };
-      this.shadowRoot = { innerHTML: "", card, querySelector: () => card };
-      return this.shadowRoot;
+      // Each render (innerHTML) creates a new ha-card, which keeps its listeners
+      // so a test can fire them; focus() makes it the shadow root's activeElement
+      const root = {
+        html: "",
+        card: null,
+        activeElement: null,
+        renders: 0,
+        get innerHTML() {
+          return this.html;
+        },
+        set innerHTML(html) {
+          this.html = html;
+          this.renders++;
+          this.activeElement = null;
+          const card = {
+            listeners: {},
+            addEventListener(type, fn) {
+              this.listeners[type] = fn;
+            },
+            focus(options) {
+              root.activeElement = card;
+              root.focusOptions = options;
+            },
+          };
+          this.card = card;
+        },
+        querySelector() {
+          return this.card;
+        },
+      };
+      this.shadowRoot = root;
+      return root;
     }
     dispatchEvent(event) {
       (this.events ||= []).push(event);
@@ -125,4 +153,22 @@ test("every language has the editor labels", () => {
   for (const [lang, dict] of Object.entries(TRANSLATIONS)) {
     assert.deepEqual(Object.keys(dict).sort(), keys, lang);
   }
+});
+
+test("a focused card keeps the keyboard focus when the value changes", () => {
+  const { el } = card();
+  const before = el.shadowRoot.renders;
+  el.shadowRoot.card.focus();
+  el.hass = { language: "en", states: { "sensor.uv": { state: "8", attributes: {} } } };
+  assert.equal(el.shadowRoot.renders, before + 1);
+  assert.equal(el.shadowRoot.activeElement, el.shadowRoot.card);
+  assert.deepEqual({ ...el.shadowRoot.focusOptions }, { preventScroll: true });
+});
+
+test("an unfocused card does not take the focus when the value changes", () => {
+  const { el } = card();
+  const before = el.shadowRoot.renders;
+  el.hass = { language: "en", states: { "sensor.uv": { state: "8", attributes: {} } } };
+  assert.equal(el.shadowRoot.renders, before + 1);
+  assert.equal(el.shadowRoot.activeElement, null);
 });
