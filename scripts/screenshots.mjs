@@ -67,8 +67,10 @@ const pageHtml = (theme, width) => `<!doctype html><html><head><meta charset="ut
 // extra: more stand-in elements, as script source.
 export async function render(shots, { icons = {}, hass = {}, extra = "" } = {}) {
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
-  const page = await browser.newPage({ deviceScaleFactor: 2, viewport: { width: 1000, height: 2000 } });
   for (const s of shots) {
+    // A fresh page per shot: the scripts declare top-level constants
+    const page = await browser.newPage({ deviceScaleFactor: 2, viewport: { width: 1000, height: 2000 } });
+    page.on("pageerror", (err) => console.error(`page error: ${err.message}`));
     await page.setContent(pageHtml(s.theme, s.width));
     await page.addScriptTag({ content: haElements(icons) + extra });
     await page.addScriptTag({ content: cardJs });
@@ -86,6 +88,7 @@ export async function render(shots, { icons = {}, hass = {}, extra = "" } = {}) 
     await page.waitForTimeout(400);
     await page.locator(s.type).screenshot({ path: `${root}screenshots/${s.file}.png`, animations: "disabled" });
     console.log(`screenshots/${s.file}.png`);
+    await page.close();
   }
   await browser.close();
 }
