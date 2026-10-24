@@ -178,7 +178,8 @@ class UvIndexCard extends HTMLElement {
     const lang =
       this._config.language || (this._hass?.language) || "en";
 
-    const level = available ? levelFor(raw) : null;
+    // WHO bands are defined on whole numbers: use the value that is displayed.
+    const level = available ? levelFor(Math.round(raw)) : null;
     const name =
       this._config.name ||
       (stateObj?.attributes.friendly_name) ||
@@ -278,17 +279,20 @@ class UvIndexCard extends HTMLElement {
   }
 }
 
-customElements.define("ha-uv-card", UvIndexCard);
+// Guarded: the resource may be loaded twice (HACS and /local/, or two ?v= URLs).
+if (!customElements.get("ha-uv-card")) {
+  customElements.define("ha-uv-card", UvIndexCard);
 
-// Register the card so it shows up in the dashboard card picker.
-window.customCards = window.customCards || [];
-window.customCards.push({
-  type: "ha-uv-card",
-  name: "UV Index Card",
-  description: "Displays the current UV index with an animated weather-style icon.",
-  preview: true,
-  documentationURL: "https://github.com/juju35/ha-uv-card",
-});
+  // Register the card so it shows up in the dashboard card picker.
+  window.customCards = window.customCards || [];
+  window.customCards.push({
+    type: "ha-uv-card",
+    name: "UV Index Card",
+    description: "Displays the current UV index with an animated weather-style icon.",
+    preview: true,
+    documentationURL: "https://github.com/juju35/ha-uv-card",
+  });
+}
 
 console.info(
   `%c HA-UV-CARD %c v${CARD_VERSION} `,
