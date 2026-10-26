@@ -281,8 +281,8 @@ class UvIndexCard extends HTMLElement {
           min-width: 0;
         }
         .value {
-          font-size: 28px;
-          font-weight: 500;
+          font-size: 30px;
+          font-weight: 400;
           line-height: 1.1;
           color: var(--uv-color);
         }
