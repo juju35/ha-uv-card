@@ -227,10 +227,12 @@ class UvIndexCard extends HTMLElement {
           --uv-color: ${color};
           ${transparent ? "background: none; box-shadow: none; border: none;" : ""}
         }
+        /* The body starts 8px under the header (the card gap is 10px). */
         .header {
           display: flex;
           align-items: center;
           gap: 10px;
+          margin-bottom: -2px;
         }
         .badge {
           width: 40px;
