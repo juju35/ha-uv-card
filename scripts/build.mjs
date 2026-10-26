@@ -12,9 +12,11 @@ const icons = {};
 for (let i = 0; i <= 11; i++) icons[i] = svg(`uv-index-${i}`);
 icons.default = svg("uv-index");
 
+// Function replacers: a literal string replacement would interpret "$" patterns
+// ($&, $$, $1...) in the version or the inlined SVGs and corrupt the output.
 const out = readFileSync(`${root}src/ha-uv-card.js`, "utf8")
-  .replace("__VERSION__", pkg.version)
-  .replace("__ICONS__", JSON.stringify(icons, null, 2));
+  .replace("__VERSION__", () => pkg.version)
+  .replace("__ICONS__", () => JSON.stringify(icons, null, 2));
 
 mkdirSync(`${root}dist`, { recursive: true });
 writeFileSync(`${root}dist/ha-uv-card.js`, out);
