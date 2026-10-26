@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Changes
+- Standard header like the other cards: a sun icon in a round badge tinted with the risk level color, then the name (16 px). The animated icon, value and risk level sit below it, side by side or stacked with `layout: vertical`. The card takes one more row in the sections view (3 rows, 4 when vertical).
+- The UV index value is 30 px at regular weight (was 28 px medium), like the other cards' main value.
+- Header geometry: the icon and value start 8 px under the header (was 10 px); badge 12 px from the top and left edges.
+
 ## 1.4.1
 
 ### Changes
