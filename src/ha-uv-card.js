@@ -149,14 +149,14 @@ class UvIndexCard extends HTMLElement {
   }
 
   getCardSize() {
-    return this._config && this._config.layout === "vertical" ? 3 : 2;
+    return this._config && this._config.layout === "vertical" ? 4 : 3;
   }
 
   getGridOptions() {
     const vertical = this._config && this._config.layout === "vertical";
     return vertical
-      ? { columns: 3, min_columns: 3, rows: 3, min_rows: 3 }
-      : { columns: 6, min_columns: 4, rows: 2, min_rows: 2 };
+      ? { columns: 3, min_columns: 3, rows: 4, min_rows: 4 }
+      : { columns: 6, min_columns: 4, rows: 3, min_rows: 3 };
   }
 
   static getStubConfig(hass) {
@@ -208,10 +208,6 @@ class UvIndexCard extends HTMLElement {
     const transparent = this._config.transparent;
     const top = this._config.align === "top";
 
-    // Cross-axis (horizontal layout) and main-axis (vertical layout) alignment.
-    const alignItems = !vertical && top ? "flex-start" : "center";
-    const justify = vertical && top ? "flex-start" : "center";
-
     // The rebuild replaces the focusable ha-card: give the focus back to the
     // new one when the old one had it (keyboard users stay on the card)
     const prev = this.shadowRoot.querySelector("ha-card");
@@ -221,17 +217,51 @@ class UvIndexCard extends HTMLElement {
       <style>
         ha-card {
           display: flex;
-          flex-direction: ${vertical ? "column" : "row"};
-          align-items: ${alignItems};
-          justify-content: ${justify};
-          text-align: ${vertical ? "center" : "left"};
-          gap: ${vertical ? "8px" : "12px"};
+          flex-direction: column;
+          justify-content: ${top ? "flex-start" : "center"};
+          gap: 10px;
           padding: 12px;
           box-sizing: border-box;
           ${top ? "height: 100%;" : ""}
           cursor: pointer;
           --uv-color: ${color};
           ${transparent ? "background: none; box-shadow: none; border: none;" : ""}
+        }
+        .header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .badge {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          flex: none;
+          background: color-mix(in srgb, var(--uv-color) 16%, transparent);
+          color: var(--uv-color);
+          --mdc-icon-size: 24px;
+        }
+        .titles {
+          flex: 1;
+          min-width: 0;
+        }
+        .name {
+          font-size: 16px;
+          font-weight: 500;
+          line-height: 1.25;
+          color: var(--primary-text-color);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .body {
+          display: flex;
+          flex-direction: ${vertical ? "column" : "row"};
+          align-items: center;
+          text-align: ${vertical ? "center" : "left"};
+          gap: ${vertical ? "8px" : "12px"};
         }
         .icon {
           width: 56px;
@@ -249,16 +279,6 @@ class UvIndexCard extends HTMLElement {
           align-items: ${vertical ? "center" : "flex-start"};
           gap: 2px;
           min-width: 0;
-        }
-        .name {
-          font-size: 16px;
-          font-weight: 500;
-          line-height: 1.25;
-          color: var(--primary-text-color);
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          max-width: 100%;
         }
         .value {
           font-size: 28px;
@@ -278,11 +298,16 @@ class UvIndexCard extends HTMLElement {
         }
       </style>
       <ha-card role="button" tabindex="0">
-        <div class="icon" title="${esc(labelText)}">${iconSvg(index)}</div>
-        <div class="info">
-          <div class="name">${esc(name)}</div>
-          ${this._config.show_value ? `<div class="value">${valueText}</div>` : ""}
-          ${this._config.show_label ? `<div class="label">${esc(labelText)}</div>` : ""}
+        <div class="header">
+          <div class="badge"><ha-icon icon="mdi:sun-wireless-outline"></ha-icon></div>
+          <div class="titles"><div class="name">${esc(name)}</div></div>
+        </div>
+        <div class="body">
+          <div class="icon" title="${esc(labelText)}">${iconSvg(index)}</div>
+          <div class="info">
+            ${this._config.show_value ? `<div class="value">${valueText}</div>` : ""}
+            ${this._config.show_label ? `<div class="label">${esc(labelText)}</div>` : ""}
+          </div>
         </div>
       </ha-card>
     `;
