@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.0 — 2026-10-26
+
+### Maintenance
+- Build: the version and inlined icon SVGs are now injected with function replacements, so any `$` pattern (`$&`, `$$`, `$1`...) in a future icon or version string is inserted literally instead of being interpreted and silently corrupting `dist/ha-uv-card.js`.
+
 ## 1.5.0
 ### Changes
 - Standard header like the other cards: a sun icon in a round badge tinted with the risk level color, then the name (16 px). The animated icon, value and risk level sit below it, side by side or stacked with `layout: vertical`. The card takes one more row in the sections view (3 rows, 4 when vertical).
