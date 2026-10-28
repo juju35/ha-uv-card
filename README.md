@@ -77,9 +77,21 @@ entity: sensor.uv_index
 
 ## Screenshots
 
-| Light | Dark (French) | Vertical |
+| Light | Dark | Vertical |
 |---|---|---|
 | ![Light](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card.png) | ![Dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-dark.png) | ![Vertical](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-vertical.png) |
+
+## Animations
+
+One animated icon per WHO risk band — the sun rays sweep continuously while the badge, value and label take the band's colour.
+
+| Animation | Description |
+|---|---|
+| ![Low](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-low.gif) | **Low (0–2)** — green badge, animated sun. |
+| ![Moderate](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-moderate.gif) | **Moderate (3–5)** — yellow badge, animated sun. |
+| ![High](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-high.gif) | **High (6–7)** — orange badge, animated sun. |
+| ![Very High](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-very-high.gif) | **Very High (8–10)** — red badge, animated sun. |
+| ![Extreme](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-extreme.gif) | **Extreme (11+)** — purple 11+ badge, animated sun. |
 
 ## How it works
 
@@ -92,7 +104,10 @@ npm install
 npm run build        # src/ + icons/ → dist/ha-uv-card.js
 npm run check        # builds and checks the card (run in CI)
 npm run screenshots  # renders the README screenshots
+npm run gifs         # records the README GIFs, one per risk band (needs ffmpeg)
 ```
+
+The **Screenshots** workflow re-renders the screenshots and GIFs on every pull request that touches `src/`, `icons/` or `scripts/` and commits them back onto the PR branch (or uploads them as an artifact on a manual run).
 
 `dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where HACS downloads it from.
 

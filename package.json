@@ -8,7 +8,8 @@
     "build": "node scripts/build.mjs",
     "check": "node scripts/build.mjs && node --check dist/ha-uv-card.js",
     "test": "node --test test/*.test.mjs",
-    "screenshots": "node scripts/screenshots.mjs"
+    "screenshots": "node scripts/screenshots.mjs",
+    "gifs": "node scripts/gifs.mjs"
   },
   "license": "MIT",
   "devDependencies": {
