@@ -32,31 +32,31 @@ const TRANSLATIONS = {
   en: { name: "UV Index", low: "Low", moderate: "Moderate", high: "High", very_high: "Very High", extreme: "Extreme", unavailable: "Unavailable",
         ed_entity: "UV index sensor", ed_name: "Name", ed_layout: "Layout", ed_horizontal: "Horizontal", ed_vertical: "Vertical",
         ed_align: "Alignment", ed_center: "Center", ed_top: "Top", ed_show_value: "Show the value", ed_show_label: "Show the risk level",
-        ed_transparent: "Transparent background", ed_language: "Language" },
+        ed_transparent: "Transparent background", ed_language: "Language", ed_auto: "Auto (Home Assistant)" },
   fr: { name: "Indice UV", low: "Faible", moderate: "Modéré", high: "Élevé", very_high: "Très élevé", extreme: "Extrême", unavailable: "Indisponible",
         ed_entity: "Capteur d'indice UV", ed_name: "Nom", ed_layout: "Disposition", ed_horizontal: "Horizontale", ed_vertical: "Verticale",
         ed_align: "Alignement", ed_center: "Centré", ed_top: "En haut", ed_show_value: "Afficher la valeur", ed_show_label: "Afficher le niveau de risque",
-        ed_transparent: "Fond transparent", ed_language: "Langue" },
+        ed_transparent: "Fond transparent", ed_language: "Langue", ed_auto: "Automatique (Home Assistant)" },
   de: { name: "UV-Index", low: "Niedrig", moderate: "Mäßig", high: "Hoch", very_high: "Sehr hoch", extreme: "Extrem", unavailable: "Nicht verfügbar",
         ed_entity: "UV-Index-Sensor", ed_name: "Name", ed_layout: "Anordnung", ed_horizontal: "Horizontal", ed_vertical: "Vertikal",
         ed_align: "Ausrichtung", ed_center: "Zentriert", ed_top: "Oben", ed_show_value: "Wert anzeigen", ed_show_label: "Risikostufe anzeigen",
-        ed_transparent: "Transparenter Hintergrund", ed_language: "Sprache" },
+        ed_transparent: "Transparenter Hintergrund", ed_language: "Sprache", ed_auto: "Automatisch (Home Assistant)" },
   es: { name: "Índice UV", low: "Bajo", moderate: "Moderado", high: "Alto", very_high: "Muy alto", extreme: "Extremo", unavailable: "No disponible",
         ed_entity: "Sensor de índice UV", ed_name: "Nombre", ed_layout: "Disposición", ed_horizontal: "Horizontal", ed_vertical: "Vertical",
         ed_align: "Alineación", ed_center: "Centrado", ed_top: "Arriba", ed_show_value: "Mostrar el valor", ed_show_label: "Mostrar el nivel de riesgo",
-        ed_transparent: "Fondo transparente", ed_language: "Idioma" },
+        ed_transparent: "Fondo transparente", ed_language: "Idioma", ed_auto: "Automático (Home Assistant)" },
   it: { name: "Indice UV", low: "Basso", moderate: "Moderato", high: "Alto", very_high: "Molto alto", extreme: "Estremo", unavailable: "Non disponibile",
         ed_entity: "Sensore indice UV", ed_name: "Nome", ed_layout: "Disposizione", ed_horizontal: "Orizzontale", ed_vertical: "Verticale",
         ed_align: "Allineamento", ed_center: "Centrato", ed_top: "In alto", ed_show_value: "Mostra il valore", ed_show_label: "Mostra il livello di rischio",
-        ed_transparent: "Sfondo trasparente", ed_language: "Lingua" },
+        ed_transparent: "Sfondo trasparente", ed_language: "Lingua", ed_auto: "Automatico (Home Assistant)" },
   nl: { name: "UV-index", low: "Laag", moderate: "Matig", high: "Hoog", very_high: "Zeer hoog", extreme: "Extreem", unavailable: "Niet beschikbaar",
         ed_entity: "UV-indexsensor", ed_name: "Naam", ed_layout: "Indeling", ed_horizontal: "Horizontaal", ed_vertical: "Verticaal",
         ed_align: "Uitlijning", ed_center: "Gecentreerd", ed_top: "Boven", ed_show_value: "Waarde tonen", ed_show_label: "Risiconiveau tonen",
-        ed_transparent: "Transparante achtergrond", ed_language: "Taal" },
+        ed_transparent: "Transparante achtergrond", ed_language: "Taal", ed_auto: "Automatisch (Home Assistant)" },
   pt: { name: "Índice UV", low: "Baixo", moderate: "Moderado", high: "Alto", very_high: "Muito alto", extreme: "Extremo", unavailable: "Indisponível",
         ed_entity: "Sensor de índice UV", ed_name: "Nome", ed_layout: "Disposição", ed_horizontal: "Horizontal", ed_vertical: "Vertical",
         ed_align: "Alinhamento", ed_center: "Centrado", ed_top: "Em cima", ed_show_value: "Mostrar o valor", ed_show_label: "Mostrar o nível de risco",
-        ed_transparent: "Fundo transparente", ed_language: "Idioma" },
+        ed_transparent: "Fundo transparente", ed_language: "Idioma", ed_auto: "Automático (Home Assistant)" },
 };
 
 const LANGUAGE_NAMES = { en: "English", fr: "Français", de: "Deutsch", es: "Español", it: "Italiano", nl: "Nederlands", pt: "Português" };
@@ -105,9 +105,14 @@ class UvIndexCard extends HTMLElement {
         { name: "show_value", default: true, selector: { boolean: {} } },
         { name: "show_label", default: true, selector: { boolean: {} } },
         { name: "transparent", default: false, selector: { boolean: {} } },
-        { name: "language", selector: { select: { mode: "dropdown", options: Object.entries(LANGUAGE_NAMES).map(([value, label]) => ({ value, label })) } } },
+        // Leading "auto" option (empty value) lets the editor revert to
+        // following the Home Assistant language once a language was picked.
+        { name: "language", selector: { select: { mode: "dropdown", options: [
+          { value: "", label: t("ed_auto") },
+          ...Object.entries(LANGUAGE_NAMES).map(([value, label]) => ({ value, label })),
+        ] } } },
       ],
-      computeLabel: (schema) => t(`ed_${schema.name}`),
+      computeLabel: (schema) => (schema.name ? t(`ed_${schema.name}`) : ""),
     };
   }
 

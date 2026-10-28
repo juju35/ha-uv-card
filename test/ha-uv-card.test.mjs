@@ -155,6 +155,19 @@ test("every language has the editor labels", () => {
   }
 });
 
+test("the editor language selector starts with an auto (empty) option", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const form = ctx.shared.registry.get("ha-uv-card").getConfigForm();
+  const language = form.schema.find((field) => field.name === "language");
+  const options = language.selector.select.options;
+  assert.deepEqual({ ...options[0] }, { value: "", label: "Auto (Home Assistant)" });
+  assert.ok(options.length > 1);
+  const grid = form.schema.find((field) => field.type === "grid");
+  assert.equal(form.computeLabel(grid), "");
+  assert.equal(form.computeLabel(language), "Language");
+});
+
 test("a focused card keeps the keyboard focus when the value changes", () => {
   const { el } = card();
   const before = el.shadowRoot.renders;
