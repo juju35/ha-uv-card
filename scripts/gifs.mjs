@@ -1,0 +1,60 @@
+// Records one animated GIF of the card per WHO risk band into screenshots/uv-<band>.gif (needs ffmpeg).
+// Usage: npm run build && npm run gifs
+// The icons animate with SMIL (<animateTransform>), which the Web Animations API does not
+// cover: the SVG document clock is paused and stepped frame by frame, so every GIF loops
+// cleanly whatever the machine's speed.
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { icons, render, uv } from "./screenshots.mjs";
+
+const root = fileURLToPath(new URL("..", import.meta.url));
+const WIDTH = 460;
+const FPS = 15;
+const SECONDS = 6; // one <animateTransform dur="6s"> cycle; the 8-fold ray pattern makes the 45° sweep seamless
+
+// One value per WHO band, matching the README's "Risk levels" table.
+const BANDS = [
+  { file: "uv-low", value: 1 },
+  { file: "uv-moderate", value: 4 },
+  { file: "uv-high", value: 7 },
+  { file: "uv-very-high", value: 9 },
+  { file: "uv-extreme", value: 11 },
+];
+
+const captureGif = (file) => async (page, clip) => {
+  await page.evaluate(() => {
+    const svg = document.querySelector("ha-uv-card").shadowRoot.querySelector(".icon svg");
+    svg.pauseAnimations();
+    window.__uvSvg = svg;
+  });
+  const dir = mkdtempSync(join(tmpdir(), "uv-frames-"));
+  const frames = FPS * SECONDS;
+  for (let i = 0; i < frames; i++) {
+    await page.evaluate((t) => window.__uvSvg.setCurrentTime(t), (i * SECONDS) / frames);
+    await page.screenshot({ path: join(dir, `f${String(i).padStart(3, "0")}.png`), clip });
+  }
+  // deviceScaleFactor is 2: scale back to CSS pixels and build a palette for a small, clean GIF.
+  execFileSync("ffmpeg", [
+    "-y", "-loglevel", "error", "-framerate", String(FPS), "-i", join(dir, "f%03d.png"),
+    "-vf", `scale=${clip.width}:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse=dither=bayer:bayer_scale=4`,
+    "-loop", "0", `${root}screenshots/${file}.gif`,
+  ]);
+  rmSync(dir, { recursive: true });
+  console.log(`screenshots/${file}.gif`);
+};
+
+await render(
+  BANDS.map(({ file, value }) => ({
+    file,
+    type: "ha-uv-card",
+    theme: "light",
+    width: WIDTH,
+    config: { entity: "sensor.uv_index" },
+    hass: { states: uv(value) },
+    capture: captureGif(file),
+  })),
+  { icons }
+);

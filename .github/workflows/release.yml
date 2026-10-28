@@ -5,6 +5,11 @@ name: Release
 on:
   push:
     branches: [main]
+    # A release only follows a version bump: skip the pushes that cannot carry
+    # one (workflow_dispatch covers the edge cases).
+    paths:
+      - package.json
+      - CHANGELOG.md
   workflow_dispatch:
 
 permissions:
