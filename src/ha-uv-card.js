@@ -183,7 +183,7 @@ class UvIndexCard extends HTMLElement {
     // Skip the rebuild if nothing visible changed (avoids the icon flicker
     // on every Home Assistant state tick).
     const sig = this._signature(stateObj);
-    if (sig === this._sig && this.shadowRoot) return;
+    if (sig === this._sig) return;
     this._sig = sig;
 
     const raw = stateObj ? Number(stateObj.state) : NaN;
@@ -348,10 +348,10 @@ if (!customElements.get("ha-uv-card")) {
     preview: true,
     documentationURL: "https://github.com/juju35/ha-uv-card",
   });
-}
 
-console.info(
-  `%c HA-UV-CARD %c v${CARD_VERSION} `,
-  "color: white; background: #f9a825; font-weight: 700;",
-  "color: #f9a825; background: white; font-weight: 700;"
-);
+  console.info(
+    `%c HA-UV-CARD %c v${CARD_VERSION} `,
+    "color: white; background: #f9a825; font-weight: 700;",
+    "color: #f9a825; background: white; font-weight: 700;"
+  );
+}
