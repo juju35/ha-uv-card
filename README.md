@@ -19,7 +19,7 @@ Lovelace card for Home Assistant that shows the current **UV index** with an ani
 - Horizontal or vertical layout, transparent mode, top alignment for stacks
 - Sections view support, card picker entry with preview
 - Tap to open the sensor's more-info dialog
-- 7 languages, following Home Assistant's
+- 7 languages, following Home Assistant's language setting
 
 ## Prerequisites
 
