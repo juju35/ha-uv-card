@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.6.1 — 2026-10-28
+
+### Changes
+- Visual editor: the language dropdown now starts with an "Auto (Home Assistant)" entry (translated in all seven languages), so a card can go back to following the Home Assistant language after a language was picked, without editing the YAML.
+- Loading the card twice no longer logs its version banner twice.
+
+### Maintenance
+- README: new Animations section with one GIF per WHO risk band, rendered by `npm run gifs`; refreshed screenshots and a corrected "Dark" column header.
+- CI: the release waits for the tests and only runs when `package.json` or `CHANGELOG.md` change, `hacs/action` is pinned on its 22.5.0 release, a Screenshots workflow re-renders stills and GIFs on pull requests, and the unused ruff tooling is gone.
+
 ## 1.6.0 — 2026-10-26
 
 ### Maintenance
