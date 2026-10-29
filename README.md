@@ -95,7 +95,7 @@ One animated icon per WHO risk band — the sun rays sweep continuously while th
 
 ## How it works
 
-The card reads the sensor's state, rounds it, then uses that rounded value both to pick one of the 12 icons (0 to 11, higher values use 11) and to map it to the WHO bands, so the value, icon and risk level always agree. It only redraws when the state, name, language or configuration change, so the icon animation doesn't restart on every Home Assistant update. Any non-numeric state shows the unavailable icon.
+The card reads the sensor's state, rounds it, then uses that rounded value both to pick one of the 12 icons (0 to 11, higher values use 11) and to map it to the WHO bands, so the value, icon and risk level always agree. The card is built once; afterwards it only updates its text, colour and layout attributes when the state, name, language or configuration change, and swaps the icon only when the rounded index changes, so the icon animation doesn't restart on every Home Assistant update. Any non-numeric or empty state shows the unavailable icon; a negative reading shows 0.
 
 ## Development
 
