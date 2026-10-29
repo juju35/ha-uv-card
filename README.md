@@ -77,9 +77,9 @@ entity: sensor.uv_index
 
 ## Screenshots
 
-| Light | Dark | Vertical |
-|---|---|---|
-| ![Light](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card.png) | ![Dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-dark.png) | ![Vertical](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-vertical.png) |
+| Light | Dark | Vertical | Unavailable |
+|---|---|---|---|
+| ![Light](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card.png) | ![Dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-dark.png) | ![Vertical](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-vertical.png) | ![Unavailable](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-unavailable.png) |
 
 ## Animations
 
@@ -95,7 +95,7 @@ One animated icon per WHO risk band — the sun rays sweep continuously while th
 
 ## How it works
 
-The card reads the sensor's state, rounds it, then uses that rounded value both to pick one of the 12 icons (0 to 11, higher values use 11) and to map it to the WHO bands, so the value, icon and risk level always agree. It only redraws when the state, name, language or configuration change, so the icon animation doesn't restart on every Home Assistant update. Any non-numeric state shows the unavailable icon.
+The card reads the sensor's state, rounds it, then uses that rounded value both to pick one of the 12 icons (0 to 11, higher values use 11) and to map it to the WHO bands, so the value, icon and risk level always agree. The card is built once; afterwards it only updates its text, colour and layout attributes when the state, name, language or configuration change, and swaps the icon only when the rounded index changes, so the icon animation doesn't restart on every Home Assistant update. Any non-numeric or empty state shows the unavailable icon; a negative reading shows 0.
 
 ## Development
 
@@ -107,7 +107,7 @@ npm run screenshots  # renders the README screenshots
 npm run gifs         # records the README GIFs, one per risk band (needs ffmpeg)
 ```
 
-The **Screenshots** workflow re-renders the screenshots and GIFs on every pull request that touches `src/`, `icons/` or `scripts/` and commits them back onto the PR branch (or uploads them as an artifact on a manual run).
+The **Screenshots** workflow re-renders the screenshots and GIFs on every pull request that touches `src/`, `icons/`, `scripts/` or the Playwright version (`package.json`, `package-lock.json`) and commits them back onto the PR branch (pull requests from forks are only rendered, not committed; a manual run uploads them as an artifact). A push made with `GITHUB_TOKEN` does not trigger `pull_request` workflows, so after committing the workflow dispatches Lint, Validate and HACS on the PR branch to check the new commit.
 
 `dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where HACS downloads it from.
 

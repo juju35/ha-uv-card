@@ -117,6 +117,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
       { file: "card", type: "ha-uv-card", theme: "light", width: 460, config: { entity: "sensor.uv_index" }, hass: { states: uv(6) } },
       { file: "card-dark", type: "ha-uv-card", theme: "dark", width: 460, config: { entity: "sensor.uv_index" }, hass: { states: uv(9) } },
       { file: "card-vertical", type: "ha-uv-card", theme: "light", width: 380, config: { entity: "sensor.uv_index", layout: "vertical", name: "UV" }, hass: { states: uv(2) } },
+      { file: "card-unavailable", type: "ha-uv-card", theme: "light", width: 460, config: { entity: "sensor.uv_index" }, hass: { states: uv("unavailable") } },
     ],
     { icons }
   );

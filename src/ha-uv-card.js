@@ -70,9 +70,111 @@ function localize(key, lang) {
   return dict[key] || TRANSLATIONS.en[key];
 }
 
-function esc(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-}
+// Static stylesheet, injected once. The per-render values are driven by the
+// --uv-color variable and the data-layout / data-align / data-transparent
+// attributes set on ha-card.
+const STYLE = `
+  ha-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+  ha-card[data-align="top"] {
+    justify-content: flex-start;
+    height: 100%;
+  }
+  ha-card[data-transparent] {
+    background: none;
+    box-shadow: none;
+    border: none;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  /* The body starts 8px under the header (the card gap is 10px). */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: -2px;
+  }
+  .badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex: none;
+    background: color-mix(in srgb, var(--uv-color) 16%, transparent);
+    color: var(--uv-color);
+    --mdc-icon-size: 24px;
+  }
+  .titles {
+    flex: 1;
+    min-width: 0;
+  }
+  .name {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.25;
+    color: var(--primary-text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .body {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    gap: 12px;
+  }
+  ha-card[data-layout="vertical"] .body {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+  .icon {
+    width: 56px;
+    height: 56px;
+    flex: 0 0 auto;
+  }
+  .icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 0;
+  }
+  ha-card[data-layout="vertical"] .info {
+    align-items: center;
+  }
+  .value {
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--uv-color);
+  }
+  .label {
+    display: inline-block;
+    margin-top: 2px;
+    padding: 1px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--uv-color);
+    background: color-mix(in srgb, var(--uv-color) 15%, transparent);
+  }
+`;
 
 function iconSvg(index) {
   return ICONS[String(index)] || ICONS.default;
@@ -170,164 +272,103 @@ class UvIndexCard extends HTMLElement {
     return { entity: uv || "sensor.uv_index" };
   }
 
+  // Builds the card once: the static stylesheet and the DOM skeleton. Later
+  // renders only update text, attributes and the --uv-color variable, so the
+  // icon (and its SMIL animation) is only swapped when the UV index changes.
+  _build() {
+    const root = this.shadowRoot;
+    const el = (tag, cls, parent) => {
+      const node = document.createElement(tag);
+      if (cls) node.className = cls;
+      parent.appendChild(node);
+      return node;
+    };
+    const style = el("style", "", root);
+    style.textContent = STYLE;
+    const card = el("ha-card", "", root);
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+    const header = el("div", "header", card);
+    const badge = el("div", "badge", header);
+    el("ha-icon", "", badge).setAttribute("icon", "mdi:sun-wireless-outline");
+    const name = el("div", "name", el("div", "titles", header));
+    const body = el("div", "body", card);
+    const icon = el("div", "icon", body);
+    const info = el("div", "info", body);
+    const value = el("div", "value", info);
+    const label = el("div", "label", info);
+    // The entity is read when the event fires, so a config change needs no rebind.
+    card.addEventListener("click", () => this._openMoreInfo(this._config.entity));
+    // Keyboard: Enter or Space opens the entity dialog, like a button
+    card.addEventListener("keydown", (ev) => {
+      if (ev.key !== "Enter" && ev.key !== " ") return;
+      ev.preventDefault();
+      this._openMoreInfo(this._config.entity);
+    });
+    this._els = { card, name, icon, value, label };
+    this._iconKey = null;
+  }
+
   _render() {
     if (!this._config) return;
 
     if (!this.shadowRoot) {
       this.attachShadow({ mode: "open" });
     }
+    if (!this._els) this._build();
 
     const entityId = this._config.entity;
     const stateObj = this._hass ? this._hass.states[entityId] : undefined;
 
-    // Skip the rebuild if nothing visible changed (avoids the icon flicker
-    // on every Home Assistant state tick).
+    // Skip the update if nothing visible changed (avoids touching the DOM on
+    // every Home Assistant state tick).
     const sig = this._signature(stateObj);
     if (sig === this._sig) return;
     this._sig = sig;
 
-    const raw = stateObj ? Number(stateObj.state) : NaN;
-    const available = stateObj && Number.isFinite(raw);
+    // Number("") and Number(" ") are 0: an empty state is unavailable, not "0".
+    const text = stateObj ? String(stateObj.state).trim() : "";
+    const raw = text !== "" ? Number(text) : NaN;
+    const available = !!stateObj && Number.isFinite(raw);
 
-    // Round and clamp the UV index to the available icons (0-11).
-    let index = available ? Math.max(0, Math.round(raw)) : NaN;
-    if (Number.isFinite(index) && index > 11) index = 11;
+    // Round and clamp the UV index to the available icons (0-11); a negative
+    // reading is shown as 0, like its icon.
+    const rounded = available ? Math.max(0, Math.round(raw)) : NaN;
+    const index = available ? Math.min(rounded, 11) : NaN;
 
     // Language: explicit config wins, otherwise follow the Home Assistant UI.
     const lang =
       this._config.language || (this._hass?.language) || "en";
 
     // WHO bands are defined on whole numbers: use the value that is displayed.
-    const level = available ? levelFor(Math.round(raw)) : null;
+    const level = available ? levelFor(rounded) : null;
     const name =
       this._config.name ||
       (stateObj?.attributes.friendly_name) ||
       localize("name", lang);
 
-    const valueText = available ? String(Math.round(raw)) : "—";
+    const valueText = available ? String(rounded) : "—";
     const labelText = level
       ? localize(level.key, lang)
       : localize("unavailable", lang);
     const color = level ? level.color : "var(--secondary-text-color)";
-    const vertical = this._config.layout === "vertical";
-    const transparent = this._config.transparent;
-    const top = this._config.align === "top";
 
-    // The rebuild replaces the focusable ha-card: give the focus back to the
-    // new one when the old one had it (keyboard users stay on the card)
-    const prev = this.shadowRoot.querySelector("ha-card");
-    const hadFocus = !!prev && this.shadowRoot.activeElement === prev;
-
-    this.shadowRoot.innerHTML = `
-      <style>
-        ha-card {
-          display: flex;
-          flex-direction: column;
-          justify-content: ${top ? "flex-start" : "center"};
-          gap: 10px;
-          padding: 12px;
-          box-sizing: border-box;
-          ${top ? "height: 100%;" : ""}
-          cursor: pointer;
-          --uv-color: ${color};
-          ${transparent ? "background: none; box-shadow: none; border: none;" : ""}
-        }
-        /* The body starts 8px under the header (the card gap is 10px). */
-        .header {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          margin-bottom: -2px;
-        }
-        .badge {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          display: grid;
-          place-items: center;
-          flex: none;
-          background: color-mix(in srgb, var(--uv-color) 16%, transparent);
-          color: var(--uv-color);
-          --mdc-icon-size: 24px;
-        }
-        .titles {
-          flex: 1;
-          min-width: 0;
-        }
-        .name {
-          font-size: 16px;
-          font-weight: 500;
-          line-height: 1.25;
-          color: var(--primary-text-color);
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-        .body {
-          display: flex;
-          flex-direction: ${vertical ? "column" : "row"};
-          align-items: center;
-          text-align: ${vertical ? "center" : "left"};
-          gap: ${vertical ? "8px" : "12px"};
-        }
-        .icon {
-          width: 56px;
-          height: 56px;
-          flex: 0 0 auto;
-        }
-        .icon svg {
-          width: 100%;
-          height: 100%;
-          display: block;
-        }
-        .info {
-          display: flex;
-          flex-direction: column;
-          align-items: ${vertical ? "center" : "flex-start"};
-          gap: 2px;
-          min-width: 0;
-        }
-        .value {
-          font-size: 30px;
-          font-weight: 400;
-          line-height: 1.1;
-          color: var(--uv-color);
-        }
-        .label {
-          display: inline-block;
-          margin-top: 2px;
-          padding: 1px 8px;
-          border-radius: 12px;
-          font-size: 11px;
-          font-weight: 500;
-          color: var(--uv-color);
-          background: color-mix(in srgb, var(--uv-color) 15%, transparent);
-        }
-      </style>
-      <ha-card role="button" tabindex="0">
-        <div class="header">
-          <div class="badge"><ha-icon icon="mdi:sun-wireless-outline"></ha-icon></div>
-          <div class="titles"><div class="name">${esc(name)}</div></div>
-        </div>
-        <div class="body">
-          <div class="icon" title="${esc(labelText)}">${iconSvg(index)}</div>
-          <div class="info">
-            ${this._config.show_value ? `<div class="value">${valueText}</div>` : ""}
-            ${this._config.show_label ? `<div class="label">${esc(labelText)}</div>` : ""}
-          </div>
-        </div>
-      </ha-card>
-    `;
-
-    const card = this.shadowRoot.querySelector("ha-card");
-    if (hadFocus) card.focus({ preventScroll: true });
-    card.addEventListener("click", () => this._openMoreInfo(entityId));
-    // Keyboard: Enter or Space opens the entity dialog, like a button
-    card.addEventListener("keydown", (ev) => {
-      if (ev.key !== "Enter" && ev.key !== " ") return;
-      ev.preventDefault();
-      this._openMoreInfo(entityId);
-    });
+    const { card, icon, value, label } = this._els;
+    card.setAttribute("data-layout", this._config.layout);
+    card.setAttribute("data-align", this._config.align);
+    card.toggleAttribute("data-transparent", this._config.transparent);
+    card.style.setProperty("--uv-color", color);
+    this._els.name.textContent = name;
+    icon.setAttribute("title", labelText);
+    const iconKey = String(index);
+    if (iconKey !== this._iconKey) {
+      icon.innerHTML = iconSvg(index);
+      this._iconKey = iconKey;
+    }
+    value.textContent = valueText;
+    value.hidden = !this._config.show_value;
+    label.textContent = labelText;
+    label.hidden = !this._config.show_label;
   }
 
   _openMoreInfo(entityId) {

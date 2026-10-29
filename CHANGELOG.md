@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.6.2 — 2026-10-29
+
+### Changes
+- An empty sensor state now shows "Unavailable" instead of "0 / Low", and a negative reading is displayed as 0.
+- The card is built once and then only updated: the UV icon animation no longer restarts when only the name, risk label, language or options change.
+
+### Maintenance
+- README: new screenshot of the unavailable state.
+- CI: the Screenshots workflow works on pull requests from forks, re-runs when Playwright is bumped, retries the Chromium download and re-runs Lint, Validate and HACS after committing refreshed screenshots; Biome no longer runs twice in the Lint workflow.
+
 ## 1.6.1 — 2026-10-28
 
 ### Changes
