@@ -77,9 +77,9 @@ entity: sensor.uv_index
 
 ## Screenshots
 
-| Light | Dark | Vertical |
-|---|---|---|
-| ![Light](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card.png) | ![Dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-dark.png) | ![Vertical](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-vertical.png) |
+| Light | Dark | Vertical | Unavailable |
+|---|---|---|---|
+| ![Light](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card.png) | ![Dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-dark.png) | ![Vertical](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-vertical.png) | ![Unavailable](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-unavailable.png) |
 
 ## Animations
 
