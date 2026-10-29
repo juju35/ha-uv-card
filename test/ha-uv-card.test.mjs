@@ -257,3 +257,23 @@ test("an unfocused card does not take the focus when the value changes", () => {
   el.hass = hassWith(8);
   assert.equal(el.shadowRoot.activeElement, null);
 });
+
+// getGridOptions (12-column sections grid) arrived with Home Assistant 2024.11
+// (frontend 20241105.0); earlier releases only call getLayoutOptions, so the
+// card's sections size is ignored there. The declared minimum must follow.
+const readRoot = (name) => readFileSync(new URL(`../${name}`, import.meta.url), "utf8");
+const haVersion = (v) => v.split(".").slice(0, 2).map(Number);
+const atLeast = ([y, m], [ry, rm]) => y > ry || (y === ry && m >= rm);
+
+test("hacs.json requires Home Assistant 2024.11, where getGridOptions exists", () => {
+  assert.match(source, /getGridOptions\(\)/);
+  const { homeassistant } = JSON.parse(readRoot("hacs.json"));
+  assert.ok(atLeast(haVersion(homeassistant), [2024, 11]), `hacs.json: ${homeassistant}`);
+});
+
+test("the README prerequisite matches the hacs.json minimum", () => {
+  const { homeassistant } = JSON.parse(readRoot("hacs.json"));
+  const readme = readRoot("README.md").match(/Home Assistant (\d{4}\.\d+) or later/);
+  assert.ok(readme, "README prerequisite line not found");
+  assert.deepEqual(haVersion(readme[1]), haVersion(homeassistant));
+});
