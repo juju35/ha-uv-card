@@ -23,7 +23,7 @@ Lovelace card for Home Assistant that shows the current **UV index** with an ani
 
 ## Prerequisites
 
-- Home Assistant 2024.8 or later
+- Home Assistant 2024.11 or later
 - A sensor whose state is the UV index, e.g. from [OpenUV](https://www.home-assistant.io/integrations/openuv/), [Met.no](https://www.home-assistant.io/integrations/met/) or a weather station
 
 ## Installation

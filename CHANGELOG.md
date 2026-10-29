@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.3 — 2026-10-29
+
+### Changes
+- HACS now asks for Home Assistant 2024.11 or later, the version whose sections view reads the card's size (3 rows, 4 when vertical); on 2024.8 to 2024.10 the card was shown at the default size. The README prerequisite says so too.
+
 ## 1.6.2 — 2026-10-29
 
 ### Changes
