@@ -8,7 +8,7 @@
 
 ### Maintenance
 - README: new screenshot of the unavailable state.
-- CI: the Screenshots workflow works on pull requests from forks, re-runs when Playwright is bumped, and retries the Chromium download; Biome no longer runs twice in the Lint workflow.
+- CI: the Screenshots workflow works on pull requests from forks, re-runs when Playwright is bumped, retries the Chromium download and re-runs Lint, Validate and HACS after committing refreshed screenshots; Biome no longer runs twice in the Lint workflow.
 
 ## 1.6.1 — 2026-10-28
 
