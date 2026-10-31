@@ -72,7 +72,7 @@ jobs:
             echo "::error::screenshots failed: $(tail -c 1200 /tmp/screenshots.log | tr -d '\r' | tr '\n' ' ')"
             exit 1
           }
-      # A push made with GITHUB_TOKEN does not trigger pull_request workflows, but workflow_dispatch does: once a
+      # The pull_request runs of a GITHUB_TOKEN push are left waiting for approval, but workflow_dispatch runs: once a
       # screenshot commit is pushed, the next step dispatches Lint, Validate and HACS on the PR branch.
       - name: Commit refreshed screenshots
         id: commit
