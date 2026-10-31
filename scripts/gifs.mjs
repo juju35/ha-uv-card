@@ -1,4 +1,4 @@
-// Records one animated GIF of the card per WHO risk band into screenshots/uv-<band>.gif (needs ffmpeg).
+// Records one animated GIF of the card per WHO risk band into screenshots/uv-<band>.gif and its dark twin uv-<band>-dark.gif (needs ffmpeg).
 // Usage: npm run build && npm run gifs
 // The icons animate with SMIL (<animateTransform>), which the Web Animations API does not
 // cover: the SVG document clock is paused and stepped frame by frame, so every GIF loops
@@ -46,15 +46,23 @@ const captureGif = (file) => async (page, clip) => {
   console.log(`screenshots/${file}.gif`);
 };
 
+// Each band in both themes with the same setup: uv-<band>.gif light, uv-<band>-dark.gif dark.
+const THEMES = [
+  { theme: "light", suffix: "" },
+  { theme: "dark", suffix: "-dark" },
+];
+
 await render(
-  BANDS.map(({ file, value }) => ({
-    file,
-    type: "ha-uv-card",
-    theme: "light",
-    width: WIDTH,
-    config: { entity: "sensor.uv_index" },
-    hass: { states: uv(value) },
-    capture: captureGif(file),
-  })),
+  BANDS.flatMap(({ file, value }) =>
+    THEMES.map(({ theme, suffix }) => ({
+      file: `${file}${suffix}`,
+      type: "ha-uv-card",
+      theme,
+      width: WIDTH,
+      config: { entity: "sensor.uv_index" },
+      hass: { states: uv(value) },
+      capture: captureGif(`${file}${suffix}`),
+    }))
+  ),
   { icons }
 );
