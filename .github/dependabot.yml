@@ -7,3 +7,18 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+  # Playwright (screenshots and GIFs): a bump re-renders them through the Screenshots workflow.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      dev-dependencies:
+        dependency-type: development
+  - package-ecosystem: pre-commit
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      pre-commit-hooks:
+        patterns: ["*"]
