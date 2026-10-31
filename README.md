@@ -87,13 +87,13 @@ entity: sensor.uv_index
 
 One animated icon per WHO risk band — the sun rays sweep continuously while the badge, value and label take the band's colour.
 
-| Animation | Description |
-|---|---|
-| ![Low](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-low.gif) | **Low (0–2)** — green badge, animated sun. |
-| ![Moderate](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-moderate.gif) | **Moderate (3–5)** — yellow badge, animated sun. |
-| ![High](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-high.gif) | **High (6–7)** — orange badge, animated sun. |
-| ![Very High](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-very-high.gif) | **Very High (8–10)** — red badge, animated sun. |
-| ![Extreme](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-extreme.gif) | **Extreme (11+)** — purple 11+ badge, animated sun. |
+| Light | Dark | Description |
+|---|---|---|
+| ![Low](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-low.gif) | ![Low dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-low-dark.gif) | **Low (0–2)** — green badge, animated sun. |
+| ![Moderate](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-moderate.gif) | ![Moderate dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-moderate-dark.gif) | **Moderate (3–5)** — yellow badge, animated sun. |
+| ![High](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-high.gif) | ![High dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-high-dark.gif) | **High (6–7)** — orange badge, animated sun. |
+| ![Very High](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-very-high.gif) | ![Very High dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-very-high-dark.gif) | **Very High (8–10)** — red badge, animated sun. |
+| ![Extreme](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-extreme.gif) | ![Extreme dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-extreme-dark.gif) | **Extreme (11+)** — purple 11+ badge, animated sun. |
 
 ## How it works
 
