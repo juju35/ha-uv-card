@@ -96,7 +96,26 @@ function localize(key, lang) {
 // --uv-color variable and the data-layout / data-align / data-transparent
 // attributes set on ha-card.
 const STYLE = `
+  /* Sections view: the grid stretches the host to the rows the card asked
+     for; ha-card fills it, so "center" centers and "top" sticks to the top. */
+  :host {
+    display: block;
+    height: 100%;
+  }
+  /* Natural width in a parent that sizes to its content (inline-block, grid
+     "auto" column, layout-card, button-card): ha-card is a size container, so
+     its content no longer gives the card a width, and this empty grid does
+     instead. Its min-content width is 0: in a "1fr 1fr" grid the card still
+     shrinks to its cell, also when a wrapping <div> (min-width: auto) takes
+     its min-content width. No height, so it takes no room. */
+  :host::before {
+    content: "";
+    display: grid;
+    grid-template-columns: minmax(0, 240px);
+    height: 0;
+  }
   ha-card {
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -104,6 +123,10 @@ const STYLE = `
     padding: 12px;
     box-sizing: border-box;
     cursor: pointer;
+    /* Size container for the narrow-card rules below. Inline-size containment
+       leaves the content out of the intrinsic width: :host::before gives the
+       card its width in a shrink-to-fit parent. */
+    container-type: inline-size;
     /* Band colors stay on the tinted backgrounds; text and the badge icon use
        them half-mixed with the theme text color, which keeps the hue and
        reaches 4.5:1 in HA's light and dark themes (bright yellow on white and
@@ -112,7 +135,11 @@ const STYLE = `
   }
   ha-card[data-align="top"] {
     justify-content: flex-start;
-    height: 100%;
+  }
+  /* Keyboard focus (the card is a role="button"), drawn inside the rounded card. */
+  ha-card:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: -2px;
   }
   ha-card[data-transparent] {
     background: none;
@@ -140,9 +167,11 @@ const STYLE = `
     color: var(--uv-text-color);
     --mdc-icon-size: 24px;
   }
+  /* The title takes the room left by the badge, keeps at least 4 characters,
+     then is cut with an ellipsis. */
   .titles {
-    flex: 1;
-    min-width: 0;
+    flex: 1 1 0;
+    min-width: 4ch;
   }
   .name {
     font-size: 16px;
@@ -181,6 +210,7 @@ const STYLE = `
     align-items: flex-start;
     gap: 2px;
     min-width: 0;
+    max-width: 100%;
   }
   ha-card[data-layout="vertical"] .info {
     align-items: center;
@@ -200,6 +230,70 @@ const STYLE = `
     font-weight: 500;
     color: var(--uv-text-color);
     background: color-mix(in srgb, var(--uv-color) 15%, transparent);
+    /* One line inside the card: a long level (pl "Bardzo wysoki", nl "Niet
+       beschikbaar") is cut with an ellipsis, its full text in the tooltip. */
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+  }
+  /* A level that does not fit even so (measured by the card) shows as its
+     colored dot; the text stays in the DOM, the tooltip and the label. */
+  .label[data-dot] {
+    font-size: 0;
+    width: 10px;
+    height: 10px;
+    padding: 0;
+    border-radius: 50%;
+    background: var(--uv-text-color);
+  }
+  /* Narrow horizontal card (4 to 6 columns of a phone section, up to about
+     186px): a smaller icon, and the level on its own row under the icon and
+     the value, the whole card width, so the longest levels show in full. */
+  @container (max-width: 160px) {
+    ha-card[data-layout="horizontal"] .icon {
+      width: 40px;
+      height: 40px;
+    }
+    .label {
+      padding: 1px 6px;
+    }
+    ha-card[data-layout="horizontal"] .body {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      column-gap: 10px;
+      row-gap: 6px;
+    }
+    ha-card[data-layout="horizontal"] .info {
+      display: contents;
+    }
+    ha-card[data-layout="horizontal"] .value {
+      min-width: 0;
+    }
+    ha-card[data-layout="horizontal"] .label {
+      grid-column: 1 / -1;
+      justify-self: start;
+      margin-top: 0;
+    }
+  }
+  /* Very narrow card (3 columns of a phone section when vertical, 4 when
+     horizontal): the badge,
+     its gap and 4 characters of title no longer fit, the badge goes (the big
+     UV icon stays) so the title stays inside the card. */
+  @container (max-width: 89px) {
+    .badge {
+      display: none;
+    }
+    /* Horizontal at 4 columns (78px inside): a smaller icon leaves "11" room. */
+    ha-card[data-layout="horizontal"] .icon {
+      width: 32px;
+      height: 32px;
+    }
+    ha-card[data-layout="horizontal"] .body {
+      column-gap: 8px;
+    }
   }
 `;
 
@@ -271,6 +365,64 @@ class UvIndexCard extends HTMLElement {
     this._render();
   }
 
+  connectedCallback() {
+    this._observe();
+  }
+
+  disconnectedCallback() {
+    this._resizeObserver?.disconnect();
+    this._resizeObserver = null;
+    if (this._fitFrame) cancelAnimationFrame(this._fitFrame);
+    this._fitFrame = 0;
+  }
+
+  // Re-fit the risk level when the card width changes (sections resize,
+  // phone rotation, editor preview). Only a width change counts, and the fit
+  // runs in the next animation frame, not in the callback: without a fixed
+  // height (masonry, stacks) the text <-> dot switch changes the card height,
+  // and resizing the observed card inside its own callback is a "ResizeObserver
+  // loop completed with undelivered notifications" error.
+  _observe() {
+    if (this._resizeObserver || !this._els || typeof ResizeObserver !== "function") return;
+    this._fitWidth = undefined;
+    this._resizeObserver = new ResizeObserver((entries) => {
+      const width = entries[entries.length - 1]?.contentRect.width;
+      if (width !== undefined && width === this._fitWidth) return;
+      this._fitWidth = width;
+      if (this._fitFrame) cancelAnimationFrame(this._fitFrame);
+      this._fitFrame = requestAnimationFrame(() => {
+        this._fitFrame = 0;
+        this._fitLabel();
+      });
+    });
+    this._resizeObserver.observe(this._els.card);
+  }
+
+  // The level shows in full when it fits, and as its colored dot when it does
+  // not (a long level on a narrow card), instead of a cut "M…".
+  // Measured with fractional widths: scrollWidth / clientWidth are rounded and
+  // miss a text cut by less than a pixel (still drawn with an ellipsis).
+  _fitLabel() {
+    const { label } = this._els;
+    label.toggleAttribute("data-dot", false);
+    label.removeAttribute("role");
+    label.removeAttribute("aria-label");
+    if (label.hidden || !label.getBoundingClientRect) return;
+    const have = label.getBoundingClientRect().width;
+    label.style.maxWidth = "none";
+    label.style.width = "max-content";
+    const need = label.getBoundingClientRect().width;
+    label.style.maxWidth = "";
+    label.style.width = "";
+    const dot = need > have + 0.01;
+    label.toggleAttribute("data-dot", dot);
+    // A dot is an image named by the level; the text names itself otherwise.
+    if (dot) {
+      label.setAttribute("role", "img");
+      label.setAttribute("aria-label", label.textContent);
+    }
+  }
+
   // Cheap fingerprint of everything that affects the rendered output, so we
   // only rebuild the DOM (and restart the SVG animation) when it changes.
   _signature(stateObj) {
@@ -334,6 +486,7 @@ class UvIndexCard extends HTMLElement {
     });
     this._els = { card, name, icon, value, label };
     this._iconKey = null;
+    if (this.isConnected) this._observe();
   }
 
   _render() {
@@ -402,7 +555,9 @@ class UvIndexCard extends HTMLElement {
     value.textContent = valueText;
     value.hidden = !this._config.show_value;
     label.textContent = labelText;
+    label.setAttribute("title", labelText);
     label.hidden = !this._config.show_label;
+    this._fitLabel();
   }
 
   _openMoreInfo(entityId) {

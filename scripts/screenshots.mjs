@@ -4,6 +4,7 @@ import { chromium } from "playwright";
 import { readFileSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { SHOTS, uv } from "./shots.mjs";
+import { samePngPixels, writeIfChanged } from "./write-if-changed.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const cardJs = readFileSync(`${root}dist/ha-uv-card.js`, "utf8");
@@ -94,8 +95,10 @@ export async function render(shots, { icons = {}, hass = {}, extra = "" } = {}) 
       // Custom capture (e.g. the GIF recorder in gifs.mjs) instead of one PNG.
       await s.capture(page, clip);
     } else {
-      await page.screenshot({ path: `${root}screenshots/${s.file}.png`, clip, animations: "disabled" });
-      console.log(`screenshots/${s.file}.png`);
+      // Only rewritten when the pixels changed, so an unchanged card leaves the file alone.
+      const png = await page.screenshot({ clip, animations: "disabled" });
+      const written = await writeIfChanged(`${root}screenshots/${s.file}.png`, png, (a, b) => samePngPixels(page, a, b));
+      console.log(`screenshots/${s.file}.png${written ? "" : " (unchanged)"}`);
     }
     await page.close();
   }
