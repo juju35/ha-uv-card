@@ -9,7 +9,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { icons, render, uv } from "./screenshots.mjs";
-import { writeIfChanged } from "./write-if-changed.mjs";
+import { sameGifPixels, writeIfChanged } from "./write-if-changed.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const WIDTH = 460;
@@ -24,14 +24,6 @@ const BANDS = [
   { file: "uv-very-high", value: 9 },
   { file: "uv-extreme", value: 11 },
 ];
-
-// Every frame of a GIF as raw RGBA, so two encodes of the same animation compare equal.
-const gifPixels = (bytes) =>
-  execFileSync("ffmpeg", ["-loglevel", "error", "-f", "gif", "-i", "pipe:0", "-f", "rawvideo", "-pix_fmt", "rgba", "pipe:1"], {
-    input: bytes,
-    maxBuffer: 1 << 30,
-  });
-const sameGifPixels = async (a, b) => gifPixels(a).equals(gifPixels(b));
 
 const captureGif = (file) => async (page, clip) => {
   await page.evaluate(() => {

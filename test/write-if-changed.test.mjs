@@ -9,7 +9,8 @@ import { test } from "node:test";
 import { writeIfChanged } from "../scripts/write-if-changed.mjs";
 
 // Stand-in decoder: the "pixels" are the bytes after a 4-byte header that
-// changes with every encode.
+// changes with every encode. The real PNG and GIF decoders are tested on real
+// images in browser.test.mjs (they need Chromium and ffmpeg).
 const pixels = (bytes) => bytes.subarray(4).toString("hex");
 const samePixels = async (a, b) => pixels(a) === pixels(b);
 
@@ -52,7 +53,7 @@ test("the still and GIF scripts write their captures through writeIfChanged", ()
 // The PNG comparison decodes raw pixels: with color management on, Chromium
 // converted the committed PNGs and an unchanged card compared as changed.
 test("the PNG comparison decodes raw pixels, without color conversion", () => {
-  const src = readFileSync(new URL("../scripts/screenshots.mjs", import.meta.url), "utf8");
+  const src = readFileSync(new URL("../scripts/write-if-changed.mjs", import.meta.url), "utf8");
   assert.match(src, /colorSpaceConversion:\s*"none"/);
   assert.match(src, /premultiplyAlpha:\s*"none"/);
 });

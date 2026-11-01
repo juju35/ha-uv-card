@@ -4,7 +4,7 @@ import { chromium } from "playwright";
 import { readFileSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { SHOTS, uv } from "./shots.mjs";
-import { writeIfChanged } from "./write-if-changed.mjs";
+import { samePngPixels, writeIfChanged } from "./write-if-changed.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const cardJs = readFileSync(`${root}dist/ha-uv-card.js`, "utf8");
@@ -64,31 +64,6 @@ const pageHtml = (theme, width) => `<!doctype html><html><head><meta charset="ut
   body { margin: 0; padding: 16px; background: var(--primary-background-color); color: var(--primary-text-color);
          font-family: Roboto, "Segoe UI", Helvetica, Arial, sans-serif; width: ${width}px; }
 </style></head><body><div id="root"></div></body></html>`;
-
-// Decodes two PNGs in the page and compares their pixels.
-export async function samePngPixels(page, a, b) {
-  return page.evaluate(
-    async ([a, b]) => {
-      const decode = async (b64) => {
-        // Raw pixels: no color management (gAMA / sRGB chunks differ between
-        // encoders) and no alpha premultiplication.
-        const bitmap = await createImageBitmap(await (await fetch(`data:image/png;base64,${b64}`)).blob(), {
-          colorSpaceConversion: "none",
-          premultiplyAlpha: "none",
-        });
-        const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-        const ctx = canvas.getContext("2d", { colorSpace: "srgb" });
-        ctx.drawImage(bitmap, 0, 0);
-        return { w: bitmap.width, h: bitmap.height, data: ctx.getImageData(0, 0, bitmap.width, bitmap.height).data };
-      };
-      const [x, y] = await Promise.all([decode(a), decode(b)]);
-      if (x.w !== y.w || x.h !== y.h) return false;
-      for (let i = 0; i < x.data.length; i++) if (x.data[i] !== y.data[i]) return false;
-      return true;
-    },
-    [a.toString("base64"), b.toString("base64")]
-  );
-}
 
 // Renders each shot { file, type, theme, width, config, hass?, after? } into screenshots/<file>.png.
 // extra: more stand-in elements, as script source.
