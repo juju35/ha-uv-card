@@ -19,7 +19,7 @@ Lovelace card for Home Assistant that shows the current **UV index** with an ani
 - Horizontal or vertical layout, transparent mode, top alignment for stacks
 - Sections view support, card picker entry with preview
 - Tap to open the sensor's more-info dialog
-- 7 languages, following Home Assistant's language setting
+- 10 languages, following Home Assistant's language setting
 
 ## Prerequisites
 
@@ -85,7 +85,7 @@ entity: sensor.uv_index
 
 ## Animations
 
-One animated icon per WHO risk band — the sun rays sweep continuously while the badge, value and label take the band's colour.
+One animated icon per WHO risk band — the sun rays sweep continuously (they stay still when the system or browser asks to reduce motion) while the badge, value and label take the band's colour, mixed with the theme text colour so that they stay readable in light and dark themes.
 
 | Light | Dark | Description |
 |---|---|---|
@@ -131,7 +131,10 @@ The card follows the language of Home Assistant (or `language`). Currently suppo
 | Español | `es` |
 | Italiano | `it` |
 | Nederlands | `nl` |
-| Português | `pt` |
+| Português (Portugal) | `pt` |
+| Polski | `pl` |
+| Српски (Serbian, Cyrillic) | `sr` |
+| Srpski (Serbian, Latin) | `sr-Latn` |
 
 Add a language in the `TRANSLATIONS` map of `src/ha-uv-card.js`. Contributions welcome!
 
