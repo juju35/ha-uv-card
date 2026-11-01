@@ -35,6 +35,7 @@ class FakeElement {
     return child;
   }
   setAttribute(name, value) { this.attributes[name] = String(value); }
+  removeAttribute(name) { delete this.attributes[name]; }
   getAttribute(name) { return name in this.attributes ? this.attributes[name] : null; }
   toggleAttribute(name, force) {
     if (force) this.attributes[name] = "";
@@ -560,7 +561,7 @@ test("the risk level pill stays on one line inside the card and keeps its full t
   assert.equal(declarations(css, ".info")["max-width"], "100%", "the text column never outgrows the card");
   assert.equal(root.querySelector(".label").getAttribute("title"), "Niet beschikbaar");
   // A narrow horizontal card shrinks the icon to leave the level room.
-  assert.equal(declarations(css, ".body")["container-type"], "inline-size");
+  assert.equal(declarations(css, "ha-card")["container-type"], "inline-size");
   assert.match(css, /@container \(max-width: \d+px\) \{\s*ha-card\[data-layout="horizontal"\] \.icon \{/);
 });
 
@@ -581,10 +582,140 @@ test("the header badge never shrinks and the title keeps at least 4 characters",
   const css = render(4).querySelector("style").textContent;
   assert.equal(declarations(css, ".badge").flex, "none");
   const titles = declarations(css, ".titles");
-  assert.equal(titles.flex, "1 1 auto");
+  // flex-basis 0: the title only takes the room left, never more than its share.
+  assert.equal(titles.flex, "1 1 0");
   assert.match(titles["min-width"], /^\d+(\.\d+)?ch$/);
   assert.ok(Number.parseFloat(titles["min-width"]) >= 4);
   assert.equal(declarations(css, ".name")["text-overflow"], "ellipsis");
+});
+
+// Body of the first @container (max-width: Npx) block whose content matches `inner`.
+function containerBlock(css, inner) {
+  const clean = css.replace(/\/\*.*?\*\//gs, "");
+  for (const m of clean.matchAll(/@container \(max-width: (\d+)px\) \{((?:[^{}]*\{[^}]*\})*)\s*\}/g)) {
+    if (inner.test(m[2])) return { max: Number(m[1]), body: m[2] };
+  }
+  return null;
+}
+
+// Vertical at 3 columns of a phone section (78-91px, 52-65px inside the
+// padding): the 40px badge, the gap and 4 characters of title (about 86px)
+// ran 9-22px past the card edge. Below the badge + gap + 4ch width the badge
+// is dropped (the big UV icon stays), so the title fits.
+test("on a very narrow card the header badge is dropped so the title stays inside", () => {
+  const css = render(4, { layout: "vertical" }).querySelector("style").textContent;
+  const block = containerBlock(css, /\.badge\s*\{[^}]*display:\s*none/);
+  assert.ok(block, "no container query hides the badge");
+  // 40px badge + 10px gap + 4ch (~36px at 16px): the badge goes before the title would be cut under 4 characters.
+  assert.ok(block.max >= 86 && block.max < 104, `badge threshold ${block.max}px`);
+});
+
+// Horizontal at 4-6 columns of a phone section (104-178px): next to the icon
+// the pill had 26-80px and showed "M…", "Bard…". Under the threshold the pill
+// moves to its own row under the icon and the value, the whole card width.
+test("on a narrow horizontal card the risk level gets its own full-width row", () => {
+  const css = render(4).querySelector("style").textContent;
+  const block = containerBlock(css, /ha-card\[data-layout="horizontal"\] \.label\s*\{[^}]*grid-column:\s*1 \/ -1/);
+  assert.ok(block, "no container query puts the pill on its own row");
+  assert.ok(block.max >= 152, `stacked below ${block.max}px only: 6 columns on a phone (178px) must stack`);
+  assert.match(block.body, /ha-card\[data-layout="horizontal"\] \.body\s*\{[^}]*display:\s*grid/);
+  assert.match(block.body, /ha-card\[data-layout="horizontal"\] \.info\s*\{[^}]*display:\s*contents/);
+});
+
+// The size container is ha-card (the header and the body both follow its
+// width). Inline-size containment drops the content from the intrinsic width:
+// in a shrink-to-fit parent (inline-block, grid "auto" column, button-card,
+// layout-card) the card would fall to its padding. A fallback intrinsic width
+// keeps it a usable card there.
+test("the size container keeps a usable intrinsic width in shrink-to-fit parents", () => {
+  const css = render(4).querySelector("style").textContent;
+  const haCard = declarations(css, "ha-card");
+  assert.equal(haCard["container-type"], "inline-size");
+  const intrinsic = haCard["contain-intrinsic-inline-size"];
+  assert.ok(intrinsic, "no contain-intrinsic-inline-size on the container");
+  assert.ok(Number.parseFloat(intrinsic) >= 200, `intrinsic width ${intrinsic}`);
+  assert.equal(declarations(css, ".body")["container-type"], undefined, "a second, content-less container in the body");
+  // The intrinsic width is also the card's min-content width: in a "1fr 1fr"
+  // grid (grid card, layout-card, horizontal-stack) the host would refuse to
+  // shrink under it and run past its cell. The host may always shrink.
+  const host = declarations(css, ":host");
+  assert.equal(host["min-width"], "0");
+  assert.equal(host.width, undefined);
+});
+
+// A pill whose text does not fit even on its own row is shown as its colored
+// dot only, the level kept in its tooltip and accessible name, instead of
+// "M…" / "Bard…". It is measured, so it only happens when the room really
+// lacks, whatever the language.
+function fitCard(lang = "en") {
+  const observers = [];
+  class ResizeObserver {
+    constructor(cb) { this.cb = cb; this.targets = []; observers.push(this); }
+    observe(t) { this.targets.push(t); }
+    disconnect() { this.targets = []; }
+  }
+  const ctx = sandbox(undefined, { ResizeObserver });
+  vm.runInContext(source, ctx);
+  const el = new (ctx.customElements.get("ha-uv-card"))();
+  el.setConfig({ entity: "sensor.uv", language: lang });
+  const pill = () => el.shadowRoot.querySelector(".label");
+  // Room for the pill, in px; the text needs 7px per character plus 16px padding.
+  let room = 300;
+  el.isConnected = true;
+  el.connectedCallback?.();
+  el.hass = hassWith(4);
+  const node = pill();
+  // Laid out at its natural width when measured unconstrained, else cut to the room.
+  node.getBoundingClientRect = () => {
+    const natural = "data-dot" in node.attributes ? 10 : node.textContent.length * 7 + 16 + 0.4;
+    return { width: node.style.width === "max-content" ? natural : Math.min(room, natural) };
+  };
+  const resize = (w) => {
+    room = w;
+    for (const o of observers) if (o.targets.length) o.cb([]);
+  };
+  return { el, pill, resize, observers };
+}
+
+test("a risk level that cannot fit is shown as its colored dot, and comes back when it fits", () => {
+  const { el, pill, resize, observers } = fitCard("pl");
+  assert.ok(observers.some((o) => o.targets.length), "the card does not watch its width");
+  resize(300);
+  assert.equal("data-dot" in pill().attributes, false, "room enough: the text shows");
+  el.hass = hassWith(9); // "Bardzo wysoki": 13 chars, 107px
+  resize(80);
+  assert.equal("data-dot" in pill().attributes, true, "no room: dot only");
+  assert.equal(pill().getAttribute("title"), "Bardzo wysoki");
+  // A dot is an image named by the level (a named generic div is not announced).
+  assert.equal(pill().getAttribute("role"), "img");
+  assert.equal(pill().getAttribute("aria-label"), "Bardzo wysoki");
+  assert.equal(pill().textContent, "Bardzo wysoki", "the text stays in the DOM for screen readers");
+  resize(107); // 107.4px needed: cut by less than a pixel is still cut
+  assert.equal("data-dot" in pill().attributes, true, "a sub-pixel cut is a cut");
+  resize(120);
+  assert.equal("data-dot" in pill().attributes, false, "room again: the text is back");
+  assert.equal(pill().getAttribute("role"), null, "the text names itself again");
+  assert.equal(pill().getAttribute("aria-label"), null);
+  // A shorter level at the same width shows in full: "Niski", 51px.
+  resize(80);
+  el.hass = hassWith(1);
+  assert.equal("data-dot" in pill().attributes, false, "a short level fits");
+  el.hass = hassWith("unavailable"); // "Niedostępny", 93px
+  assert.equal("data-dot" in pill().attributes, true, "a new long level is re-measured");
+});
+
+test("a card removed from the page stops watching its width", () => {
+  const { el, observers } = fitCard();
+  el.disconnectedCallback?.();
+  assert.ok(observers.every((o) => o.targets.length === 0));
+});
+
+test("the dot style keeps the band color and hides only the text", () => {
+  const css = render(4).querySelector("style").textContent;
+  const dot = declarations(css, ".label[data-dot]");
+  assert.equal(dot["font-size"], "0");
+  assert.ok(Number.parseFloat(dot.width) >= 8 && dot.width === dot.height, `dot ${dot.width} x ${dot.height}`);
+  assert.equal(dot.background, "var(--uv-text-color)");
 });
 
 // The card is a role="button": a visible keyboard focus ring, drawn inside the
