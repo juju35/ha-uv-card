@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.6.7 — 2026-11-01
+
+### Changes
+- In the sections view the card now fills its cell with the default `center` alignment too, so it is as tall as its neighbours and its content is really centered (before, only `top` filled the cell).
+- On narrow cards (4 columns, or 3 when vertical) the risk level stays on one line inside the card: the icon gets a little smaller so every level shows in full, and a longer text (such as "Niet beschikbaar") ends with an ellipsis, the full text showing in its tooltip. Before, Polish, Serbian, German, Spanish, Italian and Dutch levels wrapped onto two lines or ran past the card edge.
+- The card shows a focus ring when it is reached with the keyboard.
+
+### Maintenance
+- CI: Biome 2.6.4.
+
 ## 1.6.6 — 2026-11-01
 
 ### Changes
@@ -11,7 +21,7 @@
 - Added Serbian (Cyrillic and Latin) translations.
 - A Home Assistant language set to `sr-Latn` now picks the Latin-script translation: the full language code is matched before its base code.
 
-## 1.6.4 — 2026-10-29
+## 1.6.4 — 2026-11-01
 
 ### Changes
 - The UV value, the risk level label and the header icon are now readable in every band, in light and dark themes: they use the band color mixed with the theme text color (at least 4.5:1), while the tinted backgrounds keep the pure band color. Moderate (yellow) on a light theme and Very High / Extreme (red, purple) on a dark theme were hard to read.
