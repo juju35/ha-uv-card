@@ -101,6 +101,9 @@ const STYLE = `
   :host {
     display: block;
     height: 100%;
+    /* ha-card's intrinsic width (below) is a fallback for shrink-to-fit
+       parents only: in a "1fr 1fr" grid the card must still shrink to its cell. */
+    min-width: 0;
   }
   ha-card {
     height: 100%;
@@ -111,6 +114,12 @@ const STYLE = `
     padding: 12px;
     box-sizing: border-box;
     cursor: pointer;
+    /* Size container for the narrow-card rules below. Inline-size containment
+       leaves the content out of the intrinsic width: in a shrink-to-fit parent
+       (inline-block, grid "auto" column, layout-card, button-card) the card
+       takes this width instead of falling to its padding. */
+    container-type: inline-size;
+    contain-intrinsic-inline-size: 240px;
     /* Band colors stay on the tinted backgrounds; text and the badge icon use
        them half-mixed with the theme text color, which keeps the hue and
        reaches 4.5:1 in HA's light and dark themes (bright yellow on white and
@@ -151,9 +160,10 @@ const STYLE = `
     color: var(--uv-text-color);
     --mdc-icon-size: 24px;
   }
-  /* The title keeps at least 4 characters, then is cut with an ellipsis. */
+  /* The title takes the room left by the badge, keeps at least 4 characters,
+     then is cut with an ellipsis. */
   .titles {
-    flex: 1 1 auto;
+    flex: 1 1 0;
     min-width: 4ch;
   }
   .name {
@@ -166,7 +176,6 @@ const STYLE = `
     white-space: nowrap;
   }
   .body {
-    container-type: inline-size;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -222,8 +231,19 @@ const STYLE = `
     text-overflow: ellipsis;
     box-sizing: border-box;
   }
-  /* Narrow horizontal card (4 columns of the sections view): a smaller icon
-     and pill padding leave the longest risk levels room to show in full. */
+  /* A level that does not fit even so (measured by the card) shows as its
+     colored dot; the text stays in the DOM, the tooltip and the label. */
+  .label[data-dot] {
+    font-size: 0;
+    width: 10px;
+    height: 10px;
+    padding: 0;
+    border-radius: 50%;
+    background: var(--uv-text-color);
+  }
+  /* Narrow horizontal card (4 to 6 columns of a phone section, up to about
+     186px): a smaller icon, and the level on its own row under the icon and
+     the value, the whole card width, so the longest levels show in full. */
   @container (max-width: 160px) {
     ha-card[data-layout="horizontal"] .icon {
       width: 40px;
@@ -231,6 +251,41 @@ const STYLE = `
     }
     .label {
       padding: 1px 6px;
+    }
+    ha-card[data-layout="horizontal"] .body {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      column-gap: 10px;
+      row-gap: 6px;
+    }
+    ha-card[data-layout="horizontal"] .info {
+      display: contents;
+    }
+    ha-card[data-layout="horizontal"] .value {
+      min-width: 0;
+    }
+    ha-card[data-layout="horizontal"] .label {
+      grid-column: 1 / -1;
+      justify-self: start;
+      margin-top: 0;
+    }
+  }
+  /* Very narrow card (3 columns of a phone section when vertical, 4 when
+     horizontal): the badge,
+     its gap and 4 characters of title no longer fit, the badge goes (the big
+     UV icon stays) so the title stays inside the card. */
+  @container (max-width: 89px) {
+    .badge {
+      display: none;
+    }
+    /* Horizontal at 4 columns (78px inside): a smaller icon leaves "11" room. */
+    ha-card[data-layout="horizontal"] .icon {
+      width: 32px;
+      height: 32px;
+    }
+    ha-card[data-layout="horizontal"] .body {
+      column-gap: 8px;
     }
   }
 `;
@@ -303,6 +358,48 @@ class UvIndexCard extends HTMLElement {
     this._render();
   }
 
+  connectedCallback() {
+    this._observe();
+  }
+
+  disconnectedCallback() {
+    this._resizeObserver?.disconnect();
+    this._resizeObserver = null;
+  }
+
+  // Re-fit the risk level when the card width changes (sections resize,
+  // phone rotation, editor preview).
+  _observe() {
+    if (this._resizeObserver || !this._els || typeof ResizeObserver !== "function") return;
+    this._resizeObserver = new ResizeObserver(() => this._fitLabel());
+    this._resizeObserver.observe(this._els.card);
+  }
+
+  // The level shows in full when it fits, and as its colored dot when it does
+  // not (a long level on a narrow card), instead of a cut "M…".
+  // Measured with fractional widths: scrollWidth / clientWidth are rounded and
+  // miss a text cut by less than a pixel (still drawn with an ellipsis).
+  _fitLabel() {
+    const { label } = this._els;
+    label.toggleAttribute("data-dot", false);
+    label.removeAttribute("role");
+    label.removeAttribute("aria-label");
+    if (label.hidden || !label.getBoundingClientRect) return;
+    const have = label.getBoundingClientRect().width;
+    label.style.maxWidth = "none";
+    label.style.width = "max-content";
+    const need = label.getBoundingClientRect().width;
+    label.style.maxWidth = "";
+    label.style.width = "";
+    const dot = need > have + 0.01;
+    label.toggleAttribute("data-dot", dot);
+    // A dot is an image named by the level; the text names itself otherwise.
+    if (dot) {
+      label.setAttribute("role", "img");
+      label.setAttribute("aria-label", label.textContent);
+    }
+  }
+
   // Cheap fingerprint of everything that affects the rendered output, so we
   // only rebuild the DOM (and restart the SVG animation) when it changes.
   _signature(stateObj) {
@@ -366,6 +463,7 @@ class UvIndexCard extends HTMLElement {
     });
     this._els = { card, name, icon, value, label };
     this._iconKey = null;
+    if (this.isConnected) this._observe();
   }
 
   _render() {
@@ -436,6 +534,7 @@ class UvIndexCard extends HTMLElement {
     label.textContent = labelText;
     label.setAttribute("title", labelText);
     label.hidden = !this._config.show_label;
+    this._fitLabel();
   }
 
   _openMoreInfo(entityId) {
