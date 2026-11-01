@@ -82,6 +82,11 @@ const STYLE = `
     padding: 12px;
     box-sizing: border-box;
     cursor: pointer;
+    /* Band colors stay on the tinted backgrounds; text and the badge icon use
+       them half-mixed with the theme text color, which keeps the hue and
+       reaches 4.5:1 in HA's light and dark themes (bright yellow on white and
+       deep purple on dark were under 2:1). */
+    --uv-text-color: color-mix(in srgb, var(--uv-color) 50%, var(--primary-text-color));
   }
   ha-card[data-align="top"] {
     justify-content: flex-start;
@@ -110,7 +115,7 @@ const STYLE = `
     place-items: center;
     flex: none;
     background: color-mix(in srgb, var(--uv-color) 16%, transparent);
-    color: var(--uv-color);
+    color: var(--uv-text-color);
     --mdc-icon-size: 24px;
   }
   .titles {
@@ -162,7 +167,7 @@ const STYLE = `
     font-size: 30px;
     font-weight: 400;
     line-height: 1.1;
-    color: var(--uv-color);
+    color: var(--uv-text-color);
   }
   .label {
     display: inline-block;
@@ -171,7 +176,7 @@ const STYLE = `
     border-radius: 12px;
     font-size: 11px;
     font-weight: 500;
-    color: var(--uv-color);
+    color: var(--uv-text-color);
     background: color-mix(in srgb, var(--uv-color) 15%, transparent);
   }
 `;
@@ -364,6 +369,13 @@ class UvIndexCard extends HTMLElement {
     if (iconKey !== this._iconKey) {
       icon.innerHTML = iconSvg(index);
       this._iconKey = iconKey;
+      // SMIL ignores CSS media queries: honour prefers-reduced-motion by
+      // freezing the rays' rotation on its first frame.
+      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+        const svg = icon.querySelector("svg");
+        svg?.pauseAnimations?.();
+        svg?.setCurrentTime?.(0);
+      }
     }
     value.textContent = valueText;
     value.hidden = !this._config.show_value;

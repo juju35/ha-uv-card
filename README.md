@@ -85,7 +85,7 @@ entity: sensor.uv_index
 
 ## Animations
 
-One animated icon per WHO risk band — the sun rays sweep continuously while the badge, value and label take the band's colour.
+One animated icon per WHO risk band — the sun rays sweep continuously (they stay still when the system or browser asks to reduce motion) while the badge, value and label take the band's colour, mixed with the theme text colour so that they stay readable in light and dark themes.
 
 | Light | Dark | Description |
 |---|---|---|
