@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.6.6 — 2026-11-01
+
+### Changes
+- Added Polish translations. Italian, Dutch and European Portuguese were already there: every language is now checked against English (same keys and placeholders, no empty value).
+
+## 1.6.5 — 2026-11-01
+
+### Changes
+- Added Serbian (Cyrillic and Latin) translations.
+- A Home Assistant language set to `sr-Latn` now picks the Latin-script translation: the full language code is matched before its base code.
+
+## 1.6.4 — 2026-10-29
+
+### Changes
+- The UV value, the risk level label and the header icon are now readable in every band, in light and dark themes: they use the band color mixed with the theme text color (at least 4.5:1), while the tinted backgrounds keep the pure band color. Moderate (yellow) on a light theme and Very High / Extreme (red, purple) on a dark theme were hard to read.
+- With "reduce motion" enabled in the system or browser settings, the UV icon's rotating rays stay still.
+
+### Maintenance
+- CI: Biome 2.6.3 everywhere; the Lint workflow now reads the Biome version from `.pre-commit-config.yaml`.
+
 ## 1.6.3 — 2026-10-29
 
 ### Changes
