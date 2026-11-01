@@ -531,3 +531,64 @@ test("without a reduced-motion preference (or matchMedia) the icon keeps animati
     assert.deepEqual(el.shadowRoot.querySelector(".icon").querySelector("svg").smil, [], String(reduce));
   }
 });
+
+// Sections view: the grid stretches the card host to the rows it asked for
+// (3 or 4). The host and ha-card must fill that height whatever the alignment,
+// so "center" really centers and the card lines up with its neighbours.
+test("the card fills its grid cell with the default (center) alignment, not only with top", () => {
+  const css = render(4).querySelector("style").textContent;
+  const host = declarations(css, ":host");
+  assert.equal(host.display, "block");
+  assert.equal(host.height, "100%");
+  assert.equal(declarations(css, "ha-card").height, "100%", "ha-card height (center alignment)");
+  assert.equal(declarations(css, 'ha-card[data-align="top"]')["justify-content"], "flex-start");
+});
+
+// Narrow cards (min_columns 4, about 160px; vertical at 3 columns, about
+// 120px): a long risk level (pl "Bardzo wysoki", nl "Niet beschikbaar") must
+// stay on one line inside the card, cut with an ellipsis, its full text kept
+// in a tooltip.
+test("the risk level pill stays on one line inside the card and keeps its full text in a tooltip", () => {
+  const root = render("unavailable", { language: "nl" });
+  const css = root.querySelector("style").textContent;
+  const pill = declarations(css, ".label");
+  assert.equal(pill["white-space"], "nowrap");
+  assert.equal(pill.overflow, "hidden");
+  assert.equal(pill["text-overflow"], "ellipsis");
+  assert.equal(pill["max-width"], "100%");
+  assert.equal(pill["box-sizing"], "border-box");
+  assert.equal(declarations(css, ".info")["max-width"], "100%", "the text column never outgrows the card");
+  assert.equal(root.querySelector(".label").getAttribute("title"), "Niet beschikbaar");
+});
+
+test("the label tooltip follows the level when the value changes", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const card = new (ctx.customElements.get("ha-uv-card"))();
+  card.setConfig({ entity: "sensor.uv", language: "pl" });
+  card.hass = hassWith(9);
+  assert.equal(card.shadowRoot.querySelector(".label").getAttribute("title"), "Bardzo wysoki");
+  card.hass = hassWith("unavailable");
+  assert.equal(card.shadowRoot.querySelector(".label").getAttribute("title"), "Niedostępny");
+});
+
+// Header at narrow widths: the badge never shrinks, the title keeps a few
+// characters and is cut with an ellipsis.
+test("the header badge never shrinks and the title keeps at least 4 characters", () => {
+  const css = render(4).querySelector("style").textContent;
+  assert.equal(declarations(css, ".badge").flex, "none");
+  const titles = declarations(css, ".titles");
+  assert.equal(titles.flex, "1 1 auto");
+  assert.match(titles["min-width"], /^\d+(\.\d+)?ch$/);
+  assert.ok(Number.parseFloat(titles["min-width"]) >= 4);
+  assert.equal(declarations(css, ".name")["text-overflow"], "ellipsis");
+});
+
+// The card is a role="button": a visible keyboard focus ring, drawn inside the
+// rounded card, like the other cards.
+test("the card shows a focus ring for keyboard focus", () => {
+  const css = render(4).querySelector("style").textContent;
+  const ring = declarations(css, "ha-card:focus-visible");
+  assert.equal(ring.outline, "2px solid var(--primary-color)");
+  assert.ok(Number.parseFloat(ring["outline-offset"]) <= 0, `outline-offset ${ring["outline-offset"]}`);
+});
