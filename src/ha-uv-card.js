@@ -72,7 +72,7 @@ const TRANSLATIONS = {
 };
 
 const LANGUAGE_NAMES = {
-  en: "English", fr: "Français", de: "Deutsch", es: "Español", it: "Italiano", nl: "Nederlands", pt: "Português", pl: "Polski",
+  en: "English", fr: "Français", de: "Deutsch", es: "Español", it: "Italiano", nl: "Nederlands", pt: "Português (Portugal)", pl: "Polski",
   sr: "Српски", "sr-Latn": "Srpski (latinica)",
 };
 

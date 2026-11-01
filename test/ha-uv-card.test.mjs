@@ -318,7 +318,7 @@ test("the editor offers Italian, Dutch, Portuguese and Polish", () => {
   const labels = Object.fromEntries(options.map((o) => [o.value, o.label]));
   assert.equal(labels.it, "Italiano");
   assert.equal(labels.nl, "Nederlands");
-  assert.equal(labels.pt, "Português");
+  assert.equal(labels.pt, "Português (Portugal)");
   assert.equal(labels.pl, "Polski");
   // One option per translation, plus the leading auto option.
   vm.runInContext("shared.TRANSLATIONS = TRANSLATIONS;", ctx);

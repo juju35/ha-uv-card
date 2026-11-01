@@ -131,7 +131,7 @@ The card follows the language of Home Assistant (or `language`). Currently suppo
 | Español | `es` |
 | Italiano | `it` |
 | Nederlands | `nl` |
-| Português | `pt` |
+| Português (Portugal) | `pt` |
 | Polski | `pl` |
 | Српски (Serbian, Cyrillic) | `sr` |
 | Srpski (Serbian, Latin) | `sr-Latn` |
