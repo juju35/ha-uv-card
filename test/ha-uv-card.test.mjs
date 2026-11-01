@@ -625,22 +625,27 @@ test("on a narrow horizontal card the risk level gets its own full-width row", (
 // The size container is ha-card (the header and the body both follow its
 // width). Inline-size containment drops the content from the intrinsic width:
 // in a shrink-to-fit parent (inline-block, grid "auto" column, button-card,
-// layout-card) the card would fall to its padding. A fallback intrinsic width
-// keeps it a usable card there.
-test("the size container keeps a usable intrinsic width in shrink-to-fit parents", () => {
+// layout-card) the card would fall to its padding. An empty, zero-height grid
+// before ha-card gives it a natural width there, with a min-content width of
+// 0. contain-intrinsic-inline-size (or a min-width) would be a min-content
+// width: a card wrapped in a <div> in a "1fr 1fr" grid ran 40-220px past its
+// cell. The layout itself is measured in test/browser.test.mjs.
+test("the size container gets its natural width from an empty grid that may shrink to 0", () => {
   const css = render(4).querySelector("style").textContent;
   const haCard = declarations(css, "ha-card");
   assert.equal(haCard["container-type"], "inline-size");
-  const intrinsic = haCard["contain-intrinsic-inline-size"];
-  assert.ok(intrinsic, "no contain-intrinsic-inline-size on the container");
-  assert.ok(Number.parseFloat(intrinsic) >= 200, `intrinsic width ${intrinsic}`);
+  assert.doesNotMatch(css, /contain-intrinsic/);
   assert.equal(declarations(css, ".body")["container-type"], undefined, "a second, content-less container in the body");
-  // The intrinsic width is also the card's min-content width: in a "1fr 1fr"
-  // grid (grid card, layout-card, horizontal-stack) the host would refuse to
-  // shrink under it and run past its cell. The host may always shrink.
+  const sizer = declarations(css, ":host::before");
+  assert.equal(sizer.content, '""');
+  assert.equal(sizer.display, "grid");
+  assert.equal(sizer.height, "0");
+  const track = /^minmax\(0,\s*(\d+)px\)$/.exec(sizer["grid-template-columns"] || "");
+  assert.ok(track && Number(track[1]) >= 200, `natural width track ${sizer["grid-template-columns"]}`);
   const host = declarations(css, ":host");
-  assert.equal(host["min-width"], "0");
+  assert.equal(host.display, "block");
   assert.equal(host.width, undefined);
+  assert.ok(!/px/.test(host["min-width"] || ""), "a px min-width on the host would not shrink in a 1fr grid");
 });
 
 // A pill whose text does not fit even on its own row is shown as its colored
@@ -654,7 +659,20 @@ function fitCard(lang = "en") {
     observe(t) { this.targets.push(t); }
     disconnect() { this.targets = []; }
   }
-  const ctx = sandbox(undefined, { ResizeObserver });
+  // Animation frames run when the test says so (flush), like the browser after the observer.
+  let frames = new Map();
+  let next = 1;
+  const requestAnimationFrame = (fn) => {
+    frames.set(next, fn);
+    return next++;
+  };
+  const cancelAnimationFrame = (id) => frames.delete(id);
+  const flush = () => {
+    const run = frames;
+    frames = new Map();
+    for (const fn of run.values()) fn();
+  };
+  const ctx = sandbox(undefined, { ResizeObserver, requestAnimationFrame, cancelAnimationFrame });
   vm.runInContext(source, ctx);
   const el = new (ctx.customElements.get("ha-uv-card"))();
   el.setConfig({ entity: "sensor.uv", language: lang });
@@ -670,11 +688,18 @@ function fitCard(lang = "en") {
     const natural = "data-dot" in node.attributes ? 10 : node.textContent.length * 7 + 16 + 0.4;
     return { width: node.style.width === "max-content" ? natural : Math.min(room, natural) };
   };
+  // The observer reports the card's new width; the fit runs in the next frame.
+  let width = 300;
   const resize = (w) => {
     room = w;
-    for (const o of observers) if (o.targets.length) o.cb([]);
+    width += 1; // the card width follows the room
+    for (const o of observers) if (o.targets.length) o.cb([{ contentRect: { width, height: 100 } }]);
+    flush();
   };
-  return { el, pill, resize, observers };
+  const notify = (entry) => {
+    for (const o of observers) if (o.targets.length) o.cb([{ contentRect: entry }]);
+  };
+  return { el, pill, resize, observers, notify, frames: () => frames.size, flush, width: () => width };
 }
 
 test("a risk level that cannot fit is shown as its colored dot, and comes back when it fits", () => {
@@ -705,9 +730,29 @@ test("a risk level that cannot fit is shown as its colored dot, and comes back w
 });
 
 test("a card removed from the page stops watching its width", () => {
-  const { el, observers } = fitCard();
+  const { el, observers, notify, frames } = fitCard();
+  notify({ width: 120, height: 100 });
+  assert.equal(frames(), 1);
   el.disconnectedCallback?.();
   assert.ok(observers.every((o) => o.targets.length === 0));
+  assert.equal(frames(), 0, "a pending fit is cancelled");
+});
+
+// Without a fixed height (masonry, stacks) the text <-> dot switch changes the
+// card height. Fitting inside the observer callback resized the observed card
+// in its own callback ("ResizeObserver loop completed with undelivered
+// notifications"): the fit runs in the next frame, and only for a new width.
+test("the observer refits in the next frame, and only when the width changed", () => {
+  const { pill, resize, notify, frames, flush, width } = fitCard("pl");
+  resize(80);
+  assert.equal("data-dot" in pill().attributes, true, "UV 4 'Umiarkowany' (86px) does not fit in 80px");
+  notify({ width: width() + 1, height: 100 });
+  assert.equal(frames(), 1, "the fit waits for the next frame");
+  notify({ width: width() + 2, height: 100 });
+  assert.equal(frames(), 1, "two resizes in a frame fit once");
+  flush();
+  notify({ width: width() + 2, height: 140 });
+  assert.equal(frames(), 0, "a height change alone (the dot switch itself) is not refitted");
 });
 
 test("the dot style keeps the band color and hides only the text", () => {
