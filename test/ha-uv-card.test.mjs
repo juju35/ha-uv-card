@@ -211,17 +211,20 @@ test("every language has the editor labels", () => {
 
 const placeholders = (text) => (String(text).match(/\{\w+\}/g) || []).sort();
 
-test("Serbian (sr, sr-Latn) has the same keys and placeholders as English", () => {
+test("every language has the same keys, array lengths and placeholders as English, and no empty value", () => {
   const ctx = sandbox();
   vm.runInContext(`${source}\nshared.TRANSLATIONS = TRANSLATIONS;`, ctx);
   const { TRANSLATIONS } = ctx.shared;
-  for (const lang of ["sr", "sr-Latn"]) {
+  const langs = ["fr", "de", "es", "it", "nl", "pt", "pl", "sr", "sr-Latn"];
+  assert.deepEqual(Object.keys(TRANSLATIONS).sort(), ["en", ...langs].sort());
+  for (const lang of langs) {
     const dict = TRANSLATIONS[lang];
     assert.ok(dict, lang);
     assert.deepEqual(Object.keys(dict).sort(), Object.keys(TRANSLATIONS.en).sort(), lang);
     for (const [key, value] of Object.entries(TRANSLATIONS.en)) {
       if (Array.isArray(value)) assert.equal(dict[key].length, value.length, `${lang}.${key}`);
       assert.deepEqual(placeholders(dict[key]), placeholders(value), `${lang}.${key}`);
+      assert.ok(String(dict[key]).trim() !== "", `${lang}.${key} is empty`);
     }
   }
 });
@@ -250,7 +253,36 @@ test("the language resolves to the full code, then the base code, then English",
   // pt has a translation in this card, so pt-BR falls back to it.
   assert.equal(localize("ed_language", "pt-BR"), "Idioma");
   assert.equal(localize("ed_language", "ja-JP"), "Language");
+  assert.equal(localize("ed_language", "ja"), "Language");
   assert.equal(localize("ed_language", undefined), "Language");
+});
+
+test("it, nl, pt and pl resolve from their regional codes, pt-BR falls back to European Portuguese", () => {
+  const ctx = sandbox();
+  vm.runInContext(`${source}\nshared.resolveLang = resolveLang;`, ctx);
+  const { resolveLang } = ctx.shared;
+  assert.equal(resolveLang("it-IT"), "it");
+  assert.equal(resolveLang("nl-BE"), "nl");
+  assert.equal(resolveLang("pt"), "pt");
+  assert.equal(resolveLang("pt-BR"), "pt");
+  assert.equal(resolveLang("pl-PL"), "pl");
+  assert.equal(resolveLang("sr-Latn"), "sr-Latn");
+  assert.equal(resolveLang("ja"), "en");
+});
+
+test("Home Assistant set to pl-PL shows the card and the editor in Polish", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const card = new (ctx.customElements.get("ha-uv-card"))();
+  card.setConfig({ entity: "sensor.uv" });
+  card.hass = hassWith(4, "pl-PL");
+  assert.equal(card.shadowRoot.querySelector(".name").textContent, "Indeks UV");
+  assert.equal(label(card.shadowRoot), "Umiarkowany");
+  const editor = { querySelector: () => ({ hass: { language: "pl-PL" } }) };
+  const ctx2 = sandbox(undefined, { document: { ...ctx.document, ...editor } });
+  vm.runInContext(source, ctx2);
+  const form = ctx2.shared.registry.get("ha-uv-card").getConfigForm();
+  assert.equal(form.computeLabel({ name: "language" }), "Język");
 });
 
 test("Home Assistant set to sr-Latn shows the card and the editor in Latin script", () => {
@@ -276,6 +308,21 @@ test("the editor offers Serbian in Cyrillic and Latin script", () => {
   const labels = Object.fromEntries(options.map((o) => [o.value, o.label]));
   assert.equal(labels.sr, "Српски");
   assert.equal(labels["sr-Latn"], "Srpski (latinica)");
+});
+
+test("the editor offers Italian, Dutch, Portuguese and Polish", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const form = ctx.shared.registry.get("ha-uv-card").getConfigForm();
+  const options = form.schema.find((field) => field.name === "language").selector.select.options;
+  const labels = Object.fromEntries(options.map((o) => [o.value, o.label]));
+  assert.equal(labels.it, "Italiano");
+  assert.equal(labels.nl, "Nederlands");
+  assert.equal(labels.pt, "Português");
+  assert.equal(labels.pl, "Polski");
+  // One option per translation, plus the leading auto option.
+  vm.runInContext("shared.TRANSLATIONS = TRANSLATIONS;", ctx);
+  assert.deepEqual([...options.slice(1).map((o) => o.value)].sort(), [...Object.keys(ctx.shared.TRANSLATIONS)].sort());
 });
 
 test("the editor language selector starts with an auto (empty) option", () => {

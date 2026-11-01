@@ -57,6 +57,10 @@ const TRANSLATIONS = {
         ed_entity: "Sensor de índice UV", ed_name: "Nome", ed_layout: "Disposição", ed_horizontal: "Horizontal", ed_vertical: "Vertical",
         ed_align: "Alinhamento", ed_center: "Centrado", ed_top: "Em cima", ed_show_value: "Mostrar o valor", ed_show_label: "Mostrar o nível de risco",
         ed_transparent: "Fundo transparente", ed_language: "Idioma", ed_auto: "Automático (Home Assistant)" },
+  pl: { name: "Indeks UV", low: "Niski", moderate: "Umiarkowany", high: "Wysoki", very_high: "Bardzo wysoki", extreme: "Ekstremalny", unavailable: "Niedostępny",
+        ed_entity: "Czujnik indeksu UV", ed_name: "Nazwa", ed_layout: "Układ", ed_horizontal: "Poziomy", ed_vertical: "Pionowy",
+        ed_align: "Wyrównanie", ed_center: "Wyśrodkowane", ed_top: "Do góry", ed_show_value: "Pokaż wartość", ed_show_label: "Pokaż poziom ryzyka",
+        ed_transparent: "Przezroczyste tło", ed_language: "Język", ed_auto: "Automatycznie (Home Assistant)" },
   sr: { name: "УВ индекс", low: "Низак", moderate: "Умерен", high: "Висок", very_high: "Веома висок", extreme: "Екстреман", unavailable: "Недоступно",
         ed_entity: "Сензор УВ индекса", ed_name: "Назив", ed_layout: "Распоред", ed_horizontal: "Хоризонтално", ed_vertical: "Вертикално",
         ed_align: "Поравнање", ed_center: "Центрирано", ed_top: "Горе", ed_show_value: "Прикажи вредност", ed_show_label: "Прикажи ниво ризика",
@@ -68,7 +72,7 @@ const TRANSLATIONS = {
 };
 
 const LANGUAGE_NAMES = {
-  en: "English", fr: "Français", de: "Deutsch", es: "Español", it: "Italiano", nl: "Nederlands", pt: "Português",
+  en: "English", fr: "Français", de: "Deutsch", es: "Español", it: "Italiano", nl: "Nederlands", pt: "Português", pl: "Polski",
   sr: "Српски", "sr-Latn": "Srpski (latinica)",
 };
 
