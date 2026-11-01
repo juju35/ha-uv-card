@@ -101,9 +101,18 @@ const STYLE = `
   :host {
     display: block;
     height: 100%;
-    /* ha-card's intrinsic width (below) is a fallback for shrink-to-fit
-       parents only: in a "1fr 1fr" grid the card must still shrink to its cell. */
-    min-width: 0;
+  }
+  /* Natural width in a parent that sizes to its content (inline-block, grid
+     "auto" column, layout-card, button-card): ha-card is a size container, so
+     its content no longer gives the card a width, and this empty grid does
+     instead. Its min-content width is 0: in a "1fr 1fr" grid the card still
+     shrinks to its cell, also when a wrapping <div> (min-width: auto) takes
+     its min-content width. No height, so it takes no room. */
+  :host::before {
+    content: "";
+    display: grid;
+    grid-template-columns: minmax(0, 240px);
+    height: 0;
   }
   ha-card {
     height: 100%;
@@ -115,11 +124,9 @@ const STYLE = `
     box-sizing: border-box;
     cursor: pointer;
     /* Size container for the narrow-card rules below. Inline-size containment
-       leaves the content out of the intrinsic width: in a shrink-to-fit parent
-       (inline-block, grid "auto" column, layout-card, button-card) the card
-       takes this width instead of falling to its padding. */
+       leaves the content out of the intrinsic width: :host::before gives the
+       card its width in a shrink-to-fit parent. */
     container-type: inline-size;
-    contain-intrinsic-inline-size: 240px;
     /* Band colors stay on the tinted backgrounds; text and the badge icon use
        them half-mixed with the theme text color, which keeps the hue and
        reaches 4.5:1 in HA's light and dark themes (bright yellow on white and
@@ -365,13 +372,29 @@ class UvIndexCard extends HTMLElement {
   disconnectedCallback() {
     this._resizeObserver?.disconnect();
     this._resizeObserver = null;
+    if (this._fitFrame) cancelAnimationFrame(this._fitFrame);
+    this._fitFrame = 0;
   }
 
   // Re-fit the risk level when the card width changes (sections resize,
-  // phone rotation, editor preview).
+  // phone rotation, editor preview). Only a width change counts, and the fit
+  // runs in the next animation frame, not in the callback: without a fixed
+  // height (masonry, stacks) the text <-> dot switch changes the card height,
+  // and resizing the observed card inside its own callback is a "ResizeObserver
+  // loop completed with undelivered notifications" error.
   _observe() {
     if (this._resizeObserver || !this._els || typeof ResizeObserver !== "function") return;
-    this._resizeObserver = new ResizeObserver(() => this._fitLabel());
+    this._fitWidth = undefined;
+    this._resizeObserver = new ResizeObserver((entries) => {
+      const width = entries[entries.length - 1]?.contentRect.width;
+      if (width !== undefined && width === this._fitWidth) return;
+      this._fitWidth = width;
+      if (this._fitFrame) cancelAnimationFrame(this._fitFrame);
+      this._fitFrame = requestAnimationFrame(() => {
+        this._fitFrame = 0;
+        this._fitLabel();
+      });
+    });
     this._resizeObserver.observe(this._els.card);
   }
 

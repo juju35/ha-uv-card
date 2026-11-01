@@ -8,12 +8,14 @@
   - A narrow horizontal card (up to 6 columns on a phone) puts the level on its own row under the icon and the value, so every level shows in full at the default 6 columns.
   - When a level still cannot fit (4 columns on a phone, or 3 to 4 when vertical), it shows as its colored dot instead of a cut "M…", the level staying in its tooltip and for screen readers. A short level that fits keeps its text.
 - On a very narrow card (about 4 columns on a phone, or 3 when vertical) the small header icon is left out, so the title stays inside the card instead of running past its edge.
-- In a container that sizes the card to its content (an `inline-block`, a grid `auto` column, layout-card or button-card) the card keeps a usable width instead of shrinking to its title.
+- In a container that sizes the card to its content (an `inline-block`, a grid `auto` column, layout-card or button-card) the card keeps a usable width instead of shrinking to its title. In a two-column grid (grid card, layout-card), directly or wrapped in another element, it still shrinks to its column instead of running past the grid.
+- In the masonry view or a stack, switching the risk level between its text and its dot no longer logs a "ResizeObserver loop" error.
 - The card shows a focus ring when it is reached with the keyboard.
 
 ### Maintenance
 - CI: Biome 2.6.4.
 - The screenshot and GIF scripts only rewrite a capture when its pixels changed, so an unchanged card no longer shows up as modified files in a pull request.
+- Browser tests (Chromium) for the card width in real containers, the risk level refit and the screenshot pixel comparison, run in the screenshots workflow.
 
 ## 1.6.6 — 2026-11-01
 
