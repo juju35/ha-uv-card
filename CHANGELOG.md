@@ -4,11 +4,16 @@
 
 ### Changes
 - In the sections view the card now fills its cell with the default `center` alignment too, so it is as tall as its neighbours and its content is really centered (before, only `top` filled the cell).
-- On narrow cards (4 columns, or 3 when vertical) the risk level stays on one line inside the card: the icon gets a little smaller so every level shows in full, and a longer text (such as "Niet beschikbaar") ends with an ellipsis, the full text showing in its tooltip. Before, Polish, Serbian, German, Spanish, Italian and Dutch levels wrapped onto two lines or ran past the card edge.
+- On narrow cards the risk level stays on one line inside the card. Before, Polish, Serbian, German, Spanish, Italian and Dutch levels wrapped onto two lines or ran past the card edge.
+  - A narrow horizontal card (up to 6 columns on a phone) puts the level on its own row under the icon and the value, so every level shows in full at the default 6 columns.
+  - When a level still cannot fit (4 columns on a phone, or 3 to 4 when vertical), it shows as its colored dot instead of a cut "M…", the level staying in its tooltip and for screen readers. A short level that fits keeps its text.
+- On a very narrow card (about 4 columns on a phone, or 3 when vertical) the small header icon is left out, so the title stays inside the card instead of running past its edge.
+- In a container that sizes the card to its content (an `inline-block`, a grid `auto` column, layout-card or button-card) the card keeps a usable width instead of shrinking to its title.
 - The card shows a focus ring when it is reached with the keyboard.
 
 ### Maintenance
 - CI: Biome 2.6.4.
+- The screenshot and GIF scripts only rewrite a capture when its pixels changed, so an unchanged card no longer shows up as modified files in a pull request.
 
 ## 1.6.6 — 2026-11-01
 
