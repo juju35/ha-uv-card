@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.6 — 2026-11-01
+
+### Changes
+- Added Polish translations. Italian, Dutch and European Portuguese were already there: every language is now checked against English (same keys and placeholders, no empty value).
+
 ## 1.6.5 — 2026-11-01
 
 ### Changes
