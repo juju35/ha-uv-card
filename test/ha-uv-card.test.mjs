@@ -42,7 +42,18 @@ class FakeElement {
     return !!force;
   }
   get innerHTML() { return this.html; }
-  set innerHTML(html) { this.html = html; this.htmlWrites++; }
+  set innerHTML(html) {
+    this.html = html;
+    this.htmlWrites++;
+    // An inlined SVG becomes one <svg> child that records SMIL control calls.
+    this.children = [];
+    if (String(html).startsWith("<svg")) {
+      const svg = this.appendChild(new FakeElement("svg", this.root));
+      svg.smil = [];
+      svg.pauseAnimations = () => svg.smil.push("pause");
+      svg.setCurrentTime = (t) => svg.smil.push(`time ${t}`);
+    }
+  }
   addEventListener(type, fn) { this.listeners[type] = fn; }
   focus(options) {
     this.root.activeElement = this;
@@ -63,7 +74,7 @@ class FakeElement {
 
 // `shared` carries the page-wide objects (custom element registry, card picker
 // list) between two loads of the module, each load having its own scope.
-function sandbox(shared = { registry: new Map(), customCards: undefined }) {
+function sandbox(shared = { registry: new Map(), customCards: undefined }, extra = {}) {
   const { registry } = shared;
   class HTMLElement {
     attachShadow() {
@@ -94,6 +105,7 @@ function sandbox(shared = { registry: new Map(), customCards: undefined }) {
       },
     },
   };
+  Object.assign(context, extra);
   context.window = context;
   context.customCards = shared.customCards;
   context.shared = shared;
@@ -276,4 +288,130 @@ test("the README prerequisite matches the hacs.json minimum", () => {
   const readme = readRoot("README.md").match(/Home Assistant (\d{4}\.\d+) or later/);
   assert.ok(readme, "README prerequisite line not found");
   assert.deepEqual(haVersion(readme[1]), haVersion(homeassistant));
+});
+
+// Contrast (WCAG 2.x) of the risk text against what is behind it, computed from
+// the card's own stylesheet with Home Assistant's default light and dark themes
+// (the screenshot themes). A tiny resolver handles var() and color-mix() in srgb.
+const THEMES = {
+  light: { "--card-background-color": "#ffffff", "--primary-text-color": "#212121", "--secondary-text-color": "#727272" },
+  dark: { "--card-background-color": "#1c1c1c", "--primary-text-color": "#e1e1e1", "--secondary-text-color": "#9b9b9b" },
+};
+
+function splitArgs(text) {
+  const out = [];
+  let depth = 0;
+  let start = 0;
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === "(") depth++;
+    else if (text[i] === ")") depth--;
+    else if (text[i] === "," && depth === 0) {
+      out.push(text.slice(start, i).trim());
+      start = i + 1;
+    }
+  }
+  out.push(text.slice(start).trim());
+  return out;
+}
+
+// Returns [r, g, b, a] with premultiplied mixing, as color-mix() does.
+function resolveColor(expr, vars) {
+  expr = expr.trim();
+  const v = expr.match(/^var\((--[\w-]+)\)$/);
+  if (v) {
+    assert.ok(v[1] in vars, `unknown variable ${v[1]}`);
+    return resolveColor(vars[v[1]], vars);
+  }
+  if (expr === "transparent") return [0, 0, 0, 0];
+  const hex = expr.match(/^#([0-9a-f]{6})$/i);
+  if (hex) return [0, 2, 4].map((i) => parseInt(hex[1].slice(i, i + 2), 16)).concat(1);
+  const mix = expr.match(/^color-mix\(in srgb,(.*)\)$/s);
+  assert.ok(mix, `unsupported color ${expr}`);
+  const [a, b] = splitArgs(mix[1]).map((part) => {
+    const m = part.match(/^(.*?)(?:\s+([\d.]+)%)?$/s);
+    return { color: resolveColor(m[1], vars), pct: m[2] === undefined ? null : Number(m[2]) / 100 };
+  });
+  const pa = a.pct ?? (b.pct === null ? 0.5 : 1 - b.pct);
+  const pb = 1 - pa;
+  const alpha = a.color[3] * pa + b.color[3] * pb;
+  if (alpha === 0) return [0, 0, 0, 0];
+  const rgb = [0, 1, 2].map((i) => (a.color[i] * a.color[3] * pa + b.color[i] * b.color[3] * pb) / alpha);
+  return [...rgb, alpha];
+}
+
+const over = (top, bottom) => [0, 1, 2].map((i) => top[i] * top[3] + bottom[i] * (1 - top[3])).concat(1);
+const luminance = (rgb) =>
+  rgb.slice(0, 3).reduce((sum, c, i) => {
+    const s = c / 255;
+    const l = s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    return sum + l * [0.2126, 0.7152, 0.0722][i];
+  }, 0);
+const contrast = (a, b) => {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+};
+
+// Declarations of the first rule whose selector is exactly `selector`.
+function declarations(css, selector) {
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const rule = css.replace(/\/\*.*?\*\//gs, "").match(new RegExp(`(?:^|\\})\\s*${escaped}\\s*\\{([^}]*)\\}`));
+  assert.ok(rule, `rule ${selector} not found`);
+  return Object.fromEntries(
+    rule[1].split(";").map((d) => d.split(/:(.*)/s).map((x) => x.trim())).filter(([k, val]) => k && val),
+  );
+}
+
+test("the risk value, label and badge icon are readable in light and dark themes", () => {
+  // Value: 30px text (large, 3:1). Label: 11px text (4.5:1). Badge: meaningful icon (3:1).
+  const targets = [
+    { selector: ".value", min: 3, bg: null },
+    { selector: ".label", min: 4.5, bg: ".label" },
+    { selector: ".badge", min: 3, bg: ".badge" },
+  ];
+  for (const state of [1, 4, 6, 9, 11, "unavailable"]) {
+    const root = render(state);
+    const css = root.querySelector("style").textContent;
+    const haCard = root.querySelector("ha-card");
+    const cardVars = Object.fromEntries(Object.entries(declarations(css, "ha-card")).filter(([k]) => k.startsWith("--")));
+    for (const [theme, themeVars] of Object.entries(THEMES)) {
+      const vars = { ...themeVars, ...cardVars, ...haCard.style.props };
+      const cardBg = resolveColor("var(--card-background-color)", vars);
+      for (const { selector, min, bg } of targets) {
+        const decl = declarations(css, selector);
+        const behind = bg ? over(resolveColor(decl.background, vars), cardBg) : cardBg;
+        const ratio = contrast(over(resolveColor(decl.color, vars), behind), behind);
+        assert.ok(ratio >= min, `${selector} at UV ${state} (${theme}): ${ratio.toFixed(2)}:1 < ${min}:1`);
+      }
+    }
+  }
+});
+
+// Each test icon is a bare <svg> so the fake DOM exposes it to querySelector.
+const svgSource = readFileSync(new URL("../src/ha-uv-card.js", import.meta.url), "utf8")
+  .replace("__VERSION__", "test")
+  .replace("__ICONS__", () => JSON.stringify({ default: "<svg></svg>", ...Object.fromEntries([...Array(12).keys()].map((i) => [i, "<svg></svg>"])) }));
+
+function motionCard(reduce) {
+  const extra = reduce === undefined ? {} : { matchMedia: (q) => ({ matches: reduce && q === "(prefers-reduced-motion: reduce)" }) };
+  const ctx = sandbox(undefined, extra);
+  vm.runInContext(svgSource, ctx);
+  const el = new (ctx.customElements.get("ha-uv-card"))();
+  el.setConfig({ entity: "sensor.uv" });
+  el.hass = hassWith(4);
+  return el;
+}
+
+test("with prefers-reduced-motion the icon's SMIL rotation is paused, also after an icon swap", () => {
+  const el = motionCard(true);
+  const svg = () => el.shadowRoot.querySelector(".icon").querySelector("svg");
+  assert.deepEqual(svg().smil, ["pause", "time 0"]);
+  el.hass = hassWith(8);
+  assert.deepEqual(svg().smil, ["pause", "time 0"]);
+});
+
+test("without a reduced-motion preference (or matchMedia) the icon keeps animating", () => {
+  for (const reduce of [false, undefined]) {
+    const el = motionCard(reduce);
+    assert.deepEqual(el.shadowRoot.querySelector(".icon").querySelector("svg").smil, [], String(reduce));
+  }
 });
