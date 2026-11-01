@@ -96,7 +96,14 @@ function localize(key, lang) {
 // --uv-color variable and the data-layout / data-align / data-transparent
 // attributes set on ha-card.
 const STYLE = `
+  /* Sections view: the grid stretches the host to the rows the card asked
+     for; ha-card fills it, so "center" centers and "top" sticks to the top. */
+  :host {
+    display: block;
+    height: 100%;
+  }
   ha-card {
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -112,7 +119,11 @@ const STYLE = `
   }
   ha-card[data-align="top"] {
     justify-content: flex-start;
-    height: 100%;
+  }
+  /* Keyboard focus (the card is a role="button"), drawn inside the rounded card. */
+  ha-card:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: -2px;
   }
   ha-card[data-transparent] {
     background: none;
@@ -140,9 +151,10 @@ const STYLE = `
     color: var(--uv-text-color);
     --mdc-icon-size: 24px;
   }
+  /* The title keeps at least 4 characters, then is cut with an ellipsis. */
   .titles {
-    flex: 1;
-    min-width: 0;
+    flex: 1 1 auto;
+    min-width: 4ch;
   }
   .name {
     font-size: 16px;
@@ -154,6 +166,7 @@ const STYLE = `
     white-space: nowrap;
   }
   .body {
+    container-type: inline-size;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -181,6 +194,7 @@ const STYLE = `
     align-items: flex-start;
     gap: 2px;
     min-width: 0;
+    max-width: 100%;
   }
   ha-card[data-layout="vertical"] .info {
     align-items: center;
@@ -200,6 +214,24 @@ const STYLE = `
     font-weight: 500;
     color: var(--uv-text-color);
     background: color-mix(in srgb, var(--uv-color) 15%, transparent);
+    /* One line inside the card: a long level (pl "Bardzo wysoki", nl "Niet
+       beschikbaar") is cut with an ellipsis, its full text in the tooltip. */
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+  }
+  /* Narrow horizontal card (4 columns of the sections view): a smaller icon
+     and pill padding leave the longest risk levels room to show in full. */
+  @container (max-width: 160px) {
+    ha-card[data-layout="horizontal"] .icon {
+      width: 40px;
+      height: 40px;
+    }
+    .label {
+      padding: 1px 6px;
+    }
   }
 `;
 
@@ -402,6 +434,7 @@ class UvIndexCard extends HTMLElement {
     value.textContent = valueText;
     value.hidden = !this._config.show_value;
     label.textContent = labelText;
+    label.setAttribute("title", labelText);
     label.hidden = !this._config.show_label;
   }
 

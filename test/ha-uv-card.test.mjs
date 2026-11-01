@@ -559,6 +559,9 @@ test("the risk level pill stays on one line inside the card and keeps its full t
   assert.equal(pill["box-sizing"], "border-box");
   assert.equal(declarations(css, ".info")["max-width"], "100%", "the text column never outgrows the card");
   assert.equal(root.querySelector(".label").getAttribute("title"), "Niet beschikbaar");
+  // A narrow horizontal card shrinks the icon to leave the level room.
+  assert.equal(declarations(css, ".body")["container-type"], "inline-size");
+  assert.match(css, /@container \(max-width: \d+px\) \{\s*ha-card\[data-layout="horizontal"\] \.icon \{/);
 });
 
 test("the label tooltip follows the level when the value changes", () => {
