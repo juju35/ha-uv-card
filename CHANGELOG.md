@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.5 — 2026-11-01
+
+### Changes
+- Added Serbian (Cyrillic and Latin) translations.
+- A Home Assistant language set to `sr-Latn` now picks the Latin-script translation: the full language code is matched before its base code.
+
 ## 1.6.4 — 2026-10-29
 
 ### Changes

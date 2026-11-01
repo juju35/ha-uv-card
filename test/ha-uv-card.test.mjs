@@ -209,6 +209,75 @@ test("every language has the editor labels", () => {
   }
 });
 
+const placeholders = (text) => (String(text).match(/\{\w+\}/g) || []).sort();
+
+test("Serbian (sr, sr-Latn) has the same keys and placeholders as English", () => {
+  const ctx = sandbox();
+  vm.runInContext(`${source}\nshared.TRANSLATIONS = TRANSLATIONS;`, ctx);
+  const { TRANSLATIONS } = ctx.shared;
+  for (const lang of ["sr", "sr-Latn"]) {
+    const dict = TRANSLATIONS[lang];
+    assert.ok(dict, lang);
+    assert.deepEqual(Object.keys(dict).sort(), Object.keys(TRANSLATIONS.en).sort(), lang);
+    for (const [key, value] of Object.entries(TRANSLATIONS.en)) {
+      if (Array.isArray(value)) assert.equal(dict[key].length, value.length, `${lang}.${key}`);
+      assert.deepEqual(placeholders(dict[key]), placeholders(value), `${lang}.${key}`);
+    }
+  }
+});
+
+test("sr is written in Cyrillic and sr-Latn in Latin (brand names aside)", () => {
+  const ctx = sandbox();
+  vm.runInContext(`${source}\nshared.TRANSLATIONS = TRANSLATIONS;`, ctx);
+  const { TRANSLATIONS } = ctx.shared;
+  const strip = (text) => String(text).replace(/Home Assistant/g, "");
+  for (const [key, value] of Object.entries(TRANSLATIONS.sr)) {
+    assert.doesNotMatch(strip(value), /[A-Za-z]/, `sr.${key}`);
+  }
+  for (const [key, value] of Object.entries(TRANSLATIONS["sr-Latn"])) {
+    assert.doesNotMatch(value, /[Ѐ-ӿ]/, `sr-Latn.${key}`);
+  }
+});
+
+test("the language resolves to the full code, then the base code, then English", () => {
+  const ctx = sandbox();
+  vm.runInContext(`${source}\nshared.localize = localize;`, ctx);
+  const { localize } = ctx.shared;
+  assert.equal(localize("ed_language", "fr-FR"), "Langue");
+  assert.equal(localize("ed_language", "sr-Latn"), "Jezik");
+  assert.equal(localize("ed_language", "sr"), "Језик");
+  assert.equal(localize("ed_language", "sr-Cyrl"), "Језик");
+  // pt has a translation in this card, so pt-BR falls back to it.
+  assert.equal(localize("ed_language", "pt-BR"), "Idioma");
+  assert.equal(localize("ed_language", "ja-JP"), "Language");
+  assert.equal(localize("ed_language", undefined), "Language");
+});
+
+test("Home Assistant set to sr-Latn shows the card and the editor in Latin script", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const card = new (ctx.customElements.get("ha-uv-card"))();
+  card.setConfig({ entity: "sensor.uv" });
+  card.hass = hassWith(4, "sr-Latn");
+  assert.equal(card.shadowRoot.querySelector(".name").textContent, "UV indeks");
+  assert.equal(label(card.shadowRoot), "Umeren");
+  const editor = { querySelector: () => ({ hass: { language: "sr-Latn" } }) };
+  const ctx2 = sandbox(undefined, { document: { ...ctx.document, ...editor } });
+  vm.runInContext(source, ctx2);
+  const form = ctx2.shared.registry.get("ha-uv-card").getConfigForm();
+  assert.equal(form.computeLabel({ name: "language" }), "Jezik");
+});
+
+test("the editor offers Serbian in Cyrillic and Latin script", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const form = ctx.shared.registry.get("ha-uv-card").getConfigForm();
+  const options = form.schema.find((field) => field.name === "language").selector.select.options;
+  const labels = Object.fromEntries(options.map((o) => [o.value, o.label]));
+  assert.equal(labels.sr, "Српски");
+  assert.equal(labels["sr-Latn"], "Srpski (latinica)");
+});
+
 test("the editor language selector starts with an auto (empty) option", () => {
   const ctx = sandbox();
   vm.runInContext(source, ctx);
