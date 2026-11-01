@@ -57,17 +57,35 @@ const TRANSLATIONS = {
         ed_entity: "Sensor de índice UV", ed_name: "Nome", ed_layout: "Disposição", ed_horizontal: "Horizontal", ed_vertical: "Vertical",
         ed_align: "Alinhamento", ed_center: "Centrado", ed_top: "Em cima", ed_show_value: "Mostrar o valor", ed_show_label: "Mostrar o nível de risco",
         ed_transparent: "Fundo transparente", ed_language: "Idioma", ed_auto: "Automático (Home Assistant)" },
+  sr: { name: "УВ индекс", low: "Низак", moderate: "Умерен", high: "Висок", very_high: "Веома висок", extreme: "Екстреман", unavailable: "Недоступно",
+        ed_entity: "Сензор УВ индекса", ed_name: "Назив", ed_layout: "Распоред", ed_horizontal: "Хоризонтално", ed_vertical: "Вертикално",
+        ed_align: "Поравнање", ed_center: "Центрирано", ed_top: "Горе", ed_show_value: "Прикажи вредност", ed_show_label: "Прикажи ниво ризика",
+        ed_transparent: "Провидна позадина", ed_language: "Језик", ed_auto: "Аутоматски (Home Assistant)" },
+  "sr-Latn": { name: "UV indeks", low: "Nizak", moderate: "Umeren", high: "Visok", very_high: "Veoma visok", extreme: "Ekstreman", unavailable: "Nedostupno",
+        ed_entity: "Senzor UV indeksa", ed_name: "Naziv", ed_layout: "Raspored", ed_horizontal: "Horizontalno", ed_vertical: "Vertikalno",
+        ed_align: "Poravnanje", ed_center: "Centrirano", ed_top: "Gore", ed_show_value: "Prikaži vrednost", ed_show_label: "Prikaži nivo rizika",
+        ed_transparent: "Providna pozadina", ed_language: "Jezik", ed_auto: "Automatski (Home Assistant)" },
 };
 
-const LANGUAGE_NAMES = { en: "English", fr: "Français", de: "Deutsch", es: "Español", it: "Italiano", nl: "Nederlands", pt: "Português" };
+const LANGUAGE_NAMES = {
+  en: "English", fr: "Français", de: "Deutsch", es: "Español", it: "Italiano", nl: "Nederlands", pt: "Português",
+  sr: "Српски", "sr-Latn": "Srpski (latinica)",
+};
 
-// Resolve a translation for the given language, falling back to the base
-// language code (e.g. "fr-CA" -> "fr") and finally to English.
+// Pick the translation code for a language: the full code when it has a
+// translation (e.g. "sr-Latn", matched case-insensitively), else the base code
+// (e.g. "fr-CA" -> "fr"), else English.
+function resolveLang(lang) {
+  const code = String(lang || "en");
+  const lower = code.toLowerCase();
+  const full = Object.keys(TRANSLATIONS).find((k) => k.toLowerCase() === lower);
+  if (full) return full;
+  const base = lower.split("-")[0];
+  return TRANSLATIONS[base] ? base : "en";
+}
+
 function localize(key, lang) {
-  const code = (lang || "en").toLowerCase();
-  const dict =
-    TRANSLATIONS[code] || TRANSLATIONS[code.split("-")[0]] || TRANSLATIONS.en;
-  return dict[key] || TRANSLATIONS.en[key];
+  return TRANSLATIONS[resolveLang(lang)][key] || TRANSLATIONS.en[key];
 }
 
 // Static stylesheet, injected once. The per-render values are driven by the
