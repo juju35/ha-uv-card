@@ -8,6 +8,8 @@ on:
       - "src/**"
       - "icons/**"
       - "scripts/**"
+      # The browser tests below run here, where Chromium and ffmpeg are installed.
+      - "test/**"
       # A Playwright bump changes the rendering too.
       - "package.json"
       - "package-lock.json"
@@ -65,6 +67,10 @@ jobs:
           [ -n "$ok" ] || { echo "::error::apt failed 3 times"; exit 1; }
           ffmpeg -version > /dev/null
       - run: npm run build
+      # Layout in real parents, ResizeObserver, and the PNG / GIF pixel comparison
+      # on real images: skipped in the unit-test job (no browser), required here.
+      - name: Browser tests
+        run: REQUIRE_BROWSER=1 node --test test/browser.test.mjs
       - name: Render screenshots and GIFs
         run: |
           set -o pipefail

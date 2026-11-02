@@ -62,7 +62,7 @@ entity: sensor.uv_index
 | `show_label` | boolean | `true`               | Show the risk label (Low … Extreme).                     |
 | `layout`     | string  | `horizontal`         | `horizontal` (text to the right) or `vertical` (text below the icon). |
 | `transparent`| boolean | `false`              | Remove the card background, border and shadow.           |
-| `align`      | string  | `center`             | `center` or `top`. Vertical alignment of the content — use `top` to line the card up with others in a `horizontal-stack`. |
+| `align`      | string  | `center`             | `center` or `top`. Vertical alignment of the content inside the card, which fills its cell in the sections view — use `top` to line the card up with others in a `horizontal-stack`. |
 | `language`   | string  | Home Assistant UI    | Force a language code (e.g. `fr`). Defaults to your HA UI. |
 
 ### Risk levels

@@ -4,11 +4,12 @@
 // cover: the SVG document clock is paused and stepped frame by frame, so every GIF loops
 // cleanly whatever the machine's speed.
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { icons, render, uv } from "./screenshots.mjs";
+import { sameGifPixels, writeIfChanged } from "./write-if-changed.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const WIDTH = 460;
@@ -40,10 +41,12 @@ const captureGif = (file) => async (page, clip) => {
   execFileSync("ffmpeg", [
     "-y", "-loglevel", "error", "-framerate", String(FPS), "-i", join(dir, "f%03d.png"),
     "-vf", `scale=${clip.width}:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse=dither=bayer:bayer_scale=4`,
-    "-loop", "0", `${root}screenshots/${file}.gif`,
+    "-loop", "0", join(dir, "out.gif"),
   ]);
+  // Only rewritten when a frame changed, so an unchanged animation leaves the file alone.
+  const written = await writeIfChanged(`${root}screenshots/${file}.gif`, readFileSync(join(dir, "out.gif")), sameGifPixels);
   rmSync(dir, { recursive: true });
-  console.log(`screenshots/${file}.gif`);
+  console.log(`screenshots/${file}.gif${written ? "" : " (unchanged)"}`);
 };
 
 // Each band in both themes with the same setup: uv-<band>.gif light, uv-<band>-dark.gif dark.
