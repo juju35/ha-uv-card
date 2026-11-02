@@ -3,6 +3,7 @@
 [![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![HACS Validation](https://github.com/juju35/ha-uv-card/actions/workflows/hacs.yml/badge.svg)](https://github.com/juju35/ha-uv-card/actions/workflows/hacs.yml)
 [![Validate](https://github.com/juju35/ha-uv-card/actions/workflows/validate.yml/badge.svg)](https://github.com/juju35/ha-uv-card/actions/workflows/validate.yml)
+[![Lint](https://github.com/juju35/ha-uv-card/actions/workflows/lint.yml/badge.svg)](https://github.com/juju35/ha-uv-card/actions/workflows/lint.yml)
 [![Release](https://img.shields.io/github/v/release/juju35/ha-uv-card)](https://github.com/juju35/ha-uv-card/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -83,7 +84,7 @@ entity: sensor.uv_index
 | Vertical | ![Vertical](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-vertical.png) | ![Vertical dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-vertical-dark.png) |
 | Unavailable | ![Unavailable](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-unavailable.png) | ![Unavailable dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-unavailable-dark.png) |
 
-## Animations
+### Animations
 
 One animated icon per WHO risk band — the sun rays sweep continuously (they stay still when the system or browser asks to reduce motion) while the badge, value and label take the band's colour, mixed with the theme text colour so that they stay readable in light and dark themes.
 
