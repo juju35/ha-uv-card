@@ -5,7 +5,7 @@
 [![Validate](https://github.com/juju35/ha-uv-card/actions/workflows/validate.yml/badge.svg)](https://github.com/juju35/ha-uv-card/actions/workflows/validate.yml)
 [![Lint](https://github.com/juju35/ha-uv-card/actions/workflows/lint.yml/badge.svg)](https://github.com/juju35/ha-uv-card/actions/workflows/lint.yml)
 [![Release](https://img.shields.io/github/v/release/juju35/ha-uv-card)](https://github.com/juju35/ha-uv-card/releases/latest)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/juju35/ha-uv-card/blob/main/LICENSE)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/julienstep9)
 
 Lovelace card for Home Assistant that shows the current **UV index** with an animated weather-style icon, the value and the WHO risk level (Low → Extreme).
@@ -71,11 +71,11 @@ entity: sensor.uv_index
 
 | Icon | UV index | Level     | Color  |
 | ---- | -------- | --------- | ------ |
-| <img src="icons/uv-index-1.svg" width="32" />  | 0–2  | Low       | green  |
-| <img src="icons/uv-index-4.svg" width="32" />  | 3–5  | Moderate  | yellow |
-| <img src="icons/uv-index-7.svg" width="32" />  | 6–7  | High      | orange |
-| <img src="icons/uv-index-9.svg" width="32" />  | 8–10 | Very High | red    |
-| <img src="icons/uv-index-11.svg" width="32" /> | 11+  | Extreme   | purple |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-1.svg" width="32" />  | 0–2  | Low       | green  |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-4.svg" width="32" />  | 3–5  | Moderate  | yellow |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-7.svg" width="32" />  | 6–7  | High      | orange |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-9.svg" width="32" />  | 8–10 | Very High | red    |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-11.svg" width="32" /> | 11+  | Extreme   | purple |
 
 ## Screenshots
 
@@ -118,7 +118,7 @@ The **Screenshots** workflow re-renders the screenshots and GIFs on every pull r
 ### Releasing
 
 1. Bump `version` in `package.json`
-2. Add a `## <version>` section at the top of [CHANGELOG.md](CHANGELOG.md)
+2. Add a `## <version>` section at the top of [CHANGELOG.md](https://github.com/juju35/ha-uv-card/blob/main/CHANGELOG.md)
 3. Push to `main`: the **Release** workflow builds the card, creates the tag and the GitHub release with the changelog section as notes, and attaches `ha-uv-card.js`
 
 ## Translations
@@ -154,7 +154,7 @@ Add a language in the `TRANSLATIONS` map of `src/ha-uv-card.js`. Contributions w
 
 ## License
 
-[MIT](LICENSE)
+[MIT](https://github.com/juju35/ha-uv-card/blob/main/LICENSE)
 
 UV index icons from [Meteocons](https://github.com/basmilius/weather-icons) by Bas Milius (MIT).
 
