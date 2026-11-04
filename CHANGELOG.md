@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.8 — 2026-11-04
+
+### Changes
+- Added Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek translations, with their native names in the editor's language selector.
+
 ## 1.6.7 — 2026-11-01
 
 ### Changes
