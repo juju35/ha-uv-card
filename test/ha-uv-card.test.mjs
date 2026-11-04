@@ -216,7 +216,7 @@ test("every language has the same keys, array lengths and placeholders as Englis
   const ctx = sandbox();
   vm.runInContext(`${source}\nshared.TRANSLATIONS = TRANSLATIONS;`, ctx);
   const { TRANSLATIONS } = ctx.shared;
-  const langs = ["fr", "de", "es", "it", "nl", "pt", "pl", "sr", "sr-Latn"];
+  const langs = ["fr", "de", "es", "it", "nl", "pt", "pl", "ro", "da", "sv", "bg", "ru", "uk", "hu", "ga", "sk", "cs", "sl", "mt", "lv", "el", "sr", "sr-Latn"];
   assert.deepEqual(Object.keys(TRANSLATIONS).sort(), ["en", ...langs].sort());
   for (const lang of langs) {
     const dict = TRANSLATIONS[lang];
@@ -271,6 +271,37 @@ test("it, nl, pt and pl resolve from their regional codes, pt-BR falls back to E
   assert.equal(resolveLang("ja"), "en");
 });
 
+test("the 14 newer languages resolve from their regional codes", () => {
+  const ctx = sandbox();
+  vm.runInContext(`${source}\nshared.resolveLang = resolveLang;`, ctx);
+  const { resolveLang } = ctx.shared;
+  const regional = {
+    "ro-RO": "ro", "da-DK": "da", "sv-SE": "sv", "bg-BG": "bg", "ru-RU": "ru", "uk-UA": "uk", "hu-HU": "hu",
+    "ga-IE": "ga", "sk-SK": "sk", "cs-CZ": "cs", "sl-SI": "sl", "mt-MT": "mt", "lv-LV": "lv", "el-GR": "el",
+  };
+  for (const [code, lang] of Object.entries(regional)) assert.equal(resolveLang(code), lang, code);
+});
+
+test("Home Assistant set to ru-RU or el-GR shows the card and the editor in Russian or Greek", () => {
+  for (const [lang, title, level, language] of [
+    ["ru-RU", "УФ-индекс", "Умеренный", "Язык"],
+    ["el-GR", "Δείκτης UV", "Μέτριος", "Γλώσσα"],
+  ]) {
+    const ctx = sandbox();
+    vm.runInContext(source, ctx);
+    const card = new (ctx.customElements.get("ha-uv-card"))();
+    card.setConfig({ entity: "sensor.uv" });
+    card.hass = hassWith(4, lang);
+    assert.equal(card.shadowRoot.querySelector(".name").textContent, title, lang);
+    assert.equal(label(card.shadowRoot), level, lang);
+    const editor = { querySelector: () => ({ hass: { language: lang } }) };
+    const ctx2 = sandbox(undefined, { document: { ...ctx.document, ...editor } });
+    vm.runInContext(source, ctx2);
+    const form = ctx2.shared.registry.get("ha-uv-card").getConfigForm();
+    assert.equal(form.computeLabel({ name: "language" }), language, lang);
+  }
+});
+
 test("Home Assistant set to pl-PL shows the card and the editor in Polish", () => {
   const ctx = sandbox();
   vm.runInContext(source, ctx);
@@ -321,6 +352,11 @@ test("the editor offers Italian, Dutch, Portuguese and Polish", () => {
   assert.equal(labels.nl, "Nederlands");
   assert.equal(labels.pt, "Português (Portugal)");
   assert.equal(labels.pl, "Polski");
+  const natives = {
+    ro: "Română", da: "Dansk", sv: "Svenska", bg: "Български", ru: "Русский", uk: "Українська", hu: "Magyar",
+    ga: "Gaeilge", sk: "Slovenčina", cs: "Čeština", sl: "Slovenščina", mt: "Malti", lv: "Latviešu", el: "Ελληνικά",
+  };
+  for (const [code, native] of Object.entries(natives)) assert.equal(labels[code], native, code);
   // One option per translation, plus the leading auto option.
   vm.runInContext("shared.TRANSLATIONS = TRANSLATIONS;", ctx);
   assert.deepEqual([...options.slice(1).map((o) => o.value)].sort(), [...Object.keys(ctx.shared.TRANSLATIONS)].sort());
