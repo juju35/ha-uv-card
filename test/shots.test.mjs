@@ -21,7 +21,9 @@ test("every still shot has a dark twin with the same state", () => {
 });
 
 test("every light | dark pair of the README is a pair of rendered shots", () => {
-  const readme = readFileSync(new URL("../README.md", import.meta.url), "utf8");
+  const readme = readFileSync(new URL("../README.md", import.meta.url), "utf8")
+    // <img> screenshots (sized for HACS) read as ![](url)
+    .replace(/<img\b[^>]*\bsrc="([^"]+)"[^>]*>/g, "![]($1)");
   const files = new Set(SHOTS.map((s) => s.file));
   const rows = [...readme.matchAll(/screenshots\/([\w-]+)\.png\).*screenshots\/([\w-]+)\.png\)/g)];
   assert.ok(rows.length > 0);

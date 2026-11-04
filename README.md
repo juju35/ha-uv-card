@@ -12,7 +12,7 @@ Lovelace card for Home Assistant that shows the current **UV index** with an ani
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=juju35&repository=ha-uv-card&category=plugin)
 
-![UV Index Card](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card.png)
+<img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card.png" alt="UV Index Card" width="400">
 
 ## Features
 
@@ -81,9 +81,9 @@ entity: sensor.uv_index
 
 | | Light | Dark |
 |---|---|---|
-| Horizontal | ![Light](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card.png) | ![Dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-dark.png) |
-| Vertical | ![Vertical](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-vertical.png) | ![Vertical dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-vertical-dark.png) |
-| Unavailable | ![Unavailable](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-unavailable.png) | ![Unavailable dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-unavailable-dark.png) |
+| Horizontal | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card.png" alt="Light" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-dark.png" alt="Dark" width="400"> |
+| Vertical | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-vertical.png" alt="Vertical" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-vertical-dark.png" alt="Vertical dark" width="400"> |
+| Unavailable | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-unavailable.png" alt="Unavailable" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-unavailable-dark.png" alt="Unavailable dark" width="400"> |
 
 ### Animations
 
@@ -91,11 +91,11 @@ One animated icon per WHO risk band — the sun rays sweep continuously (they st
 
 | Light | Dark | Description |
 |---|---|---|
-| ![Low](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-low.gif) | ![Low dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-low-dark.gif) | **Low (0–2)** — green badge, animated sun. |
-| ![Moderate](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-moderate.gif) | ![Moderate dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-moderate-dark.gif) | **Moderate (3–5)** — yellow badge, animated sun. |
-| ![High](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-high.gif) | ![High dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-high-dark.gif) | **High (6–7)** — orange badge, animated sun. |
-| ![Very High](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-very-high.gif) | ![Very High dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-very-high-dark.gif) | **Very High (8–10)** — red badge, animated sun. |
-| ![Extreme](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-extreme.gif) | ![Extreme dark](https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-extreme-dark.gif) | **Extreme (11+)** — purple 11+ badge, animated sun. |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-low.gif" alt="Low" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-low-dark.gif" alt="Low dark" width="400"> | **Low (0–2)** — green badge, animated sun. |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-moderate.gif" alt="Moderate" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-moderate-dark.gif" alt="Moderate dark" width="400"> | **Moderate (3–5)** — yellow badge, animated sun. |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-high.gif" alt="High" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-high-dark.gif" alt="High dark" width="400"> | **High (6–7)** — orange badge, animated sun. |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-very-high.gif" alt="Very High" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-very-high-dark.gif" alt="Very High dark" width="400"> | **Very High (8–10)** — red badge, animated sun. |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-extreme.gif" alt="Extreme" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/uv-extreme-dark.gif" alt="Extreme dark" width="400"> | **Extreme (11+)** — purple 11+ badge, animated sun. |
 
 ## How it works
 
