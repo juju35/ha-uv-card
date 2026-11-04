@@ -6,6 +6,7 @@
 [![Lint](https://github.com/juju35/ha-uv-card/actions/workflows/lint.yml/badge.svg)](https://github.com/juju35/ha-uv-card/actions/workflows/lint.yml)
 [![Release](https://img.shields.io/github/v/release/juju35/ha-uv-card)](https://github.com/juju35/ha-uv-card/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/julienstep9)
 
 Lovelace card for Home Assistant that shows the current **UV index** with an animated weather-style icon, the value and the WHO risk level (Low → Extreme).
 
@@ -156,3 +157,9 @@ Add a language in the `TRANSLATIONS` map of `src/ha-uv-card.js`. Contributions w
 [MIT](LICENSE)
 
 UV index icons from [Meteocons](https://github.com/basmilius/weather-icons) by Bas Milius (MIT).
+
+## Support
+
+If you find this project useful, you can support its development:
+
+<a href="https://buymeacoffee.com/julienstep9"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" height="50"></a>
