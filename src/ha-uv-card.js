@@ -89,10 +89,6 @@ const TRANSLATIONS = {
         ed_entity: "UV-index-érzékelő", ed_name: "Név", ed_layout: "Elrendezés", ed_horizontal: "Vízszintes", ed_vertical: "Függőleges",
         ed_align: "Igazítás", ed_center: "Középre", ed_top: "Felülre", ed_show_value: "Érték megjelenítése", ed_show_label: "Kockázati szint megjelenítése",
         ed_transparent: "Átlátszó háttér", ed_language: "Nyelv", ed_auto: "Automatikus (Home Assistant)" },
-  ga: { name: "Innéacs UV", low: "Íseal", moderate: "Measartha", high: "Ard", very_high: "An-ard", extreme: "Foircneach", unavailable: "Níl ar fáil",
-        ed_entity: "Braiteoir innéacs UV", ed_name: "Ainm", ed_layout: "Leagan amach", ed_horizontal: "Cothrománach", ed_vertical: "Ingearach",
-        ed_align: "Ailíniú", ed_center: "Láraithe", ed_top: "Ag an mbarr", ed_show_value: "Taispeáin an luach", ed_show_label: "Taispeáin an leibhéal riosca",
-        ed_transparent: "Cúlra trédhearcach", ed_language: "Teanga", ed_auto: "Uathoibríoch (Home Assistant)" },
   sk: { name: "UV index", low: "Nízky", moderate: "Mierny", high: "Vysoký", very_high: "Veľmi vysoký", extreme: "Extrémny", unavailable: "Nedostupné",
         ed_entity: "Senzor UV indexu", ed_name: "Názov", ed_layout: "Rozloženie", ed_horizontal: "Vodorovné", ed_vertical: "Zvislé",
         ed_align: "Zarovnanie", ed_center: "Na stred", ed_top: "Hore", ed_show_value: "Zobraziť hodnotu", ed_show_label: "Zobraziť úroveň rizika",
@@ -105,10 +101,6 @@ const TRANSLATIONS = {
         ed_entity: "Senzor UV-indeksa", ed_name: "Ime", ed_layout: "Postavitev", ed_horizontal: "Vodoravno", ed_vertical: "Navpično",
         ed_align: "Poravnava", ed_center: "Sredinsko", ed_top: "Zgoraj", ed_show_value: "Prikaži vrednost", ed_show_label: "Prikaži raven tveganja",
         ed_transparent: "Prozorno ozadje", ed_language: "Jezik", ed_auto: "Samodejno (Home Assistant)" },
-  mt: { name: "Indiċi UV", low: "Baxx", moderate: "Moderat", high: "Għoli", very_high: "Għoli ħafna", extreme: "Estrem", unavailable: "Mhux disponibbli",
-        ed_entity: "Sensur tal-indiċi UV", ed_name: "Isem", ed_layout: "Tqassim", ed_horizontal: "Orizzontali", ed_vertical: "Vertikali",
-        ed_align: "Allinjament", ed_center: "Iċċentrat", ed_top: "Fuq", ed_show_value: "Uri l-valur", ed_show_label: "Uri l-livell tar-riskju",
-        ed_transparent: "Sfond trasparenti", ed_language: "Lingwa", ed_auto: "Awtomatiku (Home Assistant)" },
   lv: { name: "UV indekss", low: "Zems", moderate: "Mērens", high: "Augsts", very_high: "Ļoti augsts", extreme: "Ekstrēms", unavailable: "Nav pieejams",
         ed_entity: "UV indeksa sensors", ed_name: "Nosaukums", ed_layout: "Izkārtojums", ed_horizontal: "Horizontāls", ed_vertical: "Vertikāls",
         ed_align: "Līdzinājums", ed_center: "Centrēts", ed_top: "Augšā", ed_show_value: "Rādīt vērtību", ed_show_label: "Rādīt riska līmeni",
@@ -130,7 +122,7 @@ const TRANSLATIONS = {
 const LANGUAGE_NAMES = {
   en: "English", fr: "Français", de: "Deutsch", es: "Español", it: "Italiano", nl: "Nederlands", pt: "Português (Portugal)", pl: "Polski",
   ro: "Română", da: "Dansk", sv: "Svenska", bg: "Български", ru: "Русский", uk: "Українська", hu: "Magyar",
-  ga: "Gaeilge", sk: "Slovenčina", cs: "Čeština", sl: "Slovenščina", mt: "Malti", lv: "Latviešu", el: "Ελληνικά",
+  sk: "Slovenčina", cs: "Čeština", sl: "Slovenščina", lv: "Latviešu", el: "Ελληνικά",
   sr: "Српски", "sr-Latn": "Srpski (latinica)",
 };
 

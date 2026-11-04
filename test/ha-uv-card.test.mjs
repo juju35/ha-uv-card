@@ -216,7 +216,7 @@ test("every language has the same keys, array lengths and placeholders as Englis
   const ctx = sandbox();
   vm.runInContext(`${source}\nshared.TRANSLATIONS = TRANSLATIONS;`, ctx);
   const { TRANSLATIONS } = ctx.shared;
-  const langs = ["fr", "de", "es", "it", "nl", "pt", "pl", "ro", "da", "sv", "bg", "ru", "uk", "hu", "ga", "sk", "cs", "sl", "mt", "lv", "el", "sr", "sr-Latn"];
+  const langs = ["fr", "de", "es", "it", "nl", "pt", "pl", "ro", "da", "sv", "bg", "ru", "uk", "hu", "sk", "cs", "sl", "lv", "el", "sr", "sr-Latn"];
   assert.deepEqual(Object.keys(TRANSLATIONS).sort(), ["en", ...langs].sort());
   for (const lang of langs) {
     const dict = TRANSLATIONS[lang];
@@ -271,13 +271,13 @@ test("it, nl, pt and pl resolve from their regional codes, pt-BR falls back to E
   assert.equal(resolveLang("ja"), "en");
 });
 
-test("the 14 newer languages resolve from their regional codes", () => {
+test("the 12 newer languages resolve from their regional codes", () => {
   const ctx = sandbox();
   vm.runInContext(`${source}\nshared.resolveLang = resolveLang;`, ctx);
   const { resolveLang } = ctx.shared;
   const regional = {
     "ro-RO": "ro", "da-DK": "da", "sv-SE": "sv", "bg-BG": "bg", "ru-RU": "ru", "uk-UA": "uk", "hu-HU": "hu",
-    "ga-IE": "ga", "sk-SK": "sk", "cs-CZ": "cs", "sl-SI": "sl", "mt-MT": "mt", "lv-LV": "lv", "el-GR": "el",
+    "sk-SK": "sk", "cs-CZ": "cs", "sl-SI": "sl", "lv-LV": "lv", "el-GR": "el",
   };
   for (const [code, lang] of Object.entries(regional)) assert.equal(resolveLang(code), lang, code);
 });
@@ -354,7 +354,7 @@ test("the editor offers Italian, Dutch, Portuguese and Polish", () => {
   assert.equal(labels.pl, "Polski");
   const natives = {
     ro: "Română", da: "Dansk", sv: "Svenska", bg: "Български", ru: "Русский", uk: "Українська", hu: "Magyar",
-    ga: "Gaeilge", sk: "Slovenčina", cs: "Čeština", sl: "Slovenščina", mt: "Malti", lv: "Latviešu", el: "Ελληνικά",
+    sk: "Slovenčina", cs: "Čeština", sl: "Slovenščina", lv: "Latviešu", el: "Ελληνικά",
   };
   for (const [code, native] of Object.entries(natives)) assert.equal(labels[code], native, code);
   // One option per translation, plus the leading auto option.
