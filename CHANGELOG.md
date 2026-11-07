@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.0 — 2026-11-07
+
+### Changes
+- The card accepts a weather entity (Met.no and others) and reads its `uv_index` attribute; before, only sensors could be picked although the README listed Met.no.
+- New `max_entity` and `protection_entity` options show the day's max UV and the sun protection window (e.g. from OpenUV) on a line under the value, highlighted while protection is needed.
+- The icon animation is paused while the card is off-screen or the browser tab is hidden, which saves CPU.
+
 ## 1.6.9 — 2026-11-04
 
 ### Documentation

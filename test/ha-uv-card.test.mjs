@@ -53,6 +53,7 @@ class FakeElement {
       svg.smil = [];
       svg.pauseAnimations = () => svg.smil.push("pause");
       svg.setCurrentTime = (t) => svg.smil.push(`time ${t}`);
+      svg.unpauseAnimations = () => svg.smil.push("unpause");
     }
   }
   addEventListener(type, fn) { this.listeners[type] = fn; }
@@ -806,4 +807,187 @@ test("the card shows a focus ring for keyboard focus", () => {
   const ring = declarations(css, "ha-card:focus-visible");
   assert.equal(ring.outline, "2px solid var(--primary-color)");
   assert.ok(Number.parseFloat(ring["outline-offset"]) <= 0, `outline-offset ${ring["outline-offset"]}`);
+});
+
+// Met.no and other weather integrations give the UV index as the uv_index
+// attribute of their weather entity, whose state is the condition.
+function weatherCard(attributes, state = "sunny", config = {}) {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const el = new (ctx.customElements.get("ha-uv-card"))();
+  el.setConfig({ entity: "weather.home", language: "en", ...config });
+  el.hass = { language: "en", states: { "weather.home": { state, attributes: { friendly_name: "Home", ...attributes } } } };
+  return el;
+}
+
+test("a weather entity shows its uv_index attribute", () => {
+  const root = weatherCard({ uv_index: 6.4 }).shadowRoot;
+  assert.equal(value(root), "6");
+  assert.equal(label(root), "High");
+});
+
+test("a weather entity without uv_index, or unavailable, is unavailable", () => {
+  for (const [attrs, state] of [[{}, "sunny"], [{ uv_index: null }, "sunny"], [{ uv_index: 5 }, "unavailable"]]) {
+    const root = weatherCard(attrs, state).shadowRoot;
+    assert.equal(value(root), "—", JSON.stringify([attrs, state]));
+    assert.equal(label(root), "Unavailable");
+  }
+});
+
+test("a weather entity re-renders when its uv_index changes, not only its state", () => {
+  const el = weatherCard({ uv_index: 2 });
+  el.hass = { language: "en", states: { "weather.home": { state: "sunny", attributes: { uv_index: 9 } } } };
+  assert.equal(value(el.shadowRoot), "9");
+});
+
+test("the editor accepts sensor and weather entities, plus the max UV and protection sensors", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const { schema } = ctx.customElements.get("ha-uv-card").getConfigForm();
+  const byName = Object.fromEntries(schema.filter((s) => s.name).map((s) => [s.name, s]));
+  assert.deepEqual([...byName.entity.selector.entity.domain], ["sensor", "weather"]);
+  assert.equal(byName.max_entity.selector.entity.domain, "sensor");
+  assert.equal(byName.protection_entity.selector.entity.domain, "binary_sensor");
+});
+
+test("the card picker stub falls back to a weather entity with a UV index", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const cls = ctx.customElements.get("ha-uv-card");
+  const hass = { states: { "weather.home": { state: "sunny", attributes: { uv_index: 3 } }, "weather.other": { state: "sunny", attributes: {} } } };
+  assert.equal(cls.getStubConfig(hass).entity, "weather.home");
+  assert.equal(cls.getStubConfig({ states: { ...hass.states, "sensor.uv_index": { state: "1", attributes: {} } } }).entity, "sensor.uv_index");
+});
+
+const MAX_TIME = "2026-07-01T11:20:00+00:00";
+function extraCard(states, locale, config = {}) {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const el = new (ctx.customElements.get("ha-uv-card"))();
+  el.setConfig({ entity: "sensor.uv", language: "en", max_entity: "sensor.max_uv", protection_entity: "binary_sensor.protection", ...config });
+  el.hass = { language: "en", locale, config: { time_zone: "Europe/Paris" }, states: { "sensor.uv": { state: "4", attributes: {} }, ...states } };
+  const root = el.shadowRoot;
+  return { el, root, extra: root.querySelector(".extra"), max: root.querySelector(".max"), protection: root.querySelector(".protection") };
+}
+
+test("the max UV line shows the rounded max, its band color and its time in the server time zone", () => {
+  const { max, extra } = extraCard(
+    { "sensor.max_uv": { state: "7.6", attributes: { time: MAX_TIME } } },
+    { time_format: "24", time_zone: "server" },
+  );
+  assert.equal(extra.hidden, false);
+  assert.equal(max.hidden, false);
+  assert.equal(max.textContent, "Max 8 · 13:20");
+  assert.equal(max.style.props["--max-color"], "#b71c1c");
+});
+
+test("the protection window follows the 12 h setting and is highlighted while on", () => {
+  const states = {
+    "binary_sensor.protection": { state: "on", attributes: { start_time: "2026-07-01T08:45:00+00:00", end_time: "2026-07-01T14:30:00+00:00" } },
+  };
+  const { protection, max } = extraCard(states, { time_format: "12", time_zone: "server" });
+  assert.equal(max.hidden, true, "no max sensor state");
+  assert.equal(protection.textContent.replace(/\s/g, " "), "Protection 10:45 AM–04:30 PM");
+  assert.equal("data-active" in protection.attributes, true);
+  states["binary_sensor.protection"].state = "off";
+  const off = extraCard(states, { time_format: "24", time_zone: "server" }).protection;
+  assert.equal(off.textContent, "Protection 10:45–16:30");
+  assert.equal("data-active" in off.attributes, false);
+});
+
+test("a protection sensor without times shows only while on", () => {
+  const on = extraCard({ "binary_sensor.protection": { state: "on", attributes: {} } }).protection;
+  assert.equal(on.textContent, "Protection needed");
+  const off = extraCard({ "binary_sensor.protection": { state: "off", attributes: {} } });
+  assert.equal(off.protection.hidden, true);
+  assert.equal(off.extra.hidden, true, "nothing to show: the line is hidden");
+});
+
+test("the line is hidden without max or protection entities, and the grid size fits it when set", () => {
+  const { el, extra } = extraCard({}, undefined, { max_entity: undefined, protection_entity: undefined });
+  assert.equal(extra.hidden, true);
+  assert.equal(el.getGridOptions().rows, 3);
+  assert.equal(el.getGridOptions().min_columns, 4);
+  el.setConfig({ entity: "sensor.uv", max_entity: "sensor.max_uv" });
+  assert.deepEqual({ ...el.getGridOptions() }, { columns: 6, min_columns: 6, rows: 3, min_rows: 3 });
+  el.setConfig({ entity: "sensor.uv", layout: "vertical" });
+  assert.equal(el.getGridOptions().rows, 4);
+  el.setConfig({ entity: "sensor.uv", layout: "vertical", max_entity: "sensor.max_uv" });
+  assert.equal(el.getGridOptions().rows, 5);
+});
+
+test("the line updates when the max sensor changes", () => {
+  const { el, max } = extraCard({ "sensor.max_uv": { state: "3", attributes: {} } });
+  assert.equal(max.textContent, "Max 3");
+  el.hass = { ...el._hass, states: { ...el._hass.states, "sensor.max_uv": { state: "11", attributes: {} } } };
+  assert.equal(max.textContent, "Max 11");
+});
+
+// The icon animation pauses while the card is off-screen or the tab hidden.
+function viewCard({ reduce = false } = {}) {
+  const views = [];
+  class IntersectionObserver {
+    constructor(cb) { this.cb = cb; this.targets = []; views.push(this); }
+    observe(t) { this.targets.push(t); }
+    disconnect() { this.targets = []; }
+  }
+  const listeners = {};
+  const document = {
+    visibilityState: "visible",
+    querySelector: () => null,
+    createElement: (tag) => new FakeElement(tag, null),
+    addEventListener: (type, fn) => { listeners[type] = fn; },
+    removeEventListener: (type, fn) => { if (listeners[type] === fn) delete listeners[type]; },
+  };
+  const matchMedia = (q) => ({ matches: reduce && q === "(prefers-reduced-motion: reduce)" });
+  const ctx = sandbox(undefined, { IntersectionObserver, document, matchMedia });
+  vm.runInContext(svgSource, ctx);
+  const el = new (ctx.customElements.get("ha-uv-card"))();
+  el.setConfig({ entity: "sensor.uv" });
+  el.isConnected = true;
+  el.connectedCallback();
+  el.hass = hassWith(4);
+  const svg = () => el.shadowRoot.querySelector(".icon").querySelector("svg");
+  const view = (isIntersecting) => { for (const v of views) if (v.targets.length) v.cb([{ isIntersecting }]); };
+  const tab = (state) => { document.visibilityState = state; listeners.visibilitychange?.(); };
+  return { el, svg, view, tab, views, listeners };
+}
+
+test("the icon animation pauses off-screen and resumes in view", () => {
+  const { svg, view, el } = viewCard();
+  assert.deepEqual(svg().smil, []);
+  view(false);
+  assert.deepEqual(svg().smil, ["pause"]);
+  el.hass = hassWith(9);
+  assert.deepEqual(svg().smil, ["pause"], "a new icon swapped in off-screen starts paused");
+  view(true);
+  assert.deepEqual(svg().smil, ["pause", "unpause"]);
+});
+
+test("the icon animation pauses while the browser tab is hidden", () => {
+  const { svg, tab } = viewCard();
+  tab("hidden");
+  assert.deepEqual(svg().smil, ["pause"]);
+  tab("visible");
+  assert.deepEqual(svg().smil, ["pause", "unpause"]);
+});
+
+test("with reduced motion the icon is never resumed by visibility changes", () => {
+  const { svg, view, tab } = viewCard({ reduce: true });
+  view(false);
+  view(true);
+  tab("visible");
+  assert.deepEqual(svg().smil, ["pause", "time 0"]);
+});
+
+test("a card removed from the page stops watching its visibility", () => {
+  const { el, views, listeners } = viewCard();
+  el.disconnectedCallback();
+  assert.ok(views.every((v) => v.targets.length === 0));
+  assert.equal(listeners.visibilitychange, undefined);
+});
+
+test("the README documents weather entities and the max / protection options", () => {
+  const readme = readFileSync(new URL("../README.md", import.meta.url), "utf8");
+  for (const word of ["`max_entity`", "`protection_entity`", "uv_index"]) assert.ok(readme.includes(word), word);
 });
