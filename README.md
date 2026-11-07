@@ -1,6 +1,6 @@
 # ha-uv-card
 
-[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![Marketplace](https://img.shields.io/badge/Marketplace-Custom-41BDF5.svg)](https://www.home-assistant.io/integrations/marketplace/)
 [![HACS Validation](https://github.com/juju35/ha-uv-card/actions/workflows/hacs.yml/badge.svg)](https://github.com/juju35/ha-uv-card/actions/workflows/hacs.yml)
 [![Validate](https://github.com/juju35/ha-uv-card/actions/workflows/validate.yml/badge.svg)](https://github.com/juju35/ha-uv-card/actions/workflows/validate.yml)
 [![Lint](https://github.com/juju35/ha-uv-card/actions/workflows/lint.yml/badge.svg)](https://github.com/juju35/ha-uv-card/actions/workflows/lint.yml)
@@ -10,7 +10,7 @@
 
 Lovelace card for Home Assistant that shows the current **UV index** with an animated weather-style icon, the value and the WHO risk level (Low → Extreme).
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=juju35&repository=ha-uv-card&category=plugin)
+[![Open your Home Assistant instance and open a repository inside the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=juju35&repository=ha-uv-card&category=plugin)
 
 <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card.png" alt="UV Index Card" width="400">
 
@@ -30,15 +30,15 @@ Lovelace card for Home Assistant that shows the current **UV index** with an ani
 
 ## Installation
 
-### Via HACS (recommended)
+### Via the Marketplace (recommended)
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=juju35&repository=ha-uv-card&category=plugin)
+[![Open your Home Assistant instance and open a repository inside the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=juju35&repository=ha-uv-card&category=plugin)
 
 Or manually:
 
-1. Open HACS → **⋮** (top right) → **Custom repositories**
+1. Open **Settings → Marketplace → Add from link** (top right; this needs a GitHub account connected)
 2. Add `https://github.com/juju35/ha-uv-card` — Type: **Dashboard**
-3. Search for **UV Index Card** and click **Download**
+3. Open **UV Index Card** and click **Install**
 4. Reload the browser
 
 ### Manual
@@ -113,7 +113,7 @@ npm run gifs         # records the README GIFs, one per risk band (needs ffmpeg)
 
 The **Screenshots** workflow re-renders the screenshots and GIFs on every pull request that touches `src/`, `icons/`, `scripts/` or the Playwright version (`package.json`, `package-lock.json`) and commits them back onto the PR branch (pull requests from forks are only rendered, not committed; a manual run uploads them as an artifact). The `pull_request` runs created by that bot commit are left waiting for approval (they show as failed with no job once the PR is merged), so after committing the workflow dispatches Lint, Validate and HACS on the PR branch to check the new commit.
 
-`dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where HACS downloads it from.
+`dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where the Marketplace installs it from.
 
 ### Releasing
 
