@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.1 — 2026-11-08
+
+### Fixes
+- A sensor that has not reported yet (`unknown` state) is now labelled "Unknown", in every language, instead of "Unavailable", which stays for a sensor that is offline.
+
 ## 1.7.0 — 2026-11-07
 
 ### Changes

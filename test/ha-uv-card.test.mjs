@@ -145,9 +145,19 @@ test("the risk level follows the displayed (rounded) value", () => {
 });
 
 test("a non-numeric state is unavailable", () => {
+  for (const state of ["unavailable", "abc"]) {
+    const root = render(state);
+    assert.equal(value(root), "—", state);
+    assert.equal(label(root), "Unavailable", state);
+  }
+});
+
+test("an unknown state has its own label, translated", () => {
   const root = render("unknown");
   assert.equal(value(root), "—");
-  assert.equal(label(root), "Unavailable");
+  assert.equal(label(root), "Unknown");
+  assert.equal(label(render("unknown", { language: "fr" })), "Inconnu");
+  assert.equal(label(render("unknown", { language: "sr" })), "Непознато");
 });
 
 test("an empty or blank state is unavailable, not 0", () => {
@@ -832,6 +842,12 @@ test("a weather entity without uv_index, or unavailable, is unavailable", () => 
     assert.equal(value(root), "—", JSON.stringify([attrs, state]));
     assert.equal(label(root), "Unavailable");
   }
+});
+
+test("an unknown weather entity is unknown, not unavailable", () => {
+  const root = weatherCard({ uv_index: 5 }, "unknown").shadowRoot;
+  assert.equal(value(root), "—");
+  assert.equal(label(root), "Unknown");
 });
 
 test("a weather entity re-renders when its uv_index changes, not only its state", () => {
