@@ -20,13 +20,14 @@ Lovelace card for Home Assistant that shows the current **UV index** with an ani
 - Value and WHO risk level (Low, Moderate, High, Very High, Extreme) in the level's colour
 - Horizontal or vertical layout, transparent mode, top alignment for stacks
 - Sections view support, card picker entry with preview
+- Optional daily max UV and sun protection window line (e.g. from OpenUV)
 - Tap to open the sensor's more-info dialog
 - 22 languages, following Home Assistant's language setting
 
 ## Prerequisites
 
 - Home Assistant 2024.11 or later
-- A sensor whose state is the UV index, e.g. from [OpenUV](https://www.home-assistant.io/integrations/openuv/), [Met.no](https://www.home-assistant.io/integrations/met/) or a weather station
+- A sensor whose state is the UV index (e.g. from [OpenUV](https://www.home-assistant.io/integrations/openuv/) or a weather station), or a weather entity that has a `uv_index` attribute (e.g. [Met.no](https://www.home-assistant.io/integrations/met/))
 
 ## Installation
 
@@ -58,14 +59,32 @@ entity: sensor.uv_index
 
 | Name         | Type    | Default              | Description                                   |
 | ------------ | ------- | -------------------- | --------------------------------------------- |
-| `entity`     | string  | **required**         | A sensor whose state is the UV index (0–11+).            |
+| `entity`     | string  | **required**         | A sensor whose state is the UV index (0–11+), or a `weather` entity, whose `uv_index` attribute is read. |
 | `name`       | string  | entity friendly name | Title shown on the card.                                 |
+| `max_entity` | string  | —                    | A sensor with the day's maximum UV index (OpenUV `sensor.*_max_uv_index`). Shows "Max 8 · 13:20" under the value, the time from its `time` attribute. |
+| `protection_entity` | string | —             | A binary sensor for the sun protection window (OpenUV `binary_sensor.*_protection_window`). Shows its `start_time`–`end_time`, highlighted while it is on; without times, "Protection needed" while it is on. |
 | `show_value` | boolean | `true`               | Show the numeric UV value.                               |
 | `show_label` | boolean | `true`               | Show the risk label (Low … Extreme).                     |
 | `layout`     | string  | `horizontal`         | `horizontal` (text to the right) or `vertical` (text below the icon). |
 | `transparent`| boolean | `false`              | Remove the card background, border and shadow.           |
 | `align`      | string  | `center`             | `center` or `top`. Vertical alignment of the content inside the card, which fills its cell in the sections view — use `top` to line the card up with others in a `horizontal-stack`. |
 | `language`   | string  | Home Assistant UI    | Force a language code (e.g. `fr`). Defaults to your HA UI. |
+
+With OpenUV, the max UV and the protection window go on a line under the value (times follow Home Assistant's 12/24 h and time zone settings):
+
+```yaml
+type: custom:ha-uv-card
+entity: sensor.openuv_current_uv_index
+max_entity: sensor.openuv_max_uv_index
+protection_entity: binary_sensor.openuv_protection_window
+```
+
+With Met.no (or another weather integration that provides the UV index):
+
+```yaml
+type: custom:ha-uv-card
+entity: weather.forecast_home
+```
 
 ### Risk levels
 
@@ -83,6 +102,7 @@ entity: sensor.uv_index
 |---|---|---|
 | Horizontal | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card.png" alt="Light" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-dark.png" alt="Dark" width="400"> |
 | Vertical | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-vertical.png" alt="Vertical" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-vertical-dark.png" alt="Vertical dark" width="400"> |
+| Max UV and protection window | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-extra.png" alt="Max UV and protection window" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-extra-dark.png" alt="Max UV and protection window dark" width="400"> |
 | Unavailable | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-unavailable.png" alt="Unavailable" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/screenshots/card-unavailable-dark.png" alt="Unavailable dark" width="400"> |
 
 ### Animations
@@ -99,7 +119,7 @@ One animated icon per WHO risk band — the sun rays sweep continuously (they st
 
 ## How it works
 
-The card reads the sensor's state, rounds it, then uses that rounded value both to pick one of the 12 icons (0 to 11, higher values use 11) and to map it to the WHO bands, so the value, icon and risk level always agree. The card is built once; afterwards it only updates its text, colour and layout attributes when the state, name, language or configuration change, and swaps the icon only when the rounded index changes, so the icon animation doesn't restart on every Home Assistant update. Any non-numeric or empty state shows the unavailable icon; a negative reading shows 0.
+The card reads the sensor's state (or a weather entity's `uv_index` attribute), rounds it, then uses that rounded value both to pick one of the 12 icons (0 to 11, higher values use 11) and to map it to the WHO bands, so the value, icon and risk level always agree. The card is built once; afterwards it only updates its text, colour and layout attributes when the state, name, language or configuration change, and swaps the icon only when the rounded index changes, so the icon animation doesn't restart on every Home Assistant update. The animation is paused while the card is off-screen or the browser tab is hidden. Any non-numeric or empty state shows the unavailable icon; a negative reading shows 0.
 
 ## Development
 
