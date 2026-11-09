@@ -44,8 +44,8 @@ Or manually:
 
 ### Manual
 
-1. Download `ha-uv-card.js` from the [latest release](https://github.com/juju35/ha-uv-card/releases/latest) (icons included)
-2. Copy it to `/config/www/ha-uv-card/`
+1. Download `ha-uv-card.js` and the `ha-uv-card.i18n.*.js` translation files from the [latest release](https://github.com/juju35/ha-uv-card/releases/latest) (icons included)
+2. Copy them all to `/config/www/ha-uv-card/` (without the translation files, the cards show in English)
 3. Add the resource in **Settings → Dashboards → Resources**: `/local/ha-uv-card/ha-uv-card.js`, type **JavaScript module**
 
 ## Configuration
