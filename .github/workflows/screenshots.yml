@@ -8,6 +8,7 @@ on:
       - "src/**"
       - "icons/**"
       - "scripts/**"
+      - ".github/workflows/screenshots.yml"
       # The browser tests below run here, where Chromium and ffmpeg are installed.
       - "test/**"
       # A Playwright bump changes the rendering too.
