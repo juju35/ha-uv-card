@@ -2,7 +2,21 @@
 // there: re-encoding the same image (another libpng, Chromium or ffmpeg build)
 // changes the bytes, not the picture, and must not touch the file.
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+
+// Debian 12's ffmpeg (5.1) cannot read a GIF from a pipe (its demuxer seeks back): decode a temporary copy instead.
+const viaFile = (buf, fn) => {
+  const dir = mkdtempSync(join(tmpdir(), "pixels-"));
+  const file = join(dir, "input");
+  try {
+    writeFileSync(file, buf);
+    return fn(file);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+};
 
 // samePixels(oldBytes, newBytes) -> Promise<boolean>, comparing decoded pixels.
 // Returns true when the file was (re)written.
@@ -41,8 +55,9 @@ export async function samePngPixels(page, a, b) {
 // Every frame of a GIF as raw RGBA (needs ffmpeg), so two encodes of the same
 // animation compare equal and any color change in any frame does not.
 export const gifPixels = (bytes) =>
-  execFileSync("ffmpeg", ["-loglevel", "error", "-f", "gif", "-i", "pipe:0", "-f", "rawvideo", "-pix_fmt", "rgba", "pipe:1"], {
-    input: bytes,
-    maxBuffer: 1 << 30,
-  });
+  viaFile(bytes, (file) =>
+    execFileSync("ffmpeg", ["-loglevel", "error", "-f", "gif", "-i", file, "-f", "rawvideo", "-pix_fmt", "rgba", "pipe:1"], {
+      maxBuffer: 1 << 30,
+    }),
+  );
 export const sameGifPixels = async (a, b) => gifPixels(a).equals(gifPixels(b));
