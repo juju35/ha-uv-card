@@ -61,6 +61,7 @@ entity: sensor.uv_index
 | ------------ | ------- | -------------------- | --------------------------------------------- |
 | `entity`     | string  | **required**         | A sensor whose state is the UV index (0–11+), or a `weather` entity, whose `uv_index` attribute is read. |
 | `name`       | string  | entity friendly name | Title shown on the card.                                 |
+| `show_title` | boolean | `true`               | Show the title (the name), e.g. `false` under a section heading of your own. |
 | `max_entity` | string  | —                    | A sensor with the day's maximum UV index (OpenUV `sensor.*_max_uv_index`). Shows "Max 8 · 13:20" under the value, the time from its `time` attribute. |
 | `protection_entity` | string | —             | A binary sensor for the sun protection window (OpenUV `binary_sensor.*_protection_window`). Shows its `start_time`–`end_time`, highlighted while it is on; without times, "Protection needed" while it is on. |
 | `show_value` | boolean | `true`               | Show the numeric UV value.                               |
