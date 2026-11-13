@@ -1,8 +1,8 @@
 // Renders the card with mock data and saves the README screenshots.
 // Usage: npm run build && npm run screenshots
 import { chromium } from "playwright";
-import { readFileSync } from "node:fs";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { readFileSync, realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { SHOTS, uv } from "./shots.mjs";
 import { samePngPixels, writeIfChanged } from "./write-if-changed.mjs";
 
@@ -113,6 +113,6 @@ export const icons = {
 
 // Only render the still shots when run directly: gifs.mjs imports this module
 // for its harness and renders its own animated captures.
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (process.argv[1] && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
   await render(SHOTS, { icons });
 }
