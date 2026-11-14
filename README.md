@@ -22,7 +22,7 @@ Lovelace card for Home Assistant that shows the current **UV index** on a half-c
 - Big value in the centre and WHO risk level pill (Low, Moderate, High, Very high, Extreme) in the level's colour
 - Short WHO sun protection advice per level (e.g. "SPF 30+ · hat · shade at noon"), can be hidden
 - Animated icon for every UV index from 0 to 11+ (Meteocons) in the header badge, bundled in the card file, or an icon of your choice
-- Optional daily max UV (subtitle "Max 8 · 13:20" and a tick on the gauge) and sun protection window footer, highlighted while it is on (e.g. from OpenUV)
+- Optional daily max UV (subtitle "Max 10 · 13:20" and a tick on the gauge) and sun protection window footer, highlighted while it is on (e.g. from OpenUV)
 - Vertical (default) or horizontal layout, transparent mode, top alignment for stacks; band colours themable
 - Sections view support, card picker entry with preview, visual editor
 - Tap to open the sensor's more-info dialog
@@ -66,7 +66,7 @@ entity: sensor.uv_index
 | `entity`     | string  | **required**         | A sensor whose state is the UV index (0–11+), or a `weather` entity, whose `uv_index` attribute is read. |
 | `name`       | string  | entity friendly name | Title shown on the card.                                 |
 | `show_title` | boolean | `true`               | Show the title (the name), e.g. `false` under a section heading of your own. |
-| `max_entity` | string  | —                    | A sensor with the day's maximum UV index (OpenUV `sensor.*_max_uv_index`). Shows "Max 8 · 13:20" as the subtitle, the time from its `time` attribute, and a tick on the gauge at the max. |
+| `max_entity` | string  | —                    | A sensor with the day's maximum UV index (OpenUV `sensor.*_max_uv_index`). Shows "Max 10 · 13:20" as the subtitle, the time from its `time` attribute, and a tick on the gauge at the max. |
 | `protection_entity` | string | —             | A binary sensor for the sun protection window (OpenUV `binary_sensor.*_protection_window`). Shows its `start_time`–`end_time` in the footer, highlighted while it is on; without times, "Protection needed" while it is on. |
 | `show_value` | boolean | `true`               | Show the numeric UV value.                               |
 | `show_label` | boolean | `true`               | Show the risk level pill (Low … Extreme) in the header.  |

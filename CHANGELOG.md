@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.10.1 - 2026-11-14
+
+### Fixes
+- The active protection window in the footer is plain text in the level's colour with its dot, without the tinted frame that made it look like a button.
+- README screenshots: the day's max (10) is now above the current value, as it can't be below it.
+
 ## 1.10.0 - 2026-11-14
 
 ### Features

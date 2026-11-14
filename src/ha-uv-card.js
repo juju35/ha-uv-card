@@ -523,17 +523,14 @@ const STYLE = `
   }
   .protection {
     min-width: 0;
-    padding: 4px 10px;
-    border-radius: 12px;
+    padding: 4px 0;
     text-align: center;
     overflow-wrap: anywhere;
-    border: 1px solid transparent;
   }
+  /* Active: plain text in the level's colour with its dot, no frame (it is not a button). */
   .protection[data-active] {
     color: var(--uv-text-color);
     font-weight: 500;
-    background: color-mix(in srgb, var(--uv-color) 10%, transparent);
-    border-color: color-mix(in srgb, var(--uv-color) 30%, transparent);
   }
   .protection[data-active]::before {
     content: "";
