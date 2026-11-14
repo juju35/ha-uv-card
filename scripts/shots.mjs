@@ -6,7 +6,7 @@ export const uv = (value) => ({
 
 // OpenUV's daily max UV and protection window sensors, for the extra line.
 export const extra = {
-  "sensor.max_uv_index": { entity_id: "sensor.max_uv_index", state: "7.6", attributes: { time: "2026-07-01T13:20:00" } },
+  "sensor.max_uv_index": { entity_id: "sensor.max_uv_index", state: "10.2", attributes: { time: "2026-07-01T13:20:00" } },
   "binary_sensor.protection_window": {
     entity_id: "binary_sensor.protection_window",
     state: "on",
