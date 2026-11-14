@@ -135,7 +135,7 @@ test("the risk level follows the displayed (rounded) value", () => {
     [2.5, "3", "Moderate"],
     [5.4, "5", "Moderate"],
     [7.4, "7", "High"],
-    [10.4, "10", "Very High"],
+    [10.4, "10", "Very high"],
     [10.5, "11", "Extreme"],
   ]) {
     const root = render(state);
@@ -245,12 +245,13 @@ test("sr is written in Cyrillic and sr-Latn in Latin (brand names aside)", () =>
   const ctx = sandbox();
   vm.runInContext(`${source}\nshared.TRANSLATIONS = TRANSLATIONS;`, ctx);
   const { TRANSLATIONS } = ctx.shared;
-  const strip = (text) => String(text).replace(/Home Assistant/g, "");
+  // Brand names and {placeholders} aside.
+  const strip = (text) => String(text).replace(/Home Assistant|\{\w+\}/g, "");
   for (const [key, value] of Object.entries(TRANSLATIONS.sr)) {
     assert.doesNotMatch(strip(value), /[A-Za-z]/, `sr.${key}`);
   }
   for (const [key, value] of Object.entries(TRANSLATIONS["sr-Latn"])) {
-    assert.doesNotMatch(value, /[Ѐ-ӿ]/, `sr-Latn.${key}`);
+    assert.doesNotMatch(strip(value), /[Ѐ-ӿ]/, `sr-Latn.${key}`);
   }
 });
 
@@ -395,19 +396,19 @@ test("the stylesheet and the card are built once, the icon only swapped when the
   const writes = icon.htmlWrites;
   // Same rounded index (4): text may change, the icon and its animation stay.
   el.hass = hassWith(4.2);
-  el.setConfig({ entity: "sensor.uv", name: "Garden", layout: "vertical", transparent: true, align: "top" });
+  el.setConfig({ entity: "sensor.uv", name: "Garden", layout: "horizontal", transparent: true, align: "top" });
   assert.equal(root.querySelector("ha-card"), haCard);
   assert.equal(root.children.length, 2);
   assert.equal(icon.htmlWrites, writes);
   assert.equal(root.querySelector(".name").textContent, "Garden");
-  assert.equal(haCard.getAttribute("data-layout"), "vertical");
+  assert.equal(haCard.getAttribute("data-layout"), "horizontal");
   assert.equal(haCard.getAttribute("data-align"), "top");
   assert.equal(haCard.getAttribute("data-transparent"), "");
-  assert.equal(haCard.style.props["--uv-color"], "#f9a825");
+  assert.equal(haCard.style.props["--uv-color"], "var(--uv-moderate)");
   // A new index swaps the icon and the color.
   el.hass = hassWith(8);
   assert.equal(icon.htmlWrites, writes + 1);
-  assert.equal(haCard.style.props["--uv-color"], "#b71c1c");
+  assert.equal(haCard.style.props["--uv-color"], "var(--uv-very-high)");
 });
 
 test("show_value and show_label hide their element", () => {
@@ -481,10 +482,11 @@ function splitArgs(text) {
 // Returns [r, g, b, a] with premultiplied mixing, as color-mix() does.
 function resolveColor(expr, vars) {
   expr = expr.trim();
-  const v = expr.match(/^var\((--[\w-]+)\)$/);
+  const v = expr.match(/^var\((--[\w-]+)(?:,(.*))?\)$/s);
   if (v) {
-    assert.ok(v[1] in vars, `unknown variable ${v[1]}`);
-    return resolveColor(vars[v[1]], vars);
+    if (v[1] in vars) return resolveColor(vars[v[1]], vars);
+    assert.ok(v[2] !== undefined, `unknown variable ${v[1]}`);
+    return resolveColor(v[2], vars);
   }
   if (expr === "transparent") return [0, 0, 0, 0];
   const hex = expr.match(/^#([0-9a-f]{6})$/i);
@@ -605,11 +607,9 @@ test("the risk level pill stays on one line inside the card and keeps its full t
   assert.equal(pill["text-overflow"], "ellipsis");
   assert.equal(pill["max-width"], "100%");
   assert.equal(pill["box-sizing"], "border-box");
-  assert.equal(declarations(css, ".info")["max-width"], "100%", "the text column never outgrows the card");
+  assert.equal(pill["min-width"], "0", "the pill may shrink in the header");
   assert.equal(root.querySelector(".label").getAttribute("title"), "Niet beschikbaar");
-  // A narrow horizontal card shrinks the icon to leave the level room.
   assert.equal(declarations(css, "ha-card")["container-type"], "inline-size");
-  assert.match(css, /@container \(max-width: \d+px\) \{\s*ha-card\[data-layout="horizontal"\] \.icon \{/);
 });
 
 test("the label tooltip follows the level when the value changes", () => {
@@ -657,16 +657,15 @@ test("on a very narrow card the header badge is dropped so the title stays insid
   assert.ok(block.max >= 86 && block.max < 104, `badge threshold ${block.max}px`);
 });
 
-// Horizontal at 4-6 columns of a phone section (104-178px): next to the icon
-// the pill had 26-80px and showed "M…", "Bard…". Under the threshold the pill
-// moves to its own row under the icon and the value, the whole card width.
-test("on a narrow horizontal card the risk level gets its own full-width row", () => {
-  const css = render(4).querySelector("style").textContent;
-  const block = containerBlock(css, /ha-card\[data-layout="horizontal"\] \.label\s*\{[^}]*grid-column:\s*1 \/ -1/);
-  assert.ok(block, "no container query puts the pill on its own row");
-  assert.ok(block.max >= 152, `stacked below ${block.max}px only: 6 columns on a phone (178px) must stack`);
-  assert.match(block.body, /ha-card\[data-layout="horizontal"\] \.body\s*\{[^}]*display:\s*grid/);
-  assert.match(block.body, /ha-card\[data-layout="horizontal"\] \.info\s*\{[^}]*display:\s*contents/);
+// Horizontal: the gauge beside its text needs room; a narrow card stacks them
+// like the vertical layout, so the gauge keeps its size and the text its line.
+test("on a narrow horizontal card the gauge and its text stack", () => {
+  const css = render(4, { layout: "horizontal" }).querySelector("style").textContent;
+  const block = containerBlock(css, /ha-card\[data-layout="horizontal"\] \.body\s*\{[^}]*grid-template-areas:\s*"gauge" "advice"/);
+  assert.ok(block, "no container query stacks the horizontal layout");
+  assert.ok(block.max >= 280, `stacked below ${block.max}px only`);
+  assert.match(block.body, /ha-card\[data-layout="horizontal"\] \.value\s*\{[^}]*grid-area:\s*gauge/);
+  assert.match(declarations(css, 'ha-card[data-layout="horizontal"] .body')["grid-template-areas"], /"gauge value" "gauge advice"/);
 });
 
 // The size container is ha-card (the header and the body both follow its
@@ -883,18 +882,18 @@ function extraCard(states, locale, config = {}) {
   el.setConfig({ entity: "sensor.uv", language: "en", max_entity: "sensor.max_uv", protection_entity: "binary_sensor.protection", ...config });
   el.hass = { language: "en", locale, config: { time_zone: "Europe/Paris" }, states: { "sensor.uv": { state: "4", attributes: {} }, ...states } };
   const root = el.shadowRoot;
-  return { el, root, extra: root.querySelector(".extra"), max: root.querySelector(".max"), protection: root.querySelector(".protection") };
+  return { el, root, card: root.querySelector("ha-card"), extra: root.querySelector(".extra"), max: root.querySelector(".sub"), protection: root.querySelector(".protection") };
 }
 
-test("the max UV line shows the rounded max, its band color and its time in the server time zone", () => {
-  const { max, extra } = extraCard(
+test("the max UV subtitle shows the rounded max and its time in the server time zone, and a tick on the gauge", () => {
+  const { max, card } = extraCard(
     { "sensor.max_uv": { state: "7.6", attributes: { time: MAX_TIME } } },
     { time_format: "24", time_zone: "server" },
   );
-  assert.equal(extra.hidden, false);
   assert.equal(max.hidden, false);
   assert.equal(max.textContent, "Max 8 · 13:20");
-  assert.equal(max.style.props["--max-color"], "#b71c1c");
+  assert.equal("data-max" in card.attributes, true);
+  assert.equal(card.style.props["--uv-max-angle"], "120.00deg");
 });
 
 test("the protection window follows the 12 h setting and is highlighted while on", () => {
@@ -903,6 +902,7 @@ test("the protection window follows the 12 h setting and is highlighted while on
   };
   const { protection, max } = extraCard(states, { time_format: "12", time_zone: "server" });
   assert.equal(max.hidden, true, "no max sensor state");
+  assert.equal("data-max" in max.root.querySelector("ha-card").attributes, false, "no tick either");
   assert.equal(protection.textContent.replace(/\s/g, " "), "Protection 10:45 AM–04:30 PM");
   assert.equal("data-active" in protection.attributes, true);
   states["binary_sensor.protection"].state = "off";
@@ -919,24 +919,27 @@ test("a protection sensor without times shows only while on", () => {
   assert.equal(off.extra.hidden, true, "nothing to show: the line is hidden");
 });
 
-test("the line is hidden without max or protection entities, and the grid size fits it when set", () => {
+test("the footer is hidden without a protection entity, and the grid size fits it when set", () => {
   const { el, extra } = extraCard({}, undefined, { max_entity: undefined, protection_entity: undefined });
   assert.equal(extra.hidden, true);
-  assert.equal(el.getGridOptions().rows, 3);
-  assert.equal(el.getGridOptions().min_columns, 4);
+  assert.deepEqual({ ...el.getGridOptions() }, { columns: 6, min_columns: 4, rows: 4, min_rows: 4 });
+  // The max UV goes to the subtitle: no extra row.
   el.setConfig({ entity: "sensor.uv", max_entity: "sensor.max_uv" });
-  assert.deepEqual({ ...el.getGridOptions() }, { columns: 6, min_columns: 6, rows: 3, min_rows: 3 });
-  el.setConfig({ entity: "sensor.uv", layout: "vertical" });
   assert.equal(el.getGridOptions().rows, 4);
-  el.setConfig({ entity: "sensor.uv", layout: "vertical", max_entity: "sensor.max_uv" });
+  el.setConfig({ entity: "sensor.uv", protection_entity: "binary_sensor.protection" });
   assert.equal(el.getGridOptions().rows, 5);
+  el.setConfig({ entity: "sensor.uv", layout: "horizontal" });
+  assert.deepEqual({ ...el.getGridOptions() }, { columns: 9, min_columns: 6, rows: 3, min_rows: 3 });
+  el.setConfig({ entity: "sensor.uv", layout: "horizontal", protection_entity: "binary_sensor.protection" });
+  assert.equal(el.getGridOptions().rows, 4);
 });
 
-test("the line updates when the max sensor changes", () => {
+test("the subtitle and the tick update when the max sensor changes", () => {
   const { el, max } = extraCard({ "sensor.max_uv": { state: "3", attributes: {} } });
   assert.equal(max.textContent, "Max 3");
   el.hass = { ...el._hass, states: { ...el._hass.states, "sensor.max_uv": { state: "11", attributes: {} } } };
   assert.equal(max.textContent, "Max 11");
+  assert.equal(el.shadowRoot.querySelector("ha-card").style.props["--uv-max-angle"], "165.00deg");
 });
 
 // The icon animation pauses while the card is off-screen or the tab hidden.
@@ -988,6 +991,20 @@ test("the icon animation pauses while the browser tab is hidden", () => {
   assert.deepEqual(svg().smil, ["pause", "unpause"]);
 });
 
+test("the marker pulse (CSS) pauses with the icon: data-paused on the card", () => {
+  const { el, view, tab } = viewCard();
+  const paused = () => "data-paused" in el.shadowRoot.querySelector("ha-card").attributes;
+  assert.equal(paused(), false);
+  view(false);
+  assert.equal(paused(), true);
+  view(true);
+  assert.equal(paused(), false);
+  tab("hidden");
+  assert.equal(paused(), true);
+  const css = el.shadowRoot.querySelector("style").textContent;
+  assert.equal(declarations(css, "ha-card[data-paused] .halo")["animation-play-state"], "paused");
+});
+
 test("with reduced motion the icon is never resumed by visibility changes", () => {
   const { svg, view, tab } = viewCard({ reduce: true });
   view(false);
@@ -1006,4 +1023,115 @@ test("a card removed from the page stops watching its visibility", () => {
 test("the README documents weather entities and the max / protection options", () => {
   const readme = readFileSync(new URL("../README.md", import.meta.url), "utf8");
   for (const word of ["`max_entity`", "`protection_entity`", "uv_index"]) assert.ok(readme.includes(word), word);
+});
+
+// The gauge: 0 to 12 on a half circle, the WHO bands from the middle between
+// two whole numbers; the marker sits at the displayed (rounded) value.
+test("the marker angle follows the rounded value, 11+ stays inside the last band", () => {
+  for (const [state, angle] of [[0, "0.00deg"], [-2, "0.00deg"], [3, "45.00deg"], [6, "90.00deg"], [10.6, "165.00deg"], [14, "172.50deg"]]) {
+    const card = render(state).querySelector("ha-card");
+    assert.equal(card.style.props["--uv-angle"], angle, String(state));
+  }
+});
+
+test("each level dims the bands above it and pulses from Very high", () => {
+  for (const [state, level] of [[1, "0"], [4, "1"], [7, "2"], [9, "3"], [11, "4"]]) {
+    const card = render(state).querySelector("ha-card");
+    assert.equal(card.getAttribute("data-level"), level, String(state));
+    assert.equal("data-unavailable" in card.attributes, false);
+  }
+  const css = render(4).querySelector("style").textContent;
+  assert.match(css, /ha-card\[data-level="0"\] :is\(\.s1, \.s2, \.s3, \.s4\),\s*ha-card\[data-level="1"\] :is\(\.s2, \.s3, \.s4\),\s*ha-card\[data-level="2"\] :is\(\.s3, \.s4\),\s*ha-card\[data-level="3"\] \.s4 \{\s*opacity/);
+  assert.match(css, /ha-card:is\(\[data-level="3"\], \[data-level="4"\]\) \.halo \{\s*animation: uv-pulse/);
+  // The marker glides: it turns by a transition, and reduced motion turns it off.
+  assert.match(declarations(css, ".marker").transform, /rotate\(var\(--uv-angle/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{[^}]*\.marker[^}]*transition: none/);
+});
+
+test("the gauge has the five WHO bands in their themable colours", () => {
+  const root = render(4);
+  const html = root.querySelector(".gauge").innerHTML;
+  for (const [i, key] of ["low", "moderate", "high", "very-high", "extreme"].entries()) {
+    assert.match(html, new RegExp(`class="seg s${i}" style="stroke: var\\(--uv-${key}\\)"`), key);
+  }
+  const card = declarations(root.querySelector("style").textContent, "ha-card");
+  assert.equal(card["--uv-low"], "var(--uv-low-color, #558b2f)");
+  assert.equal(card["--uv-extreme"], "var(--uv-extreme-color, #6a1b9a)");
+});
+
+test("an unavailable sensor dims the gauge, hides the marker and the advice", () => {
+  const root = render("unavailable");
+  const haCard = root.querySelector("ha-card");
+  assert.equal("data-unavailable" in haCard.attributes, true);
+  assert.equal(haCard.getAttribute("data-level"), null);
+  assert.equal(root.querySelector(".advice").hidden, true);
+  const css = root.querySelector("style").textContent;
+  assert.ok(Number(declarations(css, "ha-card[data-unavailable] .seg").opacity) < 0.5);
+  assert.equal(declarations(css, "ha-card[data-unavailable] .marker").opacity, "0");
+  // Back to a value: the marker and the advice come back.
+  const { el } = card(); // the card() helper, not the ha-card above
+  el.hass = hassWith("unavailable");
+  el.hass = hassWith(5);
+  assert.equal("data-unavailable" in el.shadowRoot.querySelector("ha-card").attributes, false);
+  assert.equal(el.shadowRoot.querySelector(".advice").hidden, false);
+});
+
+test("the advice follows the level, its hours follow the 12/24 h setting, show_advice hides it", () => {
+  const advice = (state, config) => render(state, config).querySelector(".advice");
+  assert.equal(advice(1).textContent, "No protection needed");
+  assert.equal(advice(4).textContent, "Sunglasses · SPF 30+ at midday");
+  assert.equal(advice(7).textContent, "SPF 30+ · hat · shade at noon");
+  assert.match(advice(9).textContent, /^Avoid the sun 11:00\sAM–04:00\sPM$/, "English follows its 12 h clock");
+  assert.equal(advice(11).textContent, "Stay inside if possible");
+  assert.equal(advice(9, { language: "fr" }).textContent, "Évitez le soleil 11:00–16:00");
+  assert.equal(advice(4, { show_advice: false }).hidden, true);
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const el = new (ctx.customElements.get("ha-uv-card"))();
+  el.setConfig({ entity: "sensor.uv", language: "en" });
+  el.hass = { ...hassWith(9), locale: { time_format: "24" } };
+  assert.equal(el.shadowRoot.querySelector(".advice").textContent, "Avoid the sun 11:00–16:00");
+});
+
+test("the layout defaults to vertical, horizontal on request", () => {
+  assert.equal(render(4).querySelector("ha-card").getAttribute("data-layout"), "vertical");
+  assert.equal(render(4, { layout: "horizontal" }).querySelector("ha-card").getAttribute("data-layout"), "horizontal");
+  assert.equal(render(4, { layout: "diagonal" }).querySelector("ha-card").getAttribute("data-layout"), "vertical");
+});
+
+test("the header holds the badge icon, the title, the subtitle and the status pill", () => {
+  const root = render(4, { show_title: false });
+  const header = root.querySelector(".header");
+  assert.deepEqual(header.children.map((c) => c.className), ["badge", "titles", "label"]);
+  assert.equal(root.querySelector(".name").hidden, true);
+  assert.equal(root.querySelector(".sub").hidden, true, "no max sensor: no subtitle");
+});
+
+test("the icon option replaces the animated icon in the badge", () => {
+  const ctx = sandbox();
+  vm.runInContext(svgSource, ctx);
+  const el = new (ctx.customElements.get("ha-uv-card"))();
+  el.setConfig({ entity: "sensor.uv", icon: "mdi:weather-sunny" });
+  el.hass = hassWith(4);
+  const icon = el.shadowRoot.querySelector(".icon");
+  assert.equal(icon.querySelector("svg"), null);
+  assert.equal(icon.querySelector("ha-icon").getAttribute("icon"), "mdi:weather-sunny");
+  const writes = icon.htmlWrites;
+  el.hass = hassWith(9);
+  assert.equal(icon.htmlWrites, writes, "a custom icon is not redrawn with the value");
+  el.setConfig({ entity: "sensor.uv" });
+  assert.notEqual(icon.querySelector("svg"), null, "back to the animated icon");
+});
+
+test("the editor offers show_advice and the icon", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const form = ctx.customElements.get("ha-uv-card").getConfigForm();
+  const byName = Object.fromEntries(form.schema.filter((s) => s.name).map((s) => [s.name, s]));
+  assert.equal(byName.show_advice.default, true);
+  assert.ok(byName.show_advice.selector.boolean);
+  assert.ok(byName.icon.selector.icon);
+  assert.equal(form.computeLabel(byName.show_advice), "Show the protection advice");
+  const layout = form.schema.find((f) => f.type === "grid").schema.find((f) => f.name === "layout");
+  assert.equal(layout.selector.select.options[0].value, "vertical", "the default comes first");
 });

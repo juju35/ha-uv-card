@@ -15,13 +15,18 @@ export const extra = {
 };
 const extraConfig = { entity: "sensor.uv_index", max_entity: "sensor.max_uv_index", protection_entity: "binary_sensor.protection_window" };
 
-export const SHOTS = [
-  { file: "card", type: "ha-uv-card", theme: "light", width: 460, config: { entity: "sensor.uv_index" }, hass: { states: uv(6) } },
-  { file: "card-dark", type: "ha-uv-card", theme: "dark", width: 460, config: { entity: "sensor.uv_index" }, hass: { states: uv(6) } },
-  { file: "card-vertical", type: "ha-uv-card", theme: "light", width: 380, config: { entity: "sensor.uv_index", layout: "vertical", name: "UV" }, hass: { states: uv(2) } },
-  { file: "card-vertical-dark", type: "ha-uv-card", theme: "dark", width: 380, config: { entity: "sensor.uv_index", layout: "vertical", name: "UV" }, hass: { states: uv(2) } },
-  { file: "card-extra", type: "ha-uv-card", theme: "light", width: 460, config: extraConfig, hass: { states: { ...uv(6), ...extra }, locale: { time_format: "24" } } },
-  { file: "card-extra-dark", type: "ha-uv-card", theme: "dark", width: 460, config: extraConfig, hass: { states: { ...uv(6), ...extra }, locale: { time_format: "24" } } },
-  { file: "card-unavailable", type: "ha-uv-card", theme: "light", width: 460, config: { entity: "sensor.uv_index" }, hass: { states: uv("unavailable") } },
-  { file: "card-unavailable-dark", type: "ha-uv-card", theme: "dark", width: 460, config: { entity: "sensor.uv_index" }, hass: { states: uv("unavailable") } },
+// Still shots: each one in light and dark, with the same state.
+const pairs = [
+  // The default (vertical) gauge, with OpenUV's max UV (tick and subtitle) and protection window (footer).
+  { file: "card", width: 360, config: extraConfig, hass: { states: { ...uv(9), ...extra }, locale: { time_format: "24" } } },
+  // Horizontal: the gauge on the left, the value and the advice on the right.
+  { file: "card-horizontal", width: 460, config: { ...extraConfig, layout: "horizontal" }, hass: { states: { ...uv(4), ...extra }, locale: { time_format: "24" } } },
+  // A small card with only the UV sensor.
+  { file: "card-compact", width: 240, config: { entity: "sensor.uv_index", name: "UV" }, hass: { states: uv(2) } },
+  { file: "card-unavailable", width: 360, config: { entity: "sensor.uv_index" }, hass: { states: uv("unavailable") } },
 ];
+
+export const SHOTS = pairs.flatMap((s) => [
+  { ...s, type: "ha-uv-card", theme: "light" },
+  { ...s, file: `${s.file}-dark`, type: "ha-uv-card", theme: "dark" },
+]);

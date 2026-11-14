@@ -142,8 +142,9 @@ test("the risk level switches between text and dot in a card without a fixed hei
       await frames(4);
       seen.push(label.hasAttribute("data-dot"));
     }
-    // A level change at the narrow width is re-fitted too.
-    box.style.width = "80px";
+    // A level change is re-fitted too: at 200px the header (badge, 4 characters
+    // of title, pill) has room for "Niski", not for "Bardzo wysoki".
+    box.style.width = "200px";
     await frames(4);
     el.hass = { language: "pl", states: { "sensor.uv": { state: "1", attributes: {} } } };
     await frames(4);
@@ -153,7 +154,7 @@ test("the risk level switches between text and dot in a card without a fixed hei
     seen.push(label.hasAttribute("data-dot"));
     return seen;
   });
-  // "Bardzo wysoki" fits at 300px, not at 80px; "Niski" fits at 80px.
+  // "Bardzo wysoki" fits at 300px, not at 80px nor 200px; "Niski" fits at 200px.
   assert.deepEqual(dots, [false, true, false, true, false, false, true]);
   assert.deepEqual(await p.errors(), []);
   await p.close();

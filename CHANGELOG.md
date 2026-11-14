@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.10.0 - 2026-11-14
+
+### Features
+- **Gauge redesign**: the UV index is shown on a half-circle gauge from 0 to 11+ split into the five WHO bands (green 0–2, yellow 3–5, orange 6–7, red 8–10, violet 11+). The bands above the current value are dimmed, a round marker sits on the arc at the value and glides to a new one (CSS transition, the DOM is updated in place), with a gentle pulse at Very high and Extreme; the big value sits in the centre in the level's colour.
+- WHO sun protection advice under the value, per level ("No protection needed", "Sunglasses · SPF 30+ at midday", "SPF 30+ · hat · shade at noon", "Avoid the sun 11:00–16:00", "Stay inside if possible"), in the 22 languages; new `show_advice` option (default `true`, also in the visual editor).
+- Header: round tinted badge with the animated Meteocons icon, the title, a "Max 8 · 13:20" subtitle when `max_entity` is set, and the WHO risk level as a status pill on the right. A `max_entity` also puts a tick on the gauge at the day's max.
+- New `icon` option (also in the visual editor) to show an icon of your choice in the badge instead of the animated one.
+- The protection window (`protection_entity`) moves to a footer line, highlighted while it is on.
+- Band colours are CSS variables, overridable from a theme: `--uv-low-color`, `--uv-moderate-color`, `--uv-high-color`, `--uv-very-high-color`, `--uv-extreme-color`.
+- Unavailable sensor: dimmed gauge without marker, "Unavailable" (or "Unknown") pill.
+
+### Changes
+- The default layout is now `vertical` (value inside the gauge, advice under it). `layout: horizontal` puts the gauge on the left and the value and advice on the right, and stacks them on cards narrower than 300 px. Every existing option keeps working.
+- Sections grid size: 6 columns × 4 rows by default (5 with a protection window); horizontal 9 columns × 3 rows (4 with a protection window).
+- "Very High" is written "Very high" in English.
+- README: new screenshots (light and dark) and one GIF per risk band showing the marker animation.
+
 ## 1.9.0 - 2026-11-12
 
 ### Features
