@@ -232,8 +232,9 @@ test("the GIF comparison sees colors in every frame", async (t) => {
   assert.equal(await sameGifPixels(gif(["red"]), gif(["blue"])), false, "red vs blue");
 });
 
-// The illustrated header's status pill: the whole risk level from 245 to 500 px (after the title, else on its own
-// line under the subtitle), never more than about half of the title row, and the title keeps at least 4 characters.
+// The illustrated header's status pill: the whole risk level from 245 to 500 px, right after the title whenever it fits
+// there beside the title cut down to 4 characters (always for "UV index" from 360 px, the README width), else on its
+// own line under the subtitle; the title keeps at least 4 characters.
 test("status pill shows its whole label in the banner, next to a readable title", async (t) => {
   const p = await page(t);
   if (!p) return;
@@ -244,7 +245,7 @@ test("status pill shows its whole label in the banner, next to a readable title"
     });
     const out = [];
     const box = document.getElementById("root").appendChild(document.createElement("div"));
-    for (const width of [245, 260, 300, 360, 400, 500]) {
+    for (const width of [245, 260, 300, 360, 400, 460, 500]) {
       for (const [state, name] of [["9", "UV index"], ["unavailable", "UV index"], ["2", "A very long UV index title for the garden"]]) {
         box.innerHTML = "";
         box.style.width = `${width}px`;
@@ -262,8 +263,14 @@ test("status pill shows its whole label in the banner, next to a readable title"
         if (tb.width < 24) out.push(`${tag}: title ${Math.round(tb.width)}px`);
         const pb = pill.getBoundingClientRect();
         const onRow = Math.abs(pb.top + pb.height / 2 - (tb.top + tb.height / 2)) < 3;
-        const row = r.querySelector(".trow").getBoundingClientRect();
-        if (onRow && pb.width > row.width * 0.51 + 0.5) out.push(`${tag}: pill ${Math.round(pb.width)} of ${Math.round(row.width)}px`);
+        const ctx = document.createElement("canvas").getContext("2d");
+        const cs = getComputedStyle(title);
+        ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        const four = Math.min(title.scrollWidth, ctx.measureText(`${title.textContent.trim().slice(0, 4)}…`).width);
+        const banner = r.querySelector(".banner");
+        const room = banner.getBoundingClientRect().right - parseFloat(getComputedStyle(banner).paddingRight) - tb.left;
+        if (!onRow && four + 8 + pb.width <= room - 1) out.push(`${tag}: pill under the subtitle although it fits beside the title`);
+        if (!onRow && name === "UV index" && width >= 360) out.push(`${tag}: pill not beside the title`);
         if (onRow && pb.left - tb.right > 10.5) out.push(`${tag}: pill ${Math.round(pb.left - tb.right)}px after the title`);
         const card = r.querySelector("ha-card").getBoundingClientRect();
         if (pb.right > card.right - 4) out.push(`${tag}: pill past the card`);
