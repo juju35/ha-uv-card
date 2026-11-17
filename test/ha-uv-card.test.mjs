@@ -1129,7 +1129,7 @@ test("the icon option replaces the animated icon in the badge", () => {
   assert.notEqual(icon.querySelector("svg"), null, "back to the animated icon");
 });
 
-test("illustrated header: banner, MDI badge (or the icon option), animated icon in the scene, status line", () => {
+test("illustrated header: banner, MDI badge (or the icon option), animated icon in the scene, no repeated index", () => {
   const ctx = sandbox();
   vm.runInContext(svgSource, ctx);
   const el = new (ctx.customElements.get("ha-uv-card"))();
@@ -1141,22 +1141,21 @@ test("illustrated header: banner, MDI badge (or the icon option), animated icon 
   assert.notEqual(root.querySelector(".icon").querySelector("svg"), null, "the animated icon stays (in the sky)");
   assert.notEqual(root.querySelector(".mdi").querySelector("svg"), null, "MDI sun in the badge");
   assert.notEqual(root.querySelector(".uv-scene").querySelector("svg"), null, "beach scene");
-  assert.equal(root.querySelector(".status").textContent, "UV 9");
-  assert.equal(root.querySelector(".status").hidden, false);
-  // The risk level is the status pill on the title row, not repeated in the status line.
+  // The gauge shows the index big: the header does not repeat it ("UV 9") under the title.
+  assert.equal(root.querySelector(".status"), null);
+  assert.doesNotMatch(root.querySelector(".titles").textContent, /UV 9/);
+  // The risk level is the status pill on the title row.
   assert.equal(root.querySelector(".txt").textContent, "Very high");
   assert.equal(root.querySelector(".pill").getAttribute("title"), "Very high");
   assert.equal(root.querySelector(".pill").hidden, false);
   el.setConfig({ entity: "sensor.uv", icon: "mdi:sun-wireless", show_value: false });
   assert.equal(root.querySelector(".mdi").querySelector("ha-icon").getAttribute("icon"), "mdi:sun-wireless");
   assert.notEqual(root.querySelector(".icon").querySelector("svg"), null, "the icon option goes to the badge only");
-  assert.equal(root.querySelector(".status").hidden, true, "no value: no status line");
   assert.equal(root.querySelector(".pill").hidden, false, "the pill stays");
   el.setConfig({ entity: "sensor.uv", illustration: false });
   assert.equal(root.querySelector(".pill").hidden, true, "classic header: its own pill");
   assert.equal(root.querySelector(".header").className, "header");
   assert.equal(root.querySelector("ha-card").getAttribute("data-illustration"), null);
-  assert.equal(root.querySelector(".status").hidden, true);
 });
 
 test("illustrated header: night from illustration_theme, else sun.sun below the horizon or the dark theme", () => {

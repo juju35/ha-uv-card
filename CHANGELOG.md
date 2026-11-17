@@ -3,11 +3,12 @@
 ## 1.11.0 - 2026-11-17
 
 ### Features
-- **Illustrated header** (default): a 90 px banner edge to edge at the top of the card, with a beach scene on the right (rolling sea, parasol, towel) over a 10 px sand strip, and the card's own animated UV icon (rays turning, index badge) in the sky. A sun glow grows with the risk level and a heat haze rises over the sand from High. The title, with the risk level as a status pill right after it (a dot and "Very high", in the level's colour on a frosted tint; on its own line under the subtitle on a narrow card, its dot only under 200 px), and a "UV 9" status line sit on the sky next to a round badge whose sun icon takes the level's colour (grey without a value), day and night.
+- **Illustrated header** (default): a 90 px banner edge to edge at the top of the card, with a beach scene on the right (rolling sea, parasol, towel) over a 10 px sand strip, and the card's own animated UV icon (rays turning, index badge) in the sky. A sun glow grows with the risk level and a heat haze rises over the sand from High. The title, with the risk level as a status pill right after it (a dot and "Very high", in the level's colour on a frosted tint; on its own line under the subtitle on a narrow card, its dot only under 200 px) sit on the sky next to a round badge whose sun icon takes the level's colour (grey without a value), day and night.
 - Night picture (stars, dark sea and sand, no glow) when `sun.sun` is below the horizon or with a dark theme (even while the sun is up); new `illustration_theme` option (`auto`, `day`, `night`) to force it.
 - New `illustration` option (default `true`); `illustration: false` keeps the classic header with the risk level pill. Both options are in the visual editor, in the 22 languages.
 - The `icon` option replaces the badge's sun in the illustrated header (the animated icon stays in the scene).
 - Sections grid size: one more row with the illustrated header. Animations pause off-screen and honour `prefers-reduced-motion`; each card's scene ids are unique.
+- No repeated index: the banner no longer shows "UV 9" under the title, the gauge shows the index big just below; the subtitle keeps the day's max (with `max_entity`).
 
 ## 1.10.1 - 2026-11-14
 

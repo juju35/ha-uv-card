@@ -611,7 +611,6 @@ const STYLE = `
   ha-card[data-illustration][data-align="top"] .body {
     align-content: start;
   }
-  .status,
   .mdi,
   .uv-scene,
   .uv-ground {
@@ -641,15 +640,6 @@ const STYLE = `
   }
   .banner .name {
     color: inherit;
-  }
-  .banner .status {
-    display: block;
-    font-size: 13px;
-    line-height: 17px;
-    color: var(--uv-muted);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
   .banner .sub {
     color: var(--uv-muted);
@@ -1226,7 +1216,6 @@ class UvIndexCard extends HTMLElement {
     const name = el("div", "name", trow);
     const pill = el("span", "pill", trow);
     const pillText = el("span", "txt", pill);
-    const status = el("div", "status", titles);
     const sub = el("div", "sub", titles);
     const label = el("div", "label", header);
     // The illustration (shown by the banner styles only) and its sand strip.
@@ -1249,7 +1238,7 @@ class UvIndexCard extends HTMLElement {
       ev.preventDefault();
       this._openMoreInfo(this._config.entity);
     });
-    this._els = { card, header, name, pill, pillText, status, sub, mdi, icon, label, gauge, value, advice, extra, protection };
+    this._els = { card, header, name, pill, pillText, sub, mdi, icon, label, gauge, value, advice, extra, protection };
     this._iconKey = null;
     this._mdiKey = null;
     if (this.isConnected) {
@@ -1354,7 +1343,7 @@ class UvIndexCard extends HTMLElement {
     card.style.setProperty("--uv-color", level ? `var(--uv-${level.key.replace("_", "-")})` : "var(--secondary-text-color)");
     this._els.name.textContent = name;
     this._els.name.hidden = !this._config.show_title;
-    this._renderBanner(labelText, available ? String(rounded) : "");
+    this._renderBanner(labelText);
     this._renderIcon(index);
     this._els.icon.setAttribute("title", labelText);
     gauge.setAttribute("title", labelText);
@@ -1376,10 +1365,11 @@ class UvIndexCard extends HTMLElement {
     this._fitLabel();
   }
 
-  // The illustrated header: the banner class (night picture), the MDI badge, the status pill on the title row
-  // (the risk level, "Very high") and the status line under the title ("UV 9").
-  _renderBanner(labelText, valueText) {
-    const { card, header, pill, pillText, status } = this._els;
+  // The illustrated header: the banner class (night picture), the MDI badge and the status pill on the title row
+  // (the risk level, "Very high"). The index itself is not repeated under the title: the gauge shows it big just
+  // below; the subtitle keeps the day's max (see _renderMax).
+  _renderBanner(labelText) {
+    const { card, header, pill, pillText } = this._els;
     const on = this._config.illustration;
     header.className = on ? `header banner${isNight(this._hass, this._config) ? " night" : ""}` : "header";
     card.toggleAttribute("data-illustration", on);
@@ -1387,8 +1377,6 @@ class UvIndexCard extends HTMLElement {
     pillText.textContent = labelText;
     pill.setAttribute("title", labelText);
     pill.hidden = !on || !this._config.show_label;
-    status.textContent = this._config.show_value && valueText ? `UV ${valueText}` : "";
-    status.hidden = !on || !status.textContent;
   }
 
   // "Max 8 · 13:20" under the title from a max UV sensor (OpenUV: its "time"
