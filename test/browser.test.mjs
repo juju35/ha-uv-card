@@ -231,3 +231,47 @@ test("the GIF comparison sees colors in every frame", async (t) => {
   assert.equal(await sameGifPixels(redBlue, gif(["red", "green"])), false, "the second frame changed color");
   assert.equal(await sameGifPixels(gif(["red"]), gif(["blue"])), false, "red vs blue");
 });
+
+// The illustrated header's status pill: the whole risk level from 245 to 500 px (after the title, else on its own
+// line under the subtitle), never more than about half of the title row, and the title keeps at least 4 characters.
+test("status pill shows its whole label in the banner, next to a readable title", async (t) => {
+  const p = await page(t);
+  if (!p) return;
+  const failures = await p.evaluate(async () => {
+    const frames = (n) => new Promise((r) => {
+      const step = () => (n-- > 0 ? requestAnimationFrame(step) : r());
+      step();
+    });
+    const out = [];
+    const box = document.getElementById("root").appendChild(document.createElement("div"));
+    for (const width of [245, 260, 300, 360, 400, 500]) {
+      for (const [state, name] of [["9", "UV index"], ["unavailable", "UV index"], ["2", "A very long UV index title for the garden"]]) {
+        box.innerHTML = "";
+        box.style.width = `${width}px`;
+        const el = box.appendChild(document.createElement("ha-uv-card"));
+        el.setConfig({ entity: "sensor.uv", name });
+        el.hass = { language: "en", states: { "sensor.uv": { state, attributes: {} } } };
+        await frames(4);
+        const r = el.shadowRoot;
+        const pill = r.querySelector(".pill");
+        const txt = pill.querySelector(".txt");
+        const title = r.querySelector(".name");
+        const tag = `${width}px ${state} "${name}"`;
+        if (pill.hasAttribute("data-dot") || txt.scrollWidth > txt.clientWidth + 0.5) out.push(`${tag}: label cut`);
+        const tb = title.getBoundingClientRect();
+        if (tb.width < 24) out.push(`${tag}: title ${Math.round(tb.width)}px`);
+        const pb = pill.getBoundingClientRect();
+        const onRow = Math.abs(pb.top + pb.height / 2 - (tb.top + tb.height / 2)) < 3;
+        const row = r.querySelector(".trow").getBoundingClientRect();
+        if (onRow && pb.width > row.width * 0.51 + 0.5) out.push(`${tag}: pill ${Math.round(pb.width)} of ${Math.round(row.width)}px`);
+        if (onRow && pb.left - tb.right > 10.5) out.push(`${tag}: pill ${Math.round(pb.left - tb.right)}px after the title`);
+        const card = r.querySelector("ha-card").getBoundingClientRect();
+        if (pb.right > card.right - 4) out.push(`${tag}: pill past the card`);
+      }
+    }
+    return out;
+  });
+  assert.deepEqual(failures, []);
+  assert.deepEqual(await p.errors(), []);
+  await p.close();
+});

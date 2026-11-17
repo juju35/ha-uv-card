@@ -3,7 +3,7 @@
 ## 1.11.0 - 2026-11-17
 
 ### Features
-- **Illustrated header** (default): a 90 px banner edge to edge at the top of the card, with a beach scene on the right (rolling sea, parasol, towel) over a 10 px sand strip, and the card's own animated UV icon (rays turning, index badge) in the sky. A sun glow grows with the risk level and a heat haze rises over the sand from High. The title and a status line ("Very high · 9") sit on the sky next to a round badge whose sun icon takes the level's colour (grey without a value), day and night.
+- **Illustrated header** (default): a 90 px banner edge to edge at the top of the card, with a beach scene on the right (rolling sea, parasol, towel) over a 10 px sand strip, and the card's own animated UV icon (rays turning, index badge) in the sky. A sun glow grows with the risk level and a heat haze rises over the sand from High. The title, with the risk level as a status pill right after it (a dot and "Very high", in the level's colour on a frosted tint; on its own line under the subtitle on a narrow card, its dot only under 200 px), and a "UV 9" status line sit on the sky next to a round badge whose sun icon takes the level's colour (grey without a value), day and night.
 - Night picture (stars, dark sea and sand, no glow) when `sun.sun` is below the horizon, else with a dark theme; new `illustration_theme` option (`auto`, `day`, `night`) to force it.
 - New `illustration` option (default `true`); `illustration: false` keeps the classic header with the risk level pill. Both options are in the visual editor, in the 22 languages.
 - The `icon` option replaces the badge's sun in the illustrated header (the animated icon stays in the scene).

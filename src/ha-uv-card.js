@@ -658,6 +658,73 @@ const STYLE = `
   .banner > .label {
     display: none;
   }
+  /* Status pill on the title row (illustrated header): a dot and the risk level right after the title, in the
+     level's colour on a frosted tint. The title is cut first (at least 4 characters), then the pill; one that
+     does not fit even so shows as its dot (its text stays for screen readers and in the tooltip). */
+  .trow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .trow .name {
+    flex: 0 100 auto;
+    min-width: 4ch;
+  }
+  .pill {
+    display: none;
+  }
+  .banner .pill {
+    --c: var(--uv-color);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex: 0 1 auto;
+    min-width: 0;
+    /* At most about half of the title row; a longer level goes on its own line. */
+    max-width: 51%;
+    padding: 1px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    box-sizing: border-box;
+    background: color-mix(in srgb, var(--c) 18%, rgba(255, 255, 255, 0.78));
+    color: color-mix(in srgb, var(--c) 45%, #0d2a45);
+  }
+  .banner.night .pill {
+    background: color-mix(in srgb, var(--c) 30%, rgba(8, 18, 38, 0.55));
+    color: color-mix(in srgb, var(--c) 35%, #ffffff);
+  }
+  .banner .pill[hidden] {
+    display: none;
+  }
+  .pill::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--c);
+    flex: none;
+  }
+  .pill .txt {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .banner .pill[data-dot] {
+    padding: 0;
+    background: none;
+  }
+  .banner .pill[data-dot] .txt {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
   .banner .badge {
     color: var(--uv-icon);
     background: rgba(255, 255, 255, 0.62);
@@ -751,6 +818,51 @@ const STYLE = `
   /* A narrow card gives the scene less room, so the title keeps its own. */
   @container (max-width: 299px) {
     .banner { --uv-u: min(1px, 0.28cqw); }
+  }
+  /* A narrow banner has no room for the pill next to the title: it goes on its own line under the subtitle
+     (also when the card measures that it does not fit there). */
+  .banner[data-wrap] .titles {
+    display: flex;
+    flex-direction: column;
+  }
+  .banner[data-wrap] .trow {
+    display: contents;
+  }
+  .banner[data-wrap] .pill {
+    order: 9;
+    align-self: flex-start;
+    /* On its own line the pill may run over the faded left edge of the scene. */
+    max-width: calc(100cqw - 76px);
+    margin-top: 3px;
+  }
+  @container (max-width: 260px) {
+    .banner .titles {
+      display: flex;
+      flex-direction: column;
+    }
+    .banner .trow {
+      display: contents;
+    }
+    .banner .pill {
+      order: 9;
+      align-self: flex-start;
+      max-width: 100%;
+      margin-top: 3px;
+    }
+  }
+  /* Very narrow banner: only the pill's dot (its text stays for screen readers and in the tooltip). */
+  @container (max-width: 200px) {
+    .banner .pill {
+      padding: 0;
+      background: none;
+    }
+    .banner .pill .txt {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     .marker, .tick, .seg, .dot, .value, .badge { transition: none; }
@@ -1005,11 +1117,28 @@ class UvIndexCard extends HTMLElement {
   // Measured with fractional widths: scrollWidth / clientWidth are rounded and
   // miss a text cut by less than a pixel (still drawn with an ellipsis).
   _fitLabel() {
-    const { label } = this._els;
+    const { label: classic, pill, header } = this._els;
+    const banner = this._config.illustration;
+    const label = banner ? pill : classic;
+    (label === pill ? classic : pill).toggleAttribute("data-dot", false);
+    header.toggleAttribute("data-wrap", false);
     label.toggleAttribute("data-dot", false);
     label.removeAttribute("role");
     label.removeAttribute("aria-label");
     if (label.hidden || !label.getBoundingClientRect) return;
+    // The banner's pill that does not fit after the title (cut to 4 characters) goes on its own line first.
+    if (banner && !this._labelFits(label)) header.toggleAttribute("data-wrap", true);
+    const dot = !this._labelFits(label);
+    label.toggleAttribute("data-dot", dot);
+    // A dot is an image named by the level; the text names itself otherwise.
+    if (dot) {
+      label.setAttribute("role", "img");
+      label.setAttribute("aria-label", label.textContent);
+    }
+  }
+
+  // Whether the label shows its whole text where it is.
+  _labelFits(label) {
     const have = label.getBoundingClientRect().width;
     label.style.maxWidth = "none";
     label.style.width = "max-content";
@@ -1018,13 +1147,7 @@ class UvIndexCard extends HTMLElement {
     label.style.maxWidth = "";
     label.style.width = "";
     label.style.flex = "";
-    const dot = need > have + 0.01;
-    label.toggleAttribute("data-dot", dot);
-    // A dot is an image named by the level; the text names itself otherwise.
-    if (dot) {
-      label.setAttribute("role", "img");
-      label.setAttribute("aria-label", label.textContent);
-    }
+    return need <= have + 0.01;
   }
 
   // Cheap fingerprint of everything that affects the rendered output, so we
@@ -1099,7 +1222,11 @@ class UvIndexCard extends HTMLElement {
     const mdi = el("div", "mdi", badge);
     const icon = el("div", "icon", badge);
     const titles = el("div", "titles", header);
-    const name = el("div", "name", titles);
+    // The title row: the title, then (illustrated header) the status pill right after it.
+    const trow = el("div", "trow", titles);
+    const name = el("div", "name", trow);
+    const pill = el("span", "pill", trow);
+    const pillText = el("span", "txt", pill);
     const status = el("div", "status", titles);
     const sub = el("div", "sub", titles);
     const label = el("div", "label", header);
@@ -1123,7 +1250,7 @@ class UvIndexCard extends HTMLElement {
       ev.preventDefault();
       this._openMoreInfo(this._config.entity);
     });
-    this._els = { card, header, name, status, sub, mdi, icon, label, gauge, value, advice, extra, protection };
+    this._els = { card, header, name, pill, pillText, status, sub, mdi, icon, label, gauge, value, advice, extra, protection };
     this._iconKey = null;
     this._mdiKey = null;
     if (this.isConnected) {
@@ -1250,16 +1377,19 @@ class UvIndexCard extends HTMLElement {
     this._fitLabel();
   }
 
-  // The illustrated header: the banner class (night picture), the MDI badge and the status line ("Very high · 9").
+  // The illustrated header: the banner class (night picture), the MDI badge, the status pill on the title row
+  // (the risk level, "Very high") and the status line under the title ("UV 9").
   _renderBanner(labelText, valueText) {
-    const { card, header, status } = this._els;
+    const { card, header, pill, pillText, status } = this._els;
     const on = this._config.illustration;
     header.className = on ? `header banner${isNight(this._hass, this._config) ? " night" : ""}` : "header";
     card.toggleAttribute("data-illustration", on);
     this._renderMdi();
-    const parts = [this._config.show_label ? labelText : "", this._config.show_value ? valueText : ""].filter(Boolean);
-    status.textContent = parts.join(" · ");
-    status.hidden = !on || parts.length === 0;
+    pillText.textContent = labelText;
+    pill.setAttribute("title", labelText);
+    pill.hidden = !on || !this._config.show_label;
+    status.textContent = this._config.show_value && valueText ? `UV ${valueText}` : "";
+    status.hidden = !on || !status.textContent;
   }
 
   // "Max 8 · 13:20" under the title from a max UV sensor (OpenUV: its "time"

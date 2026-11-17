@@ -721,7 +721,7 @@ function fitCard(lang = "en") {
   const ctx = sandbox(undefined, { ResizeObserver, requestAnimationFrame, cancelAnimationFrame });
   vm.runInContext(source, ctx);
   const el = new (ctx.customElements.get("ha-uv-card"))();
-  el.setConfig({ entity: "sensor.uv", language: lang });
+  el.setConfig({ entity: "sensor.uv", language: lang, illustration: false }); // the classic header's pill
   const pill = () => el.shadowRoot.querySelector(".label");
   // Room for the pill, in px; the text needs 7px per character plus 16px padding.
   let room = 300;
@@ -1141,13 +1141,19 @@ test("illustrated header: banner, MDI badge (or the icon option), animated icon 
   assert.notEqual(root.querySelector(".icon").querySelector("svg"), null, "the animated icon stays (in the sky)");
   assert.notEqual(root.querySelector(".mdi").querySelector("svg"), null, "MDI sun in the badge");
   assert.notEqual(root.querySelector(".uv-scene").querySelector("svg"), null, "beach scene");
-  assert.equal(root.querySelector(".status").textContent, "Very high · 9");
+  assert.equal(root.querySelector(".status").textContent, "UV 9");
   assert.equal(root.querySelector(".status").hidden, false);
+  // The risk level is the status pill on the title row, not repeated in the status line.
+  assert.equal(root.querySelector(".txt").textContent, "Very high");
+  assert.equal(root.querySelector(".pill").getAttribute("title"), "Very high");
+  assert.equal(root.querySelector(".pill").hidden, false);
   el.setConfig({ entity: "sensor.uv", icon: "mdi:sun-wireless", show_value: false });
   assert.equal(root.querySelector(".mdi").querySelector("ha-icon").getAttribute("icon"), "mdi:sun-wireless");
   assert.notEqual(root.querySelector(".icon").querySelector("svg"), null, "the icon option goes to the badge only");
-  assert.equal(root.querySelector(".status").textContent, "Very high");
+  assert.equal(root.querySelector(".status").hidden, true, "no value: no status line");
+  assert.equal(root.querySelector(".pill").hidden, false, "the pill stays");
   el.setConfig({ entity: "sensor.uv", illustration: false });
+  assert.equal(root.querySelector(".pill").hidden, true, "classic header: its own pill");
   assert.equal(root.querySelector(".header").className, "header");
   assert.equal(root.querySelector("ha-card").getAttribute("data-illustration"), null);
   assert.equal(root.querySelector(".status").hidden, true);
