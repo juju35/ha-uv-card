@@ -133,7 +133,7 @@ test("the risk level switches between text and dot in a card without a fixed hei
     const box = document.getElementById("root").appendChild(document.createElement("div"));
     box.style.width = "300px";
     const el = box.appendChild(document.createElement("ha-uv-card"));
-    el.setConfig({ entity: "sensor.uv" });
+    el.setConfig({ entity: "sensor.uv", illustration: false }); // the pill is in the classic header
     el.hass = { language: "pl", states: { "sensor.uv": { state: "9", attributes: {} } } };
     const label = el.shadowRoot.querySelector(".label");
     const seen = [];
@@ -142,20 +142,21 @@ test("the risk level switches between text and dot in a card without a fixed hei
       await frames(4);
       seen.push(label.hasAttribute("data-dot"));
     }
-    // A level change is re-fitted too: at 200px the header (badge, 4 characters
-    // of title, pill) has room for "Niski", not for "Bardzo wysoki".
-    box.style.width = "200px";
+    // A level change is re-fitted too: at 210px the title row has room for "Niski" beside the title, while
+    // "Bardzo wysoki" goes on its own line under it (whole).
+    box.style.width = "210px";
     await frames(4);
+    const header = el.shadowRoot.querySelector(".header");
     el.hass = { language: "pl", states: { "sensor.uv": { state: "1", attributes: {} } } };
     await frames(4);
-    seen.push(label.hasAttribute("data-dot"));
+    seen.push(label.hasAttribute("data-dot"), header.hasAttribute("data-wrap"));
     el.hass = { language: "pl", states: { "sensor.uv": { state: "9", attributes: {} } } };
     await frames(4);
-    seen.push(label.hasAttribute("data-dot"));
+    seen.push(label.hasAttribute("data-dot"), header.hasAttribute("data-wrap"));
     return seen;
   });
-  // "Bardzo wysoki" fits at 300px, not at 80px nor 200px; "Niski" fits at 200px.
-  assert.deepEqual(dots, [false, true, false, true, false, false, true]);
+  // "Bardzo wysoki" fits at 300px; at 80px (200 px or less) the pill is its dot alone.
+  assert.deepEqual(dots, [false, true, false, true, false, false, false, false, true]);
   assert.deepEqual(await p.errors(), []);
   await p.close();
 });
@@ -230,4 +231,47 @@ test("the GIF comparison sees colors in every frame", async (t) => {
   assert.equal(await sameGifPixels(redBlue, gif(["red", "blue"])), true, "same animation");
   assert.equal(await sameGifPixels(redBlue, gif(["red", "green"])), false, "the second frame changed color");
   assert.equal(await sameGifPixels(gif(["red"]), gif(["blue"])), false, "red vs blue");
+});
+
+// The illustrated header's status pill: the whole risk level from 245 to 500 px, right after the title or on its own
+// line under the subtitle (the rule in every language: pill-layout.test.mjs), next to a readable title.
+test("status pill shows its whole label in the banner, next to a readable title", async (t) => {
+  const p = await page(t);
+  if (!p) return;
+  const failures = await p.evaluate(async () => {
+    const frames = (n) => new Promise((r) => {
+      const step = () => (n-- > 0 ? requestAnimationFrame(step) : r());
+      step();
+    });
+    const out = [];
+    const box = document.getElementById("root").appendChild(document.createElement("div"));
+    for (const width of [245, 260, 300, 360, 400, 460, 500]) {
+      for (const [state, name] of [["9", "UV index"], ["unavailable", "UV index"], ["2", "A very long UV index title for the garden"]]) {
+        box.innerHTML = "";
+        box.style.width = `${width}px`;
+        const el = box.appendChild(document.createElement("ha-uv-card"));
+        el.setConfig({ entity: "sensor.uv", name });
+        el.hass = { language: "en", states: { "sensor.uv": { state, attributes: {} } } };
+        await frames(4);
+        const r = el.shadowRoot;
+        const pill = r.querySelector(".pill");
+        const txt = pill.querySelector(".txt");
+        const title = r.querySelector(".name");
+        const tag = `${width}px ${state} "${name}"`;
+        if (pill.hasAttribute("data-dot") || txt.scrollWidth > txt.clientWidth + 0.5) out.push(`${tag}: label cut`);
+        const tb = title.getBoundingClientRect();
+        if (tb.width < 24) out.push(`${tag}: title ${Math.round(tb.width)}px`);
+        const pb = pill.getBoundingClientRect();
+        const onRow = Math.abs(pb.top + pb.height / 2 - (tb.top + tb.height / 2)) < 3;
+        // Beside the whole title or under the subtitle, in every language: pill-layout.test.mjs.
+        if (onRow && pb.left - tb.right > 10.5) out.push(`${tag}: pill ${Math.round(pb.left - tb.right)}px after the title`);
+        const card = r.querySelector("ha-card").getBoundingClientRect();
+        if (pb.right > card.right - 4) out.push(`${tag}: pill past the card`);
+      }
+    }
+    return out;
+  });
+  assert.deepEqual(failures, []);
+  assert.deepEqual(await p.errors(), []);
+  await p.close();
 });

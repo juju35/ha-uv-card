@@ -37,154 +37,176 @@ const TRANSLATIONS = {
         ed_transparent: "Transparent background", ed_language: "Language", ed_auto: "Auto (Home Assistant)",
         max_uv: "Max", protection: "Protection", protection_now: "Protection needed", ed_max_entity: "Max UV index sensor", ed_protection_entity: "Protection window sensor",
         advice_low: "No protection needed", advice_moderate: "Sunglasses · SPF 30+ at midday", advice_high: "SPF 30+ · hat · shade at noon",
-        advice_very_high: "Avoid the sun {from}–{to}", advice_extreme: "Stay inside if possible", ed_show_advice: "Show the protection advice", ed_icon: "Icon (animated by default)" },
+        advice_very_high: "Avoid the sun {from}–{to}", advice_extreme: "Stay inside if possible", ed_show_advice: "Show the protection advice", ed_icon: "Icon (animated by default)",
+        ed_illustration: "Animated illustration", ed_illustration_theme: "Illustration theme", theme_auto: "Automatic (sun or dark theme)", theme_day: "Day", theme_night: "Night" },
   fr: { name: "Indice UV", low: "Faible", moderate: "Modéré", high: "Élevé", very_high: "Très élevé", extreme: "Extrême", unavailable: "Indisponible", unknown: "Inconnu",
         ed_entity: "Capteur d'indice UV", ed_name: "Nom", ed_layout: "Disposition", ed_horizontal: "Horizontale", ed_vertical: "Verticale",
         ed_align: "Alignement", ed_center: "Centré", ed_top: "En haut", ed_show_value: "Afficher la valeur", ed_show_title: "Afficher le titre", ed_show_label: "Afficher le niveau de risque",
         ed_transparent: "Fond transparent", ed_language: "Langue", ed_auto: "Automatique (Home Assistant)",
         max_uv: "Max", protection: "Protection", protection_now: "Protection nécessaire", ed_max_entity: "Capteur d'indice UV max", ed_protection_entity: "Capteur de fenêtre de protection",
         advice_low: "Aucune protection nécessaire", advice_moderate: "Lunettes de soleil · SPF 30+ à midi", advice_high: "SPF 30+ · chapeau · ombre à midi",
-        advice_very_high: "Évitez le soleil {from}–{to}", advice_extreme: "Restez à l'intérieur si possible", ed_show_advice: "Afficher le conseil de protection", ed_icon: "Icône (animée par défaut)" },
+        advice_very_high: "Évitez le soleil {from}–{to}", advice_extreme: "Restez à l'intérieur si possible", ed_show_advice: "Afficher le conseil de protection", ed_icon: "Icône (animée par défaut)",
+        ed_illustration: "Illustration animée", ed_illustration_theme: "Thème de l’illustration", theme_auto: "Automatique (soleil ou thème sombre)", theme_day: "Jour", theme_night: "Nuit" },
   de: { name: "UV-Index", low: "Niedrig", moderate: "Mäßig", high: "Hoch", very_high: "Sehr hoch", extreme: "Extrem", unavailable: "Nicht verfügbar", unknown: "Unbekannt",
         ed_entity: "UV-Index-Sensor", ed_name: "Name", ed_layout: "Anordnung", ed_horizontal: "Horizontal", ed_vertical: "Vertikal",
         ed_align: "Ausrichtung", ed_center: "Zentriert", ed_top: "Oben", ed_show_value: "Wert anzeigen", ed_show_title: "Titel anzeigen", ed_show_label: "Risikostufe anzeigen",
         ed_transparent: "Transparenter Hintergrund", ed_language: "Sprache", ed_auto: "Automatisch (Home Assistant)",
         max_uv: "Max.", protection: "Schutz", protection_now: "Schutz nötig", ed_max_entity: "Sensor für maximalen UV-Index", ed_protection_entity: "Sensor für Schutzzeitraum",
         advice_low: "Kein Schutz nötig", advice_moderate: "Sonnenbrille · LSF 30+ mittags", advice_high: "LSF 30+ · Hut · mittags Schatten",
-        advice_very_high: "Sonne meiden {from}–{to}", advice_extreme: "Möglichst drinnen bleiben", ed_show_advice: "Schutzempfehlung anzeigen", ed_icon: "Symbol (standardmäßig animiert)" },
+        advice_very_high: "Sonne meiden {from}–{to}", advice_extreme: "Möglichst drinnen bleiben", ed_show_advice: "Schutzempfehlung anzeigen", ed_icon: "Symbol (standardmäßig animiert)",
+        ed_illustration: "Animierte Illustration", ed_illustration_theme: "Thema der Illustration", theme_auto: "Automatisch (Sonne oder dunkles Design)", theme_day: "Tag", theme_night: "Nacht" },
   es: { name: "Índice UV", low: "Bajo", moderate: "Moderado", high: "Alto", very_high: "Muy alto", extreme: "Extremo", unavailable: "No disponible", unknown: "Desconocido",
         ed_entity: "Sensor de índice UV", ed_name: "Nombre", ed_layout: "Disposición", ed_horizontal: "Horizontal", ed_vertical: "Vertical",
         ed_align: "Alineación", ed_center: "Centrado", ed_top: "Arriba", ed_show_value: "Mostrar el valor", ed_show_title: "Mostrar el título", ed_show_label: "Mostrar el nivel de riesgo",
         ed_transparent: "Fondo transparente", ed_language: "Idioma", ed_auto: "Automático (Home Assistant)",
         max_uv: "Máx.", protection: "Protección", protection_now: "Protección necesaria", ed_max_entity: "Sensor de índice UV máximo", ed_protection_entity: "Sensor de ventana de protección",
         advice_low: "No se necesita protección", advice_moderate: "Gafas de sol · FPS 30+ a mediodía", advice_high: "FPS 30+ · sombrero · sombra a mediodía",
-        advice_very_high: "Evite el sol {from}–{to}", advice_extreme: "Quédese en casa si es posible", ed_show_advice: "Mostrar el consejo de protección", ed_icon: "Icono (animado por defecto)" },
+        advice_very_high: "Evite el sol {from}–{to}", advice_extreme: "Quédese en casa si es posible", ed_show_advice: "Mostrar el consejo de protección", ed_icon: "Icono (animado por defecto)",
+        ed_illustration: "Ilustración animada", ed_illustration_theme: "Tema de la ilustración", theme_auto: "Automático (sol o tema oscuro)", theme_day: "Día", theme_night: "Noche" },
   it: { name: "Indice UV", low: "Basso", moderate: "Moderato", high: "Alto", very_high: "Molto alto", extreme: "Estremo", unavailable: "Non disponibile", unknown: "Sconosciuto",
         ed_entity: "Sensore indice UV", ed_name: "Nome", ed_layout: "Disposizione", ed_horizontal: "Orizzontale", ed_vertical: "Verticale",
         ed_align: "Allineamento", ed_center: "Centrato", ed_top: "In alto", ed_show_value: "Mostra il valore", ed_show_title: "Mostra il titolo", ed_show_label: "Mostra il livello di rischio",
         ed_transparent: "Sfondo trasparente", ed_language: "Lingua", ed_auto: "Automatico (Home Assistant)",
         max_uv: "Max", protection: "Protezione", protection_now: "Protezione necessaria", ed_max_entity: "Sensore indice UV massimo", ed_protection_entity: "Sensore finestra di protezione",
         advice_low: "Nessuna protezione necessaria", advice_moderate: "Occhiali da sole · SPF 30+ a mezzogiorno", advice_high: "SPF 30+ · cappello · ombra a mezzogiorno",
-        advice_very_high: "Evitare il sole {from}–{to}", advice_extreme: "Restare al chiuso se possibile", ed_show_advice: "Mostra il consiglio di protezione", ed_icon: "Icona (animata per impostazione predefinita)" },
+        advice_very_high: "Evitare il sole {from}–{to}", advice_extreme: "Restare al chiuso se possibile", ed_show_advice: "Mostra il consiglio di protezione", ed_icon: "Icona (animata per impostazione predefinita)",
+        ed_illustration: "Illustrazione animata", ed_illustration_theme: "Tema dell’illustrazione", theme_auto: "Automatico (sole o tema scuro)", theme_day: "Giorno", theme_night: "Notte" },
   nl: { name: "UV-index", low: "Laag", moderate: "Matig", high: "Hoog", very_high: "Zeer hoog", extreme: "Extreem", unavailable: "Niet beschikbaar", unknown: "Onbekend",
         ed_entity: "UV-indexsensor", ed_name: "Naam", ed_layout: "Indeling", ed_horizontal: "Horizontaal", ed_vertical: "Verticaal",
         ed_align: "Uitlijning", ed_center: "Gecentreerd", ed_top: "Boven", ed_show_value: "Waarde tonen", ed_show_title: "Titel tonen", ed_show_label: "Risiconiveau tonen",
         ed_transparent: "Transparante achtergrond", ed_language: "Taal", ed_auto: "Automatisch (Home Assistant)",
         max_uv: "Max.", protection: "Bescherming", protection_now: "Bescherming nodig", ed_max_entity: "Sensor maximale UV-index", ed_protection_entity: "Sensor beschermingsperiode",
         advice_low: "Geen bescherming nodig", advice_moderate: "Zonnebril · SPF 30+ rond het middaguur", advice_high: "SPF 30+ · hoed · schaduw rond het middaguur",
-        advice_very_high: "Vermijd de zon {from}–{to}", advice_extreme: "Blijf zo mogelijk binnen", ed_show_advice: "Beschermingsadvies tonen", ed_icon: "Pictogram (standaard geanimeerd)" },
+        advice_very_high: "Vermijd de zon {from}–{to}", advice_extreme: "Blijf zo mogelijk binnen", ed_show_advice: "Beschermingsadvies tonen", ed_icon: "Pictogram (standaard geanimeerd)",
+        ed_illustration: "Geanimeerde illustratie", ed_illustration_theme: "Thema van de illustratie", theme_auto: "Automatisch (zon of donker thema)", theme_day: "Dag", theme_night: "Nacht" },
   pt: { name: "Índice UV", low: "Baixo", moderate: "Moderado", high: "Alto", very_high: "Muito alto", extreme: "Extremo", unavailable: "Indisponível", unknown: "Desconhecido",
         ed_entity: "Sensor de índice UV", ed_name: "Nome", ed_layout: "Disposição", ed_horizontal: "Horizontal", ed_vertical: "Vertical",
         ed_align: "Alinhamento", ed_center: "Centrado", ed_top: "Em cima", ed_show_value: "Mostrar o valor", ed_show_title: "Mostrar o título", ed_show_label: "Mostrar o nível de risco",
         ed_transparent: "Fundo transparente", ed_language: "Idioma", ed_auto: "Automático (Home Assistant)",
         max_uv: "Máx.", protection: "Proteção", protection_now: "Proteção necessária", ed_max_entity: "Sensor de índice UV máximo", ed_protection_entity: "Sensor do período de proteção",
         advice_low: "Não é necessária proteção", advice_moderate: "Óculos de sol · FPS 30+ ao meio-dia", advice_high: "FPS 30+ · chapéu · sombra ao meio-dia",
-        advice_very_high: "Evite o sol {from}–{to}", advice_extreme: "Fique em casa se possível", ed_show_advice: "Mostrar o conselho de proteção", ed_icon: "Ícone (animado por predefinição)" },
+        advice_very_high: "Evite o sol {from}–{to}", advice_extreme: "Fique em casa se possível", ed_show_advice: "Mostrar o conselho de proteção", ed_icon: "Ícone (animado por predefinição)",
+        ed_illustration: "Ilustração animada", ed_illustration_theme: "Tema da ilustração", theme_auto: "Automático (sol ou tema escuro)", theme_day: "Dia", theme_night: "Noite" },
   pl: { name: "Indeks UV", low: "Niski", moderate: "Umiarkowany", high: "Wysoki", very_high: "Bardzo wysoki", extreme: "Ekstremalny", unavailable: "Niedostępny", unknown: "Nieznany",
         ed_entity: "Czujnik indeksu UV", ed_name: "Nazwa", ed_layout: "Układ", ed_horizontal: "Poziomy", ed_vertical: "Pionowy",
         ed_align: "Wyrównanie", ed_center: "Wyśrodkowane", ed_top: "Do góry", ed_show_value: "Pokaż wartość", ed_show_title: "Pokaż tytuł", ed_show_label: "Pokaż poziom ryzyka",
         ed_transparent: "Przezroczyste tło", ed_language: "Język", ed_auto: "Automatycznie (Home Assistant)",
         max_uv: "Maks.", protection: "Ochrona", protection_now: "Wymagana ochrona", ed_max_entity: "Czujnik maksymalnego indeksu UV", ed_protection_entity: "Czujnik okna ochrony",
         advice_low: "Ochrona niepotrzebna", advice_moderate: "Okulary przeciwsłoneczne · SPF 30+ w południe", advice_high: "SPF 30+ · kapelusz · cień w południe",
-        advice_very_high: "Unikaj słońca {from}–{to}", advice_extreme: "Zostań w domu, jeśli to możliwe", ed_show_advice: "Pokaż zalecenie ochrony", ed_icon: "Ikona (domyślnie animowana)" },
+        advice_very_high: "Unikaj słońca {from}–{to}", advice_extreme: "Zostań w domu, jeśli to możliwe", ed_show_advice: "Pokaż zalecenie ochrony", ed_icon: "Ikona (domyślnie animowana)",
+        ed_illustration: "Animowana ilustracja", ed_illustration_theme: "Motyw ilustracji", theme_auto: "Automatycznie (słońce lub ciemny motyw)", theme_day: "Dzień", theme_night: "Noc" },
   ro: { name: "Indice UV", low: "Scăzut", moderate: "Moderat", high: "Ridicat", very_high: "Foarte ridicat", extreme: "Extrem", unavailable: "Indisponibil", unknown: "Necunoscut",
         ed_entity: "Senzor de indice UV", ed_name: "Nume", ed_layout: "Dispunere", ed_horizontal: "Orizontală", ed_vertical: "Verticală",
         ed_align: "Aliniere", ed_center: "Centrat", ed_top: "Sus", ed_show_value: "Afișează valoarea", ed_show_title: "Afișează titlul", ed_show_label: "Afișează nivelul de risc",
         ed_transparent: "Fundal transparent", ed_language: "Limbă", ed_auto: "Automat (Home Assistant)",
         max_uv: "Max.", protection: "Protecție", protection_now: "Protecție necesară", ed_max_entity: "Senzor de indice UV maxim", ed_protection_entity: "Senzor pentru intervalul de protecție",
         advice_low: "Nu este necesară protecția", advice_moderate: "Ochelari de soare · SPF 30+ la prânz", advice_high: "SPF 30+ · pălărie · umbră la prânz",
-        advice_very_high: "Evitați soarele {from}–{to}", advice_extreme: "Rămâneți în casă dacă puteți", ed_show_advice: "Afișează sfatul de protecție", ed_icon: "Pictogramă (animată implicit)" },
+        advice_very_high: "Evitați soarele {from}–{to}", advice_extreme: "Rămâneți în casă dacă puteți", ed_show_advice: "Afișează sfatul de protecție", ed_icon: "Pictogramă (animată implicit)",
+        ed_illustration: "Ilustrație animată", ed_illustration_theme: "Tema ilustrației", theme_auto: "Automat (soare sau temă întunecată)", theme_day: "Zi", theme_night: "Noapte" },
   da: { name: "UV-indeks", low: "Lav", moderate: "Moderat", high: "Høj", very_high: "Meget høj", extreme: "Ekstrem", unavailable: "Utilgængelig", unknown: "Ukendt",
         ed_entity: "UV-indekssensor", ed_name: "Navn", ed_layout: "Layout", ed_horizontal: "Vandret", ed_vertical: "Lodret",
         ed_align: "Justering", ed_center: "Centreret", ed_top: "Øverst", ed_show_value: "Vis værdien", ed_show_title: "Vis titel", ed_show_label: "Vis risikoniveauet",
         ed_transparent: "Gennemsigtig baggrund", ed_language: "Sprog", ed_auto: "Automatisk (Home Assistant)",
         max_uv: "Maks.", protection: "Beskyttelse", protection_now: "Beskyttelse nødvendig", ed_max_entity: "Sensor for maksimalt UV-indeks", ed_protection_entity: "Sensor for beskyttelsesperiode",
         advice_low: "Ingen beskyttelse nødvendig", advice_moderate: "Solbriller · SPF 30+ midt på dagen", advice_high: "SPF 30+ · hat · skygge midt på dagen",
-        advice_very_high: "Undgå solen {from}–{to}", advice_extreme: "Bliv indenfor, hvis det er muligt", ed_show_advice: "Vis beskyttelsesrådet", ed_icon: "Ikon (animeret som standard)" },
+        advice_very_high: "Undgå solen {from}–{to}", advice_extreme: "Bliv indenfor, hvis det er muligt", ed_show_advice: "Vis beskyttelsesrådet", ed_icon: "Ikon (animeret som standard)",
+        ed_illustration: "Animeret illustration", ed_illustration_theme: "Illustrationens tema", theme_auto: "Automatisk (sol eller mørkt tema)", theme_day: "Dag", theme_night: "Nat" },
   sv: { name: "UV-index", low: "Låg", moderate: "Måttlig", high: "Hög", very_high: "Mycket hög", extreme: "Extrem", unavailable: "Ej tillgänglig", unknown: "Okänd",
         ed_entity: "UV-indexsensor", ed_name: "Namn", ed_layout: "Layout", ed_horizontal: "Horisontell", ed_vertical: "Vertikal",
         ed_align: "Justering", ed_center: "Centrerad", ed_top: "Överst", ed_show_value: "Visa värdet", ed_show_title: "Visa rubrik", ed_show_label: "Visa risknivån",
         ed_transparent: "Transparent bakgrund", ed_language: "Språk", ed_auto: "Automatiskt (Home Assistant)",
         max_uv: "Max", protection: "Skydd", protection_now: "Skydd behövs", ed_max_entity: "Sensor för maximalt UV-index", ed_protection_entity: "Sensor för skyddsperiod",
         advice_low: "Inget skydd behövs", advice_moderate: "Solglasögon · SPF 30+ mitt på dagen", advice_high: "SPF 30+ · hatt · skugga mitt på dagen",
-        advice_very_high: "Undvik solen {from}–{to}", advice_extreme: "Stanna inne om möjligt", ed_show_advice: "Visa skyddsrådet", ed_icon: "Ikon (animerad som standard)" },
+        advice_very_high: "Undvik solen {from}–{to}", advice_extreme: "Stanna inne om möjligt", ed_show_advice: "Visa skyddsrådet", ed_icon: "Ikon (animerad som standard)",
+        ed_illustration: "Animerad illustration", ed_illustration_theme: "Illustrationens tema", theme_auto: "Automatiskt (sol eller mörkt tema)", theme_day: "Dag", theme_night: "Natt" },
   bg: { name: "UV индекс", low: "Нисък", moderate: "Умерен", high: "Висок", very_high: "Много висок", extreme: "Екстремен", unavailable: "Недостъпен", unknown: "Неизвестно",
         ed_entity: "Сензор за UV индекс", ed_name: "Име", ed_layout: "Оформление", ed_horizontal: "Хоризонтално", ed_vertical: "Вертикално",
         ed_align: "Подравняване", ed_center: "Центрирано", ed_top: "Горе", ed_show_value: "Показване на стойността", ed_show_title: "Показване на заглавието", ed_show_label: "Показване на нивото на риск",
         ed_transparent: "Прозрачен фон", ed_language: "Език", ed_auto: "Автоматично (Home Assistant)",
         max_uv: "Макс.", protection: "Защита", protection_now: "Нужна е защита", ed_max_entity: "Сензор за максимален UV индекс", ed_protection_entity: "Сензор за период на защита",
         advice_low: "Не е нужна защита", advice_moderate: "Слънчеви очила · SPF 30+ по обяд", advice_high: "SPF 30+ · шапка · сянка по обяд",
-        advice_very_high: "Избягвайте слънцето {from}–{to}", advice_extreme: "Останете вътре, ако е възможно", ed_show_advice: "Показване на съвета за защита", ed_icon: "Икона (анимирана по подразбиране)" },
+        advice_very_high: "Избягвайте слънцето {from}–{to}", advice_extreme: "Останете вътре, ако е възможно", ed_show_advice: "Показване на съвета за защита", ed_icon: "Икона (анимирана по подразбиране)",
+        ed_illustration: "Анимирана илюстрация", ed_illustration_theme: "Тема на илюстрацията", theme_auto: "Автоматично (слънце или тъмна тема)", theme_day: "Ден", theme_night: "Нощ" },
   ru: { name: "УФ-индекс", low: "Низкий", moderate: "Умеренный", high: "Высокий", very_high: "Очень высокий", extreme: "Экстремальный", unavailable: "Недоступно", unknown: "Неизвестно",
         ed_entity: "Датчик УФ-индекса", ed_name: "Название", ed_layout: "Расположение", ed_horizontal: "Горизонтально", ed_vertical: "Вертикально",
         ed_align: "Выравнивание", ed_center: "По центру", ed_top: "Сверху", ed_show_value: "Показывать значение", ed_show_title: "Показывать заголовок", ed_show_label: "Показывать уровень риска",
         ed_transparent: "Прозрачный фон", ed_language: "Язык", ed_auto: "Автоматически (Home Assistant)",
         max_uv: "Макс.", protection: "Защита", protection_now: "Нужна защита", ed_max_entity: "Датчик максимального УФ-индекса", ed_protection_entity: "Датчик периода защиты",
         advice_low: "Защита не нужна", advice_moderate: "Солнцезащитные очки · SPF 30+ в полдень", advice_high: "SPF 30+ · шляпа · тень в полдень",
-        advice_very_high: "Избегайте солнца {from}–{to}", advice_extreme: "По возможности оставайтесь в помещении", ed_show_advice: "Показывать совет по защите", ed_icon: "Значок (по умолчанию анимированный)" },
+        advice_very_high: "Избегайте солнца {from}–{to}", advice_extreme: "По возможности оставайтесь в помещении", ed_show_advice: "Показывать совет по защите", ed_icon: "Значок (по умолчанию анимированный)",
+        ed_illustration: "Анимированная иллюстрация", ed_illustration_theme: "Тема иллюстрации", theme_auto: "Автоматически (солнце или тёмная тема)", theme_day: "День", theme_night: "Ночь" },
   uk: { name: "УФ-індекс", low: "Низький", moderate: "Помірний", high: "Високий", very_high: "Дуже високий", extreme: "Екстремальний", unavailable: "Недоступно", unknown: "Невідомо",
         ed_entity: "Датчик УФ-індексу", ed_name: "Назва", ed_layout: "Розташування", ed_horizontal: "Горизонтально", ed_vertical: "Вертикально",
         ed_align: "Вирівнювання", ed_center: "По центру", ed_top: "Зверху", ed_show_value: "Показувати значення", ed_show_title: "Показувати заголовок", ed_show_label: "Показувати рівень ризику",
         ed_transparent: "Прозорий фон", ed_language: "Мова", ed_auto: "Автоматично (Home Assistant)",
         max_uv: "Макс.", protection: "Захист", protection_now: "Потрібен захист", ed_max_entity: "Датчик максимального УФ-індексу", ed_protection_entity: "Датчик періоду захисту",
         advice_low: "Захист не потрібен", advice_moderate: "Сонцезахисні окуляри · SPF 30+ опівдні", advice_high: "SPF 30+ · капелюх · тінь опівдні",
-        advice_very_high: "Уникайте сонця {from}–{to}", advice_extreme: "За можливості залишайтеся в приміщенні", ed_show_advice: "Показувати пораду щодо захисту", ed_icon: "Значок (типово анімований)" },
+        advice_very_high: "Уникайте сонця {from}–{to}", advice_extreme: "За можливості залишайтеся в приміщенні", ed_show_advice: "Показувати пораду щодо захисту", ed_icon: "Значок (типово анімований)",
+        ed_illustration: "Анімована ілюстрація", ed_illustration_theme: "Тема ілюстрації", theme_auto: "Автоматично (сонце або темна тема)", theme_day: "День", theme_night: "Ніч" },
   hu: { name: "UV-index", low: "Alacsony", moderate: "Mérsékelt", high: "Magas", very_high: "Nagyon magas", extreme: "Extrém", unavailable: "Nem elérhető", unknown: "Ismeretlen",
         ed_entity: "UV-index-érzékelő", ed_name: "Név", ed_layout: "Elrendezés", ed_horizontal: "Vízszintes", ed_vertical: "Függőleges",
         ed_align: "Igazítás", ed_center: "Középre", ed_top: "Felülre", ed_show_value: "Érték megjelenítése", ed_show_title: "Cím megjelenítése", ed_show_label: "Kockázati szint megjelenítése",
         ed_transparent: "Átlátszó háttér", ed_language: "Nyelv", ed_auto: "Automatikus (Home Assistant)",
         max_uv: "Max.", protection: "Védelem", protection_now: "Védelem szükséges", ed_max_entity: "Maximális UV-index érzékelő", ed_protection_entity: "Védelmi időszak érzékelő",
         advice_low: "Nincs szükség védelemre", advice_moderate: "Napszemüveg · SPF 30+ délben", advice_high: "SPF 30+ · kalap · árnyék délben",
-        advice_very_high: "Kerülje a napot {from}–{to}", advice_extreme: "Lehetőleg maradjon bent", ed_show_advice: "Védelmi tanács megjelenítése", ed_icon: "Ikon (alapértelmezés szerint animált)" },
+        advice_very_high: "Kerülje a napot {from}–{to}", advice_extreme: "Lehetőleg maradjon bent", ed_show_advice: "Védelmi tanács megjelenítése", ed_icon: "Ikon (alapértelmezés szerint animált)",
+        ed_illustration: "Animált illusztráció", ed_illustration_theme: "Az illusztráció témája", theme_auto: "Automatikus (nap vagy sötét téma)", theme_day: "Nappal", theme_night: "Éjszaka" },
   sk: { name: "UV index", low: "Nízky", moderate: "Mierny", high: "Vysoký", very_high: "Veľmi vysoký", extreme: "Extrémny", unavailable: "Nedostupné", unknown: "Neznáme",
         ed_entity: "Senzor UV indexu", ed_name: "Názov", ed_layout: "Rozloženie", ed_horizontal: "Vodorovné", ed_vertical: "Zvislé",
         ed_align: "Zarovnanie", ed_center: "Na stred", ed_top: "Hore", ed_show_value: "Zobraziť hodnotu", ed_show_title: "Zobraziť názov", ed_show_label: "Zobraziť úroveň rizika",
         ed_transparent: "Priehľadné pozadie", ed_language: "Jazyk", ed_auto: "Automaticky (Home Assistant)",
         max_uv: "Max.", protection: "Ochrana", protection_now: "Potrebná ochrana", ed_max_entity: "Senzor maximálneho UV indexu", ed_protection_entity: "Senzor obdobia ochrany",
         advice_low: "Ochrana nie je potrebná", advice_moderate: "Slnečné okuliare · SPF 30+ na obed", advice_high: "SPF 30+ · klobúk · tieň na obed",
-        advice_very_high: "Vyhnite sa slnku {from}–{to}", advice_extreme: "Ak je to možné, zostaňte vnútri", ed_show_advice: "Zobraziť odporúčanie ochrany", ed_icon: "Ikona (predvolene animovaná)" },
+        advice_very_high: "Vyhnite sa slnku {from}–{to}", advice_extreme: "Ak je to možné, zostaňte vnútri", ed_show_advice: "Zobraziť odporúčanie ochrany", ed_icon: "Ikona (predvolene animovaná)",
+        ed_illustration: "Animovaná ilustrácia", ed_illustration_theme: "Téma ilustrácie", theme_auto: "Automaticky (slnko alebo tmavá téma)", theme_day: "Deň", theme_night: "Noc" },
   cs: { name: "UV index", low: "Nízký", moderate: "Mírný", high: "Vysoký", very_high: "Velmi vysoký", extreme: "Extrémní", unavailable: "Nedostupné", unknown: "Neznámé",
         ed_entity: "Senzor UV indexu", ed_name: "Název", ed_layout: "Rozvržení", ed_horizontal: "Vodorovné", ed_vertical: "Svislé",
         ed_align: "Zarovnání", ed_center: "Na střed", ed_top: "Nahoře", ed_show_value: "Zobrazit hodnotu", ed_show_title: "Zobrazit název", ed_show_label: "Zobrazit úroveň rizika",
         ed_transparent: "Průhledné pozadí", ed_language: "Jazyk", ed_auto: "Automaticky (Home Assistant)",
         max_uv: "Max.", protection: "Ochrana", protection_now: "Nutná ochrana", ed_max_entity: "Senzor maximálního UV indexu", ed_protection_entity: "Senzor období ochrany",
         advice_low: "Ochrana není nutná", advice_moderate: "Sluneční brýle · SPF 30+ v poledne", advice_high: "SPF 30+ · klobouk · stín v poledne",
-        advice_very_high: "Vyhněte se slunci {from}–{to}", advice_extreme: "Pokud možno zůstaňte uvnitř", ed_show_advice: "Zobrazit doporučení ochrany", ed_icon: "Ikona (ve výchozím stavu animovaná)" },
+        advice_very_high: "Vyhněte se slunci {from}–{to}", advice_extreme: "Pokud možno zůstaňte uvnitř", ed_show_advice: "Zobrazit doporučení ochrany", ed_icon: "Ikona (ve výchozím stavu animovaná)",
+        ed_illustration: "Animovaná ilustrace", ed_illustration_theme: "Motiv ilustrace", theme_auto: "Automaticky (slunce nebo tmavý motiv)", theme_day: "Den", theme_night: "Noc" },
   sl: { name: "UV-indeks", low: "Nizek", moderate: "Zmeren", high: "Visok", very_high: "Zelo visok", extreme: "Ekstremen", unavailable: "Ni na voljo", unknown: "Neznano",
         ed_entity: "Senzor UV-indeksa", ed_name: "Ime", ed_layout: "Postavitev", ed_horizontal: "Vodoravno", ed_vertical: "Navpično",
         ed_align: "Poravnava", ed_center: "Sredinsko", ed_top: "Zgoraj", ed_show_value: "Prikaži vrednost", ed_show_title: "Prikaži naslov", ed_show_label: "Prikaži raven tveganja",
         ed_transparent: "Prozorno ozadje", ed_language: "Jezik", ed_auto: "Samodejno (Home Assistant)",
         max_uv: "Najv.", protection: "Zaščita", protection_now: "Potrebna zaščita", ed_max_entity: "Senzor največjega UV-indeksa", ed_protection_entity: "Senzor obdobja zaščite",
         advice_low: "Zaščita ni potrebna", advice_moderate: "Sončna očala · SPF 30+ opoldne", advice_high: "SPF 30+ · klobuk · senca opoldne",
-        advice_very_high: "Izogibajte se soncu {from}–{to}", advice_extreme: "Če je mogoče, ostanite v zaprtih prostorih", ed_show_advice: "Prikaži nasvet za zaščito", ed_icon: "Ikona (privzeto animirana)" },
+        advice_very_high: "Izogibajte se soncu {from}–{to}", advice_extreme: "Če je mogoče, ostanite v zaprtih prostorih", ed_show_advice: "Prikaži nasvet za zaščito", ed_icon: "Ikona (privzeto animirana)",
+        ed_illustration: "Animirana ilustracija", ed_illustration_theme: "Tema ilustracije", theme_auto: "Samodejno (sonce ali temna tema)", theme_day: "Dan", theme_night: "Noč" },
   lv: { name: "UV indekss", low: "Zems", moderate: "Mērens", high: "Augsts", very_high: "Ļoti augsts", extreme: "Ekstrēms", unavailable: "Nav pieejams", unknown: "Nezināms",
         ed_entity: "UV indeksa sensors", ed_name: "Nosaukums", ed_layout: "Izkārtojums", ed_horizontal: "Horizontāls", ed_vertical: "Vertikāls",
         ed_align: "Līdzinājums", ed_center: "Centrēts", ed_top: "Augšā", ed_show_value: "Rādīt vērtību", ed_show_title: "Rādīt virsrakstu", ed_show_label: "Rādīt riska līmeni",
         ed_transparent: "Caurspīdīgs fons", ed_language: "Valoda", ed_auto: "Automātiski (Home Assistant)",
         max_uv: "Maks.", protection: "Aizsardzība", protection_now: "Nepieciešama aizsardzība", ed_max_entity: "Maksimālā UV indeksa sensors", ed_protection_entity: "Aizsardzības perioda sensors",
         advice_low: "Aizsardzība nav nepieciešama", advice_moderate: "Saulesbrilles · SPF 30+ pusdienlaikā", advice_high: "SPF 30+ · cepure · ēna pusdienlaikā",
-        advice_very_high: "Izvairieties no saules {from}–{to}", advice_extreme: "Ja iespējams, palieciet telpās", ed_show_advice: "Rādīt aizsardzības ieteikumu", ed_icon: "Ikona (pēc noklusējuma animēta)" },
+        advice_very_high: "Izvairieties no saules {from}–{to}", advice_extreme: "Ja iespējams, palieciet telpās", ed_show_advice: "Rādīt aizsardzības ieteikumu", ed_icon: "Ikona (pēc noklusējuma animēta)",
+        ed_illustration: "Animēta ilustrācija", ed_illustration_theme: "Ilustrācijas motīvs", theme_auto: "Automātiski (saule vai tumšais motīvs)", theme_day: "Diena", theme_night: "Nakts" },
   el: { name: "Δείκτης UV", low: "Χαμηλός", moderate: "Μέτριος", high: "Υψηλός", very_high: "Πολύ υψηλός", extreme: "Ακραίος", unavailable: "Μη διαθέσιμο", unknown: "Άγνωστο",
         ed_entity: "Αισθητήρας δείκτη UV", ed_name: "Όνομα", ed_layout: "Διάταξη", ed_horizontal: "Οριζόντια", ed_vertical: "Κάθετη",
         ed_align: "Στοίχιση", ed_center: "Στο κέντρο", ed_top: "Στην κορυφή", ed_show_value: "Εμφάνιση της τιμής", ed_show_title: "Εμφάνιση τίτλου", ed_show_label: "Εμφάνιση του επιπέδου κινδύνου",
         ed_transparent: "Διαφανές φόντο", ed_language: "Γλώσσα", ed_auto: "Αυτόματα (Home Assistant)",
         max_uv: "Μέγ.", protection: "Προστασία", protection_now: "Απαιτείται προστασία", ed_max_entity: "Αισθητήρας μέγιστου δείκτη UV", ed_protection_entity: "Αισθητήρας περιόδου προστασίας",
         advice_low: "Δεν χρειάζεται προστασία", advice_moderate: "Γυαλιά ηλίου · SPF 30+ το μεσημέρι", advice_high: "SPF 30+ · καπέλο · σκιά το μεσημέρι",
-        advice_very_high: "Αποφύγετε τον ήλιο {from}–{to}", advice_extreme: "Μείνετε μέσα αν είναι δυνατόν", ed_show_advice: "Εμφάνιση της συμβουλής προστασίας", ed_icon: "Εικονίδιο (κινούμενο από προεπιλογή)" },
+        advice_very_high: "Αποφύγετε τον ήλιο {from}–{to}", advice_extreme: "Μείνετε μέσα αν είναι δυνατόν", ed_show_advice: "Εμφάνιση της συμβουλής προστασίας", ed_icon: "Εικονίδιο (κινούμενο από προεπιλογή)",
+        ed_illustration: "Κινούμενη εικονογράφηση", ed_illustration_theme: "Θέμα εικονογράφησης", theme_auto: "Αυτόματα (ήλιος ή σκούρο θέμα)", theme_day: "Ημέρα", theme_night: "Νύχτα" },
   sr: { name: "УВ индекс", low: "Низак", moderate: "Умерен", high: "Висок", very_high: "Веома висок", extreme: "Екстреман", unavailable: "Недоступно", unknown: "Непознато",
         ed_entity: "Сензор УВ индекса", ed_name: "Назив", ed_layout: "Распоред", ed_horizontal: "Хоризонтално", ed_vertical: "Вертикално",
         ed_align: "Поравнање", ed_center: "Центрирано", ed_top: "Горе", ed_show_value: "Прикажи вредност", ed_show_title: "Прикажи наслов", ed_show_label: "Прикажи ниво ризика",
         ed_transparent: "Провидна позадина", ed_language: "Језик", ed_auto: "Аутоматски (Home Assistant)",
         max_uv: "Макс.", protection: "Заштита", protection_now: "Потребна заштита", ed_max_entity: "Сензор максималног УВ индекса", ed_protection_entity: "Сензор периода заштите",
         advice_low: "Заштита није потребна", advice_moderate: "Наочаре за сунце · ЗФ 30+ у подне", advice_high: "ЗФ 30+ · шешир · хлад у подне",
-        advice_very_high: "Избегавајте сунце {from}–{to}", advice_extreme: "Останите унутра ако је могуће", ed_show_advice: "Прикажи савет за заштиту", ed_icon: "Икона (подразумевано анимирана)" },
+        advice_very_high: "Избегавајте сунце {from}–{to}", advice_extreme: "Останите унутра ако је могуће", ed_show_advice: "Прикажи савет за заштиту", ed_icon: "Икона (подразумевано анимирана)",
+        ed_illustration: "Анимирана илустрација", ed_illustration_theme: "Тема илустрације", theme_auto: "Аутоматски (сунце или тамна тема)", theme_day: "Дан", theme_night: "Ноћ" },
   "sr-Latn": { name: "UV indeks", low: "Nizak", moderate: "Umeren", high: "Visok", very_high: "Veoma visok", extreme: "Ekstreman", unavailable: "Nedostupno", unknown: "Nepoznato",
         ed_entity: "Senzor UV indeksa", ed_name: "Naziv", ed_layout: "Raspored", ed_horizontal: "Horizontalno", ed_vertical: "Vertikalno",
         ed_align: "Poravnanje", ed_center: "Centrirano", ed_top: "Gore", ed_show_value: "Prikaži vrednost", ed_show_title: "Prikaži naslov", ed_show_label: "Prikaži nivo rizika",
         ed_transparent: "Providna pozadina", ed_language: "Jezik", ed_auto: "Automatski (Home Assistant)",
         max_uv: "Maks.", protection: "Zaštita", protection_now: "Potrebna zaštita", ed_max_entity: "Senzor maksimalnog UV indeksa", ed_protection_entity: "Senzor perioda zaštite",
         advice_low: "Zaštita nije potrebna", advice_moderate: "Naočare za sunce · ZF 30+ u podne", advice_high: "ZF 30+ · šešir · hlad u podne",
-        advice_very_high: "Izbegavajte sunce {from}–{to}", advice_extreme: "Ostanite unutra ako je moguće", ed_show_advice: "Prikaži savet za zaštitu", ed_icon: "Ikona (podrazumevano animirana)" },
+        advice_very_high: "Izbegavajte sunce {from}–{to}", advice_extreme: "Ostanite unutra ako je moguće", ed_show_advice: "Prikaži savet za zaštitu", ed_icon: "Ikona (podrazumevano animirana)",
+        ed_illustration: "Animirana ilustracija", ed_illustration_theme: "Tema ilustracije", theme_auto: "Automatski (sunce ili tamna tema)", theme_day: "Dan", theme_night: "Noć" },
 };
 
 const LANGUAGE_NAMES = {
@@ -239,6 +261,38 @@ const GAUGE_SVG = `<svg viewBox="0 0 200 112" aria-hidden="true">${UV_LEVELS.map
   const t1 = BOUNDS[i + 1] / GAUGE_MAX - (i < UV_LEVELS.length - 1 ? GAP : 0);
   return `<path class="seg s${i}" style="stroke: var(--uv-${l.key.replace("_", "-")})" d="M ${arcPoint(t0)} A ${R} ${R} 0 0 1 ${arcPoint(t1)}"/>`;
 }).join("")}<g class="tick"><line x1="${CX - R - 11}" y1="${CY}" x2="${CX - R + 11}" y2="${CY}"/></g><g class="marker"><circle class="halo" cx="${CX - R}" cy="${CY}" r="9"/><circle class="dot" cx="${CX - R}" cy="${CY}" r="9"/></g></svg>`;
+
+// The illustrated header ("banner"): a beach at the right of a 200 x 80 picture (sea with a rolling wave, sand,
+// a parasol and a towel), under a sky that is the banner's own background, and a 10 px sand strip edge to edge
+// at the bottom. The card's own animated Meteocons icon (rays turning, the index in its badge) stands in the sky
+// at the top right; a glow behind it and a heat haze over the sand grow with the risk level. Night: stars, dark
+// sea and sand, no glow. `uid` keeps each card's gradient id apart.
+let uvUid = 0;
+const UV_STARS = [[12, 8], [44, 18], [96, 6], [132, 24], [168, 10], [188, 30], [70, 30]];
+const UV_WAVE = `M0 58${" q5 -2 10 0"}${" t10 0".repeat(21)}`;
+const uvSceneSvg = (uid) => `<svg viewBox="0 0 200 80" preserveAspectRatio="xMaxYMax meet" aria-hidden="true" focusable="false">
+  <defs><radialGradient id="uv-glow-${uid}"><stop offset="0" stop-color="#ffd54f" stop-opacity=".9"/><stop offset="1" stop-color="#ffd54f" stop-opacity="0"/></radialGradient></defs>
+  <g class="uv-stars">${UV_STARS.map(([x, y], i) => `<circle class="uv-star${i % 3 ? "" : " tw"}" cx="${x}" cy="${y}" r=".6"/>`).join("")}</g>
+  <circle class="uv-glow" cx="170" cy="26" r="30" fill="url(#uv-glow-${uid})"/>
+  <rect class="uv-sea" y="56" width="200" height="14"/>
+  <path class="uv-wave" d="${UV_WAVE}"/>
+  <g class="uv-haze"><path d="M34 64q2-3 0-6t0-6"/><path d="M76 63q2-3 0-6t0-6"/><path d="M150 63q2-3 0-6t0-6"/><path d="M186 64q2-3 0-6t0-6"/></g>
+  <path class="uv-sand" d="M0 70 Q100 62 200 68 V80 H0Z"/>
+  <g transform="translate(110 70)"><path class="uv-pole" d="M0 0 V-28"/><path class="uv-parasol" d="M-16 -26 Q0 -38 16 -26Z"/></g>
+  <rect class="uv-towel" x="122" y="66" width="22" height="3" rx="1"/>
+</svg>`;
+
+// Material Design Icons "weather-sunny": the banner badge icon (an `icon` option replaces it).
+const MDI_SUN =
+  "M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,6.65C6.9,7.16 6.36,7.78 5.94,8.5C5.5,9.24 5.25,10 5.11,10.79L3.34,7M3.36,17L5.12,13.23C5.26,14 5.53,14.78 5.95,15.5C6.37,16.24 6.91,16.86 7.5,17.37L3.36,17M20.65,7L18.88,10.79C18.74,10 18.47,9.23 18.05,8.5C17.63,7.78 17.1,7.15 16.5,6.64L20.65,7M20.64,17L16.5,17.36C17.09,16.85 17.62,16.22 18.04,15.5C18.46,14.77 18.73,14 18.87,13.21L20.64,17M12,22L9.59,18.56C10.33,18.83 11.14,19 12,19C12.82,19 13.63,18.83 14.37,18.56L12,22Z";
+
+// Night picture: forced by illustration_theme, else the sun below the horizon or Home Assistant's dark theme
+// (an unknown or unavailable sun leaves the theme alone to decide).
+function isNight(hass, config) {
+  if (config.illustration_theme === "night") return true;
+  if (config.illustration_theme === "day") return false;
+  return hass?.states?.["sun.sun"]?.state === "below_horizon" || !!hass?.themes?.darkMode;
+}
 
 // Static stylesheet, injected once. The per-render values are driven by the
 // --uv-color / --uv-angle / --uv-max-angle variables and the data-layout,
@@ -334,11 +388,10 @@ const STYLE = `
     height: 100%;
     display: block;
   }
-  /* The title takes the room left by the badge and the pill, keeps at least
-     4 characters, then is cut with an ellipsis. */
+  /* The titles take the room left by the badge; the title is cut with an ellipsis only when it does not fit alone. */
   .titles {
     flex: 1 1 0;
-    min-width: 4ch;
+    min-width: 0;
   }
   .name {
     font-size: 16px;
@@ -357,13 +410,39 @@ const STYLE = `
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  /* With a subtitle the pill stays on the title's line. */
-  .header[data-sub] > .label {
+  /* The status pill, in both headers: on the title row right after the title only when the whole title and the
+     pill's whole label fit there; otherwise on its own line under the (one-line) subtitle; its dot alone, beside the
+     title, when the banner has no room left above its sand strip, when the label does not fit even alone, or on a
+     card of 200 px or less. Decided by measurement (see _fitLabel), in every language. */
+  .trow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .trow .name {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+  .header[data-wrap] .titles {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .header[data-wrap] .titles > *,
+  .header[data-wrap] .trow > .name {
+    max-width: 100%;
+  }
+  .header[data-wrap] .trow {
+    display: contents;
+  }
+  .header[data-wrap] .trow > :is(.pill, .label) {
+    order: 9;
     align-self: flex-start;
-    margin-top: 1px;
+    margin-top: 2px;
   }
   .label {
-    flex: 0 1 auto;
+    flex: none;
     padding: 1px 8px;
     border-radius: 12px;
     font-size: 11px;
@@ -541,9 +620,232 @@ const STYLE = `
     border-radius: 50%;
     background: var(--uv-text-color);
   }
+  /* Illustrated header (default; illustration: false keeps the classic one). 90 px high, edge to edge at the
+     top of the card: the badge, the title and the status on the sky at the left, the beach scene at the right
+     (200 x 80 at most, 66 % of the card; the text may run over its faded left edge), a 10 px sand strip under the whole banner. --uv-u is one unit of the
+     scene's picture, so the icon placed over it scales with it on a narrow card. */
+  ha-card[data-illustration] {
+    padding-top: 0;
+    overflow: hidden;
+    justify-content: flex-start;
+  }
+  ha-card[data-illustration] .body {
+    flex: 1 1 auto;
+    align-content: center;
+  }
+  ha-card[data-illustration][data-align="top"] .body {
+    align-content: start;
+  }
+  .mdi,
+  .uv-scene,
+  .uv-ground {
+    display: none;
+  }
+  .banner {
+    --uv-u: min(1px, 0.33cqw);
+    --uv-scene-w: calc(200 * var(--uv-u));
+    position: relative;
+    flex: none;
+    height: 90px;
+    margin: 0 -12px;
+    /* The text stops short of the scene; to keep a short title and its pill on one row it may run up to 24 px further
+       over the scene's faded left edge. */
+    padding: 0 max(calc(var(--uv-scene-w) * 0.86 - 24px), min(calc(var(--uv-scene-w) * 0.86), calc(100cqw - 210px))) 10px 12px;
+    box-sizing: border-box;
+    overflow: hidden;
+    color: #0d2a45;
+    background: linear-gradient(90deg, #f1f8ff 0%, #e2f1fd 34%, #b9def8 70%, #9fd0f3 100%);
+    /* The badge icon in the level's colour, darkened (day) or lightened (night) to read on the sky. */
+    --uv-icon: color-mix(in srgb, var(--uv-color) 72%, #0d2a45);
+    --uv-muted: #3b5b78;
+  }
+  .banner.night {
+    color: #fff;
+    background: linear-gradient(90deg, #1b2f52 0%, #15284a 36%, #0f1f3d 72%, #0a1830 100%);
+    --uv-icon: color-mix(in srgb, var(--uv-color) 62%, #fff);
+    --uv-muted: rgba(255, 255, 255, 0.78);
+  }
+  .banner .name {
+    color: inherit;
+  }
+  .banner .sub {
+    color: var(--uv-muted);
+  }
+  .banner .label {
+    display: none;
+  }
+  /* Status pill on the title row (illustrated header): a dot and the risk level in the level's colour on a frosted
+     tint. Where it goes is measured by the card (see _fitLabel). */
+  .pill {
+    display: none;
+  }
+  .banner .pill {
+    --c: var(--uv-color);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex: none;
+    min-width: 0;
+    max-width: none;
+    padding: 1px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    box-sizing: border-box;
+    background: color-mix(in srgb, var(--c) 18%, rgba(255, 255, 255, 0.78));
+    color: color-mix(in srgb, var(--c) 45%, #0d2a45);
+  }
+  .banner.night .pill {
+    background: color-mix(in srgb, var(--c) 30%, rgba(8, 18, 38, 0.55));
+    color: color-mix(in srgb, var(--c) 35%, #ffffff);
+  }
+  .banner .pill[hidden] {
+    display: none;
+  }
+  .pill::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--c);
+    flex: none;
+  }
+  .pill .txt {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .banner .pill[data-dot] {
+    padding: 0;
+    background: none;
+  }
+  .banner .pill[data-dot] .txt {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .banner .badge {
+    color: var(--uv-icon);
+    background: rgba(255, 255, 255, 0.62);
+    box-shadow: inset 0 0 0 1px rgba(47, 128, 237, 0.18);
+  }
+  .banner.night .badge {
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  }
+  .banner .mdi {
+    display: grid;
+    place-items: center;
+  }
+  .mdi svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    display: block;
+  }
+  /* The card's animated icon, in the scene's sky at the top right (x 150-190, y 6-46 of the picture). */
+  .banner .icon {
+    position: absolute;
+    z-index: 1;
+    right: calc(10 * var(--uv-u));
+    bottom: calc(10px + 34 * var(--uv-u));
+    width: calc(40 * var(--uv-u));
+    height: calc(40 * var(--uv-u));
+  }
+  .banner .uv-scene {
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: 10px;
+    width: var(--uv-scene-w);
+    height: calc(80 * var(--uv-u));
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 14%);
+  }
+  .uv-scene svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .uv-stars, .uv-haze { display: none; }
+  .night .uv-stars { display: inline; }
+  .uv-star { fill: #fff; opacity: 0.8; }
+  .uv-star.tw { animation: uv-twinkle 3.2s ease-in-out infinite alternate; }
+  .uv-sea { fill: #4fb3e8; }
+  .night .uv-sea { fill: #173a5e; }
+  .uv-wave { fill: none; stroke: #b5e2fa; stroke-width: 1.2; animation: uv-wave 3s ease-in-out infinite; }
+  .night .uv-wave { stroke: #2b5a86; }
+  .uv-sand { fill: #f3dca4; }
+  .night .uv-sand { fill: #5a4e3a; }
+  .uv-pole { stroke: #8a5a3a; stroke-width: 1.4; fill: none; }
+  .uv-parasol { fill: #2f80ed; }
+  .uv-towel { fill: #e5484d; }
+  /* The sun's glow grows with the level; none at night or without a value. */
+  .uv-glow { opacity: 0; transition: opacity 0.6s ease; }
+  ha-card[data-level="1"] .uv-glow { opacity: 0.25; }
+  ha-card[data-level="2"] .uv-glow { opacity: 0.45; }
+  ha-card[data-level="3"] .uv-glow { opacity: 0.65; }
+  ha-card[data-level="4"] .uv-glow { opacity: 0.85; }
+  .night .uv-glow { opacity: 0 !important; }
+  /* High and above: heat rising over the sand (faster from Very high). */
+  ha-card:is([data-level="2"], [data-level="3"], [data-level="4"]) .banner:not(.night) .uv-haze { display: inline; }
+  .uv-haze path { fill: none; stroke: #fff; stroke-width: 0.9; stroke-linecap: round; opacity: 0; animation: uv-haze 3.2s ease-out infinite; }
+  .uv-haze path:nth-child(2) { animation-delay: -0.8s; }
+  .uv-haze path:nth-child(3) { animation-delay: -1.6s; }
+  .uv-haze path:nth-child(4) { animation-delay: -2.4s; }
+  ha-card:is([data-level="3"], [data-level="4"]) .uv-haze path { animation-duration: 2.2s; }
+  ha-card[data-paused] .uv-scene * { animation-play-state: paused; }
+  @keyframes uv-wave { 50% { transform: translateX(-6px); } }
+  @keyframes uv-twinkle { from { opacity: 0.35; } to { opacity: 1; } }
+  @keyframes uv-haze { 0% { opacity: 0; transform: translateY(2px); } 40% { opacity: 0.7; } 100% { opacity: 0; transform: translateY(-6px); } }
+  /* The sand strip under the whole banner. */
+  .banner .uv-ground {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 10px;
+    background: #f0d9a6 radial-gradient(#d9b979 0.8px, transparent 1px) 0 0 / 7px 5px;
+    box-shadow: inset 0 2px 0 #f8e8c4;
+  }
+  .banner.night .uv-ground {
+    background-color: #4a3f2c;
+    background-image: radial-gradient(#5c4f38 0.8px, transparent 1px);
+    box-shadow: inset 0 2px 0 #5a4d36;
+  }
+  /* A narrow card gives the scene less room, so the title keeps its own. */
+  @container (max-width: 299px) {
+    .banner { --uv-u: min(1px, 0.28cqw); }
+  }
+  /* On its own line the banner's pill may run over the faded left edge of the scene. */
+  .banner[data-wrap] .pill {
+    max-width: calc(100cqw - 76px);
+    margin-top: 3px;
+  }
+  /* Very narrow banner: only the pill's dot (its text stays for screen readers and in the tooltip). */
+  @container (max-width: 200px) {
+    .banner .pill {
+      padding: 0;
+      background: none;
+    }
+    .banner .pill .txt {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     .marker, .tick, .seg, .dot, .value, .badge { transition: none; }
-    .halo { animation: none !important; }
+    .halo, .uv-wave, .uv-star.tw, .uv-haze path { animation: none !important; }
+    .uv-glow { transition: none; }
   }
   /* A horizontal card too narrow for the gauge and a text column side by side
      stacks them like the vertical layout. */
@@ -670,6 +972,8 @@ class UvIndexCard extends HTMLElement {
           ],
         },
         { name: "icon", selector: { icon: {} } },
+        { name: "illustration", default: true, selector: { boolean: {} } },
+        { name: "illustration_theme", selector: { select: { mode: "dropdown", options: ["auto", "day", "night"].map((v) => ({ value: v, label: t(`theme_${v}`) })) } } },
         { name: "show_title", default: true, selector: { boolean: {} } },
         { name: "show_value", default: true, selector: { boolean: {} } },
         { name: "show_label", default: true, selector: { boolean: {} } },
@@ -704,6 +1008,10 @@ class UvIndexCard extends HTMLElement {
       // "center" (default) or "top": vertical alignment inside the card,
       // useful to line the card up with others in a horizontal-stack.
       align: config.align === "top" ? "top" : "center",
+      // Illustrated header (beach scene) by default; false keeps the classic header.
+      illustration: config.illustration !== false,
+      // "auto" follows sun.sun (else the dark theme); "day" / "night" force the picture.
+      illustration_theme: ["day", "night"].includes(config.illustration_theme) ? config.illustration_theme : "auto",
     };
     this._configSig = JSON.stringify(this._config);
     this._sig = null; // force a re-render on the next paint
@@ -782,16 +1090,66 @@ class UvIndexCard extends HTMLElement {
     this._resizeObserver.observe(this._els.card);
   }
 
-  // The level shows in full when it fits, and as its colored dot when it does
-  // not (a long level on a narrow card), instead of a cut "M…".
-  // Measured with fractional widths: scrollWidth / clientWidth are rounded and
-  // miss a text cut by less than a pixel (still drawn with an ellipsis).
+  // The status pill (the risk level) goes right after the title only when the whole title and its whole label fit
+  // on that row; otherwise on its own line under the subtitle (data-wrap). It shows as its colored dot (beside the
+  // title) when the banner has no room for that line above its sand strip, when the label does not fit even alone,
+  // and on a card of 200 px or less, instead of a cut "M…". Measured with fractional widths: scrollWidth /
+  // clientWidth are rounded and miss a text cut by less than a pixel (still drawn with an ellipsis).
   _fitLabel() {
-    const { label } = this._els;
+    const { label: classic, pill, header } = this._els;
+    const banner = this._config.illustration;
+    const label = banner ? pill : classic;
+    (label === pill ? classic : pill).toggleAttribute("data-dot", false);
+    header.toggleAttribute("data-wrap", false);
     label.toggleAttribute("data-dot", false);
     label.removeAttribute("role");
     label.removeAttribute("aria-label");
     if (label.hidden || !label.getBoundingClientRect) return;
+    const width = this._els.card.getBoundingClientRect?.().width;
+    let dot = !banner && width > 0 && width <= 200;
+    if (!dot && !this._pillBeside(label)) {
+      header.toggleAttribute("data-wrap", true);
+      if (!this._labelFits(label) || (banner && this._pillOut())) {
+        header.toggleAttribute("data-wrap", false);
+        dot = true;
+      }
+    }
+    label.toggleAttribute("data-dot", dot);
+    // A dot is an image named by the level; the text names itself otherwise.
+    if (dot) {
+      label.setAttribute("role", "img");
+      label.setAttribute("aria-label", label.textContent);
+    }
+  }
+
+  // Whether the whole title and the pill's whole label fit on the title row.
+  _pillBeside(pill) {
+    const row = pill.parentElement;
+    const name = this._els.name;
+    const shown = name && !name.hidden && getComputedStyle(name).display !== "none";
+    const gap = parseFloat(getComputedStyle(row).columnGap) || 0;
+    name.style.flex = "none";
+    const title = shown ? name.getBoundingClientRect().width + gap : 0;
+    name.style.flex = "";
+    pill.style.width = "max-content";
+    const need = pill.getBoundingClientRect().width;
+    pill.style.width = "";
+    return title + need <= row.getBoundingClientRect().width + 0.01;
+  }
+
+  // Whether the banner's titles (the pill on its own line) run below the top of the sand strip or out of the banner.
+  _pillOut() {
+    const { header, name, sub, pill } = this._els;
+    const b = header.getBoundingClientRect();
+    const floor = b.bottom - 10 + 0.5;
+    return [name, sub, pill].some((e) => {
+      const r = e.getBoundingClientRect();
+      return !e.hidden && r.height && (r.bottom > floor || r.top < b.top - 0.5 || r.right > b.right + 0.5);
+    });
+  }
+
+  // Whether the label shows its whole text where it is.
+  _labelFits(label) {
     const have = label.getBoundingClientRect().width;
     label.style.maxWidth = "none";
     label.style.width = "max-content";
@@ -800,13 +1158,7 @@ class UvIndexCard extends HTMLElement {
     label.style.maxWidth = "";
     label.style.width = "";
     label.style.flex = "";
-    const dot = need > have + 0.01;
-    label.toggleAttribute("data-dot", dot);
-    // A dot is an image named by the level; the text names itself otherwise.
-    if (dot) {
-      label.setAttribute("role", "img");
-      label.setAttribute("aria-label", label.textContent);
-    }
+    return need <= have + 0.01;
   }
 
   // Cheap fingerprint of everything that affects the rendered output, so we
@@ -825,6 +1177,7 @@ class UvIndexCard extends HTMLElement {
       max ? [max.state, max.attributes?.time] : null,
       protection ? [protection.state, protection.attributes?.start_time, protection.attributes?.end_time] : null,
       locale ? [locale.time_format, locale.time_zone] : null,
+      this._config.illustration ? isNight(this._hass, this._config) : null,
     ]);
   }
 
@@ -835,7 +1188,7 @@ class UvIndexCard extends HTMLElement {
 
   getCardSize() {
     const size = this._config && this._config.layout === "horizontal" ? 4 : 5;
-    return size + (this._hasExtra() ? 1 : 0);
+    return size + (this._hasExtra() ? 1 : 0) + (this._config?.illustration ? 1 : 0);
   }
 
   getGridOptions() {
@@ -843,7 +1196,8 @@ class UvIndexCard extends HTMLElement {
     const extra = this._hasExtra();
     // Horizontal: the gauge beside its text fits 3 rows, the footer takes a
     // 4th; vertical: the gauge with the value inside and the advice take 4.
-    const rows = horizontal ? (extra ? 4 : 3) : extra ? 5 : 4;
+    // The illustrated header (90 px) takes one more row.
+    const rows = (horizontal ? (extra ? 4 : 3) : extra ? 5 : 4) + (this._config?.illustration ? 1 : 0);
     return horizontal
       ? { columns: 9, min_columns: 6, rows, min_rows: rows }
       : { columns: 6, min_columns: 4, rows, min_rows: rows };
@@ -875,11 +1229,23 @@ class UvIndexCard extends HTMLElement {
     card.setAttribute("role", "button");
     card.setAttribute("tabindex", "0");
     const header = el("div", "header", card);
-    const icon = el("div", "icon", el("div", "badge", header));
+    const badge = el("div", "badge", header);
+    const mdi = el("div", "mdi", badge);
+    const icon = el("div", "icon", badge);
     const titles = el("div", "titles", header);
-    const name = el("div", "name", titles);
+    // The title row: the title, then (illustrated header) the status pill right after it.
+    const trow = el("div", "trow", titles);
+    const name = el("div", "name", trow);
+    const pill = el("span", "pill", trow);
+    const pillText = el("span", "txt", pill);
+    // The classic header's pill, on the same title row.
+    const label = el("div", "label", trow);
     const sub = el("div", "sub", titles);
-    const label = el("div", "label", header);
+    // The illustration (shown by the banner styles only) and its sand strip.
+    this._uid ||= ++uvUid;
+    const scene = el("div", "uv-scene", header);
+    scene.innerHTML = uvSceneSvg(this._uid);
+    el("div", "uv-ground", header);
     const body = el("div", "body", card);
     const gauge = el("div", "gauge", body);
     gauge.innerHTML = GAUGE_SVG;
@@ -895,18 +1261,33 @@ class UvIndexCard extends HTMLElement {
       ev.preventDefault();
       this._openMoreInfo(this._config.entity);
     });
-    this._els = { card, header, name, sub, icon, label, gauge, value, advice, extra, protection };
+    this._els = { card, header, name, pill, pillText, sub, mdi, icon, label, gauge, value, advice, extra, protection };
     this._iconKey = null;
+    this._mdiKey = null;
     if (this.isConnected) {
       this._observe();
       this._watchView();
     }
   }
 
-  // The badge: the animated Meteocons icon of the index, or the `icon` option.
+  // The banner badge: the `icon` option, else the MDI sun (its colour follows the level, from the stylesheet).
+  _renderMdi() {
+    const { mdi } = this._els;
+    const custom = this._config.illustration ? this._config.icon || "" : null;
+    if (custom === this._mdiKey) return;
+    this._mdiKey = custom;
+    if (custom === null) mdi.innerHTML = "";
+    else if (custom) {
+      mdi.innerHTML = "";
+      mdi.appendChild(document.createElement("ha-icon")).setAttribute("icon", custom);
+    } else mdi.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${MDI_SUN}"/></svg>`;
+  }
+
+  // The animated Meteocons icon of the index: in the classic badge (where the `icon` option replaces it), or in
+  // the banner's sky.
   _renderIcon(index) {
     const { icon } = this._els;
-    const custom = this._config.icon;
+    const custom = this._config.illustration ? null : this._config.icon;
     const iconKey = custom ? `icon:${custom}` : String(index);
     if (iconKey === this._iconKey) return;
     this._iconKey = iconKey;
@@ -985,6 +1366,7 @@ class UvIndexCard extends HTMLElement {
     card.style.setProperty("--uv-color", level ? `var(--uv-${level.key.replace("_", "-")})` : "var(--secondary-text-color)");
     this._els.name.textContent = name;
     this._els.name.hidden = !this._config.show_title;
+    this._renderBanner(labelText);
     this._renderIcon(index);
     this._els.icon.setAttribute("title", labelText);
     gauge.setAttribute("title", labelText);
@@ -1006,6 +1388,20 @@ class UvIndexCard extends HTMLElement {
     this._fitLabel();
   }
 
+  // The illustrated header: the banner class (night picture), the MDI badge and the status pill on the title row
+  // (the risk level, "Very high"). The index itself is not repeated under the title: the gauge shows it big just
+  // below; the subtitle keeps the day's max (see _renderMax).
+  _renderBanner(labelText) {
+    const { card, header, pill, pillText } = this._els;
+    const on = this._config.illustration;
+    header.className = on ? `header banner${isNight(this._hass, this._config) ? " night" : ""}` : "header";
+    card.toggleAttribute("data-illustration", on);
+    this._renderMdi();
+    pillText.textContent = labelText;
+    pill.setAttribute("title", labelText);
+    pill.hidden = !on || !this._config.show_label;
+  }
+
   // "Max 8 · 13:20" under the title from a max UV sensor (OpenUV: its "time"
   // attribute), and the max tick on the gauge.
   _renderMax(lang) {
@@ -1018,6 +1414,7 @@ class UvIndexCard extends HTMLElement {
       const rounded = Math.max(0, Math.round(maxRaw));
       const at = formatTime(maxObj.attributes?.time, this._hass, lang);
       sub.textContent = `${localize("max_uv", lang)} ${rounded}${at ? ` · ${at}` : ""}`;
+      sub.setAttribute("title", sub.textContent);
       card.style.setProperty("--uv-max-angle", `${gaugeAngle(rounded).toFixed(2)}deg`);
     } else {
       sub.textContent = "";

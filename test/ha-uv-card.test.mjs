@@ -99,6 +99,7 @@ function sandbox(shared = { registry: new Map(), customCards: undefined }, extra
     },
     console: { info() {} },
     document: { querySelector: () => null, createElement: (tag) => new FakeElement(tag, null) },
+    getComputedStyle: () => ({ columnGap: "8px", display: "block" }),
     customElements: {
       get: (name) => registry.get(name),
       define: (name, cls) => {
@@ -625,14 +626,14 @@ test("the label tooltip follows the level when the value changes", () => {
 
 // Header at narrow widths: the badge never shrinks, the title keeps a few
 // characters and is cut with an ellipsis.
-test("the header badge never shrinks and the title keeps at least 4 characters", () => {
+test("the header badge never shrinks and the titles take the room left", () => {
   const css = render(4).querySelector("style").textContent;
   assert.equal(declarations(css, ".badge").flex, "none");
   const titles = declarations(css, ".titles");
   // flex-basis 0: the title only takes the room left, never more than its share.
   assert.equal(titles.flex, "1 1 0");
-  assert.match(titles["min-width"], /^\d+(\.\d+)?ch$/);
-  assert.ok(Number.parseFloat(titles["min-width"]) >= 4);
+  // The title is cut only when it does not fit alone; where the pill goes is measured (see pill-layout.test.mjs).
+  assert.equal(titles["min-width"], "0");
   assert.equal(declarations(css, ".name")["text-overflow"], "ellipsis");
 });
 
@@ -721,7 +722,7 @@ function fitCard(lang = "en") {
   const ctx = sandbox(undefined, { ResizeObserver, requestAnimationFrame, cancelAnimationFrame });
   vm.runInContext(source, ctx);
   const el = new (ctx.customElements.get("ha-uv-card"))();
-  el.setConfig({ entity: "sensor.uv", language: lang });
+  el.setConfig({ entity: "sensor.uv", language: lang, illustration: false }); // the classic header's pill
   const pill = () => el.shadowRoot.querySelector(".label");
   // Room for the pill, in px; the text needs 7px per character plus 16px padding.
   let room = 300;
@@ -729,6 +730,9 @@ function fitCard(lang = "en") {
   el.connectedCallback?.();
   el.hass = hassWith(4);
   const node = pill();
+  // The title row: a 62 px title, the 8 px gap, then the room for the pill.
+  el._els.name.getBoundingClientRect = () => ({ width: 62 });
+  node.parentElement = { getBoundingClientRect: () => ({ width: 70 + room }) };
   // Laid out at its natural width when measured unconstrained, else cut to the room.
   node.getBoundingClientRect = () => {
     const natural = "data-dot" in node.attributes ? 10 : node.textContent.length * 7 + 16 + 0.4;
@@ -922,16 +926,22 @@ test("a protection sensor without times shows only while on", () => {
 test("the footer is hidden without a protection entity, and the grid size fits it when set", () => {
   const { el, extra } = extraCard({}, undefined, { max_entity: undefined, protection_entity: undefined });
   assert.equal(extra.hidden, true);
+  // The illustrated header (default) takes one more row than the classic one.
+  assert.deepEqual({ ...el.getGridOptions() }, { columns: 6, min_columns: 4, rows: 5, min_rows: 5 });
+  const classic = { entity: "sensor.uv", illustration: false };
+  el.setConfig(classic);
   assert.deepEqual({ ...el.getGridOptions() }, { columns: 6, min_columns: 4, rows: 4, min_rows: 4 });
   // The max UV goes to the subtitle: no extra row.
-  el.setConfig({ entity: "sensor.uv", max_entity: "sensor.max_uv" });
+  el.setConfig({ ...classic, max_entity: "sensor.max_uv" });
   assert.equal(el.getGridOptions().rows, 4);
-  el.setConfig({ entity: "sensor.uv", protection_entity: "binary_sensor.protection" });
+  el.setConfig({ ...classic, protection_entity: "binary_sensor.protection" });
   assert.equal(el.getGridOptions().rows, 5);
-  el.setConfig({ entity: "sensor.uv", layout: "horizontal" });
+  el.setConfig({ ...classic, layout: "horizontal" });
   assert.deepEqual({ ...el.getGridOptions() }, { columns: 9, min_columns: 6, rows: 3, min_rows: 3 });
-  el.setConfig({ entity: "sensor.uv", layout: "horizontal", protection_entity: "binary_sensor.protection" });
+  el.setConfig({ ...classic, layout: "horizontal", protection_entity: "binary_sensor.protection" });
   assert.equal(el.getGridOptions().rows, 4);
+  el.setConfig({ entity: "sensor.uv", layout: "horizontal", protection_entity: "binary_sensor.protection" });
+  assert.equal(el.getGridOptions().rows, 5);
 });
 
 test("the subtitle and the tick update when the max sensor changes", () => {
@@ -1102,7 +1112,9 @@ test("the layout defaults to vertical, horizontal on request", () => {
 test("the header holds the badge icon, the title, the subtitle and the status pill", () => {
   const root = render(4, { show_title: false });
   const header = root.querySelector(".header");
-  assert.deepEqual(header.children.map((c) => c.className), ["badge", "titles", "label"]);
+  assert.deepEqual(header.children.map((c) => c.className), ["badge", "titles", "uv-scene", "uv-ground"]);
+  // The classic header's pill sits on the title row, right after the title.
+  assert.deepEqual(root.querySelector(".trow").children.map((c) => c.className), ["name", "pill", "label"]);
   assert.equal(root.querySelector(".name").hidden, true);
   assert.equal(root.querySelector(".sub").hidden, true, "no max sensor: no subtitle");
 });
@@ -1111,7 +1123,7 @@ test("the icon option replaces the animated icon in the badge", () => {
   const ctx = sandbox();
   vm.runInContext(svgSource, ctx);
   const el = new (ctx.customElements.get("ha-uv-card"))();
-  el.setConfig({ entity: "sensor.uv", icon: "mdi:weather-sunny" });
+  el.setConfig({ entity: "sensor.uv", icon: "mdi:weather-sunny", illustration: false });
   el.hass = hassWith(4);
   const icon = el.shadowRoot.querySelector(".icon");
   assert.equal(icon.querySelector("svg"), null);
@@ -1119,8 +1131,83 @@ test("the icon option replaces the animated icon in the badge", () => {
   const writes = icon.htmlWrites;
   el.hass = hassWith(9);
   assert.equal(icon.htmlWrites, writes, "a custom icon is not redrawn with the value");
-  el.setConfig({ entity: "sensor.uv" });
+  el.setConfig({ entity: "sensor.uv", illustration: false });
   assert.notEqual(icon.querySelector("svg"), null, "back to the animated icon");
+});
+
+test("illustrated header: banner, MDI badge (or the icon option), animated icon in the scene, no repeated index", () => {
+  const ctx = sandbox();
+  vm.runInContext(svgSource, ctx);
+  const el = new (ctx.customElements.get("ha-uv-card"))();
+  el.setConfig({ entity: "sensor.uv" });
+  el.hass = hassWith(9);
+  const root = el.shadowRoot;
+  assert.equal(root.querySelector(".header").className, "header banner");
+  assert.equal(root.querySelector("ha-card").getAttribute("data-illustration"), "");
+  assert.notEqual(root.querySelector(".icon").querySelector("svg"), null, "the animated icon stays (in the sky)");
+  assert.notEqual(root.querySelector(".mdi").querySelector("svg"), null, "MDI sun in the badge");
+  assert.notEqual(root.querySelector(".uv-scene").querySelector("svg"), null, "beach scene");
+  // The gauge shows the index big: the header does not repeat it ("UV 9") under the title.
+  assert.equal(root.querySelector(".status"), null);
+  assert.doesNotMatch(root.querySelector(".titles").textContent, /UV 9/);
+  // The risk level is the status pill on the title row.
+  assert.equal(root.querySelector(".txt").textContent, "Very high");
+  assert.equal(root.querySelector(".pill").getAttribute("title"), "Very high");
+  assert.equal(root.querySelector(".pill").hidden, false);
+  el.setConfig({ entity: "sensor.uv", icon: "mdi:sun-wireless", show_value: false });
+  assert.equal(root.querySelector(".mdi").querySelector("ha-icon").getAttribute("icon"), "mdi:sun-wireless");
+  assert.notEqual(root.querySelector(".icon").querySelector("svg"), null, "the icon option goes to the badge only");
+  assert.equal(root.querySelector(".pill").hidden, false, "the pill stays");
+  el.setConfig({ entity: "sensor.uv", illustration: false });
+  assert.equal(root.querySelector(".pill").hidden, true, "classic header: its own pill");
+  assert.equal(root.querySelector(".header").className, "header");
+  assert.equal(root.querySelector("ha-card").getAttribute("data-illustration"), null);
+});
+
+test("illustrated header: night from illustration_theme, else sun.sun below the horizon or the dark theme", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const el = new (ctx.customElements.get("ha-uv-card"))();
+  const cls = () => el.shadowRoot.querySelector(".header").className;
+  const sun = (state) => ({ "sun.sun": { state, attributes: {} } });
+  el.setConfig({ entity: "sensor.uv" });
+  el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("below_horizon") } };
+  assert.equal(cls(), "header banner night");
+  el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("above_horizon") }, themes: { darkMode: true } };
+  assert.equal(cls(), "header banner night", "the dark theme gives the night even while the sun is up");
+  el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("above_horizon") }, themes: { darkMode: false } };
+  assert.equal(cls(), "header banner", "a light theme with the sun up: day");
+  el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} } }, themes: { darkMode: true } };
+  assert.equal(cls(), "header banner night", "no sun.sun: the dark theme");
+  el.setConfig({ entity: "sensor.uv", illustration_theme: "day" });
+  assert.equal(cls(), "header banner");
+  el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("above_horizon") }, themes: { darkMode: true } };
+  assert.equal(cls(), "header banner", "forced day wins over the dark theme");
+  el.setConfig({ entity: "sensor.uv", illustration_theme: "night" });
+  el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("above_horizon") } };
+  assert.equal(cls(), "header banner night");
+});
+
+test("illustrated header: unique gradient ids per card", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const Card = ctx.customElements.get("ha-uv-card");
+  const ids = [new Card(), new Card()].map((el) => {
+    el.setConfig({ entity: "sensor.uv" });
+    el.hass = hassWith(5);
+    return el.shadowRoot.querySelector(".uv-scene").innerHTML.match(/id="([^"]+)"/)[1];
+  });
+  assert.notEqual(ids[0], ids[1]);
+});
+
+test("the editor offers the illustration and its theme", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const form = ctx.customElements.get("ha-uv-card").getConfigForm();
+  const byName = Object.fromEntries(form.schema.filter((s) => s.name).map((s) => [s.name, s]));
+  assert.equal(byName.illustration.default, true);
+  assert.deepEqual([...byName.illustration_theme.selector.select.options.map((o) => o.value)], ["auto", "day", "night"]);
+  assert.equal(form.computeLabel(byName.illustration_theme), "Illustration theme");
 });
 
 test("the editor offers show_advice and the icon", () => {
