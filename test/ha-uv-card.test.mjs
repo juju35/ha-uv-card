@@ -99,6 +99,7 @@ function sandbox(shared = { registry: new Map(), customCards: undefined }, extra
     },
     console: { info() {} },
     document: { querySelector: () => null, createElement: (tag) => new FakeElement(tag, null) },
+    getComputedStyle: () => ({ columnGap: "8px", display: "block" }),
     customElements: {
       get: (name) => registry.get(name),
       define: (name, cls) => {
@@ -625,14 +626,14 @@ test("the label tooltip follows the level when the value changes", () => {
 
 // Header at narrow widths: the badge never shrinks, the title keeps a few
 // characters and is cut with an ellipsis.
-test("the header badge never shrinks and the title keeps at least 4 characters", () => {
+test("the header badge never shrinks and the titles take the room left", () => {
   const css = render(4).querySelector("style").textContent;
   assert.equal(declarations(css, ".badge").flex, "none");
   const titles = declarations(css, ".titles");
   // flex-basis 0: the title only takes the room left, never more than its share.
   assert.equal(titles.flex, "1 1 0");
-  assert.match(titles["min-width"], /^\d+(\.\d+)?ch$/);
-  assert.ok(Number.parseFloat(titles["min-width"]) >= 4);
+  // The title is cut only when it does not fit alone; where the pill goes is measured (see pill-layout.test.mjs).
+  assert.equal(titles["min-width"], "0");
   assert.equal(declarations(css, ".name")["text-overflow"], "ellipsis");
 });
 
@@ -729,6 +730,9 @@ function fitCard(lang = "en") {
   el.connectedCallback?.();
   el.hass = hassWith(4);
   const node = pill();
+  // The title row: a 62 px title, the 8 px gap, then the room for the pill.
+  el._els.name.getBoundingClientRect = () => ({ width: 62 });
+  node.parentElement = { getBoundingClientRect: () => ({ width: 70 + room }) };
   // Laid out at its natural width when measured unconstrained, else cut to the room.
   node.getBoundingClientRect = () => {
     const natural = "data-dot" in node.attributes ? 10 : node.textContent.length * 7 + 16 + 0.4;
@@ -1108,7 +1112,9 @@ test("the layout defaults to vertical, horizontal on request", () => {
 test("the header holds the badge icon, the title, the subtitle and the status pill", () => {
   const root = render(4, { show_title: false });
   const header = root.querySelector(".header");
-  assert.deepEqual(header.children.map((c) => c.className), ["badge", "titles", "label", "uv-scene", "uv-ground"]);
+  assert.deepEqual(header.children.map((c) => c.className), ["badge", "titles", "uv-scene", "uv-ground"]);
+  // The classic header's pill sits on the title row, right after the title.
+  assert.deepEqual(root.querySelector(".trow").children.map((c) => c.className), ["name", "pill", "label"]);
   assert.equal(root.querySelector(".name").hidden, true);
   assert.equal(root.querySelector(".sub").hidden, true, "no max sensor: no subtitle");
 });

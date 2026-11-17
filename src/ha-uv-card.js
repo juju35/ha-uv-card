@@ -388,11 +388,10 @@ const STYLE = `
     height: 100%;
     display: block;
   }
-  /* The title takes the room left by the badge and the pill, keeps at least
-     4 characters, then is cut with an ellipsis. */
+  /* The titles take the room left by the badge; the title is cut with an ellipsis only when it does not fit alone. */
   .titles {
     flex: 1 1 0;
-    min-width: 4ch;
+    min-width: 0;
   }
   .name {
     font-size: 16px;
@@ -411,13 +410,39 @@ const STYLE = `
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  /* With a subtitle the pill stays on the title's line. */
-  .header[data-sub] > .label {
+  /* The status pill, in both headers: on the title row right after the title only when the whole title and the
+     pill's whole label fit there; otherwise on its own line under the (one-line) subtitle; its dot alone, beside the
+     title, when the banner has no room left above its sand strip, when the label does not fit even alone, or on a
+     card of 200 px or less. Decided by measurement (see _fitLabel), in every language. */
+  .trow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .trow .name {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+  .header[data-wrap] .titles {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .header[data-wrap] .titles > *,
+  .header[data-wrap] .trow > .name {
+    max-width: 100%;
+  }
+  .header[data-wrap] .trow {
+    display: contents;
+  }
+  .header[data-wrap] .trow > :is(.pill, .label) {
+    order: 9;
     align-self: flex-start;
-    margin-top: 1px;
+    margin-top: 2px;
   }
   .label {
-    flex: 0 1 auto;
+    flex: none;
     padding: 1px 8px;
     border-radius: 12px;
     font-size: 11px;
@@ -646,23 +671,11 @@ const STYLE = `
   .banner .sub {
     color: var(--uv-muted);
   }
-  .banner > .label {
+  .banner .label {
     display: none;
   }
-  /* Status pill on the title row (illustrated header): a dot and the risk level right after the title, in the
-     level's colour on a frosted tint, with its whole label. The title is cut first (at least 4 characters); a pill
-     that does not fit even so goes on its own line under the subtitle (measured by the card, see _fitLabel), and
-     shows as its dot if it does not fit there either (its text stays for screen readers and in the tooltip). */
-  .trow {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-  }
-  .trow .name {
-    flex: 0 100 auto;
-    min-width: 4ch;
-  }
+  /* Status pill on the title row (illustrated header): a dot and the risk level in the level's colour on a frosted
+     tint. Where it goes is measured by the card (see _fitLabel). */
   .pill {
     display: none;
   }
@@ -810,18 +823,8 @@ const STYLE = `
   @container (max-width: 299px) {
     .banner { --uv-u: min(1px, 0.28cqw); }
   }
-  /* No room for the whole pill next to the title (measured by the card): it goes on its own line under the subtitle. */
-  .banner[data-wrap] .titles {
-    display: flex;
-    flex-direction: column;
-  }
-  .banner[data-wrap] .trow {
-    display: contents;
-  }
+  /* On its own line the banner's pill may run over the faded left edge of the scene. */
   .banner[data-wrap] .pill {
-    order: 9;
-    align-self: flex-start;
-    /* On its own line the pill may run over the faded left edge of the scene. */
     max-width: calc(100cqw - 76px);
     margin-top: 3px;
   }
@@ -937,16 +940,6 @@ function formatTime(value, hass, lang) {
 function formatHour(hour, hass, lang) {
   return formatWith(lang, timeOptions(hass), new Date(2000, 0, 1, hour, 0));
 }
-
-// The width of an element's first four characters and an ellipsis, in its own font: the least a cut title keeps.
-let fourCtx;
-const fourChars = (el) => {
-  const cs = getComputedStyle(el);
-  fourCtx ??= document.createElement("canvas").getContext?.("2d");
-  if (!fourCtx) return 0;
-  fourCtx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-  return fourCtx.measureText(`${[...el.textContent.trim()].slice(0, 4).join("")}\u2026`).width;
-};
 
 function reducedMotion() {
   return !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -1097,10 +1090,11 @@ class UvIndexCard extends HTMLElement {
     this._resizeObserver.observe(this._els.card);
   }
 
-  // The level shows in full when it fits, and as its colored dot when it does
-  // not (a long level on a narrow card), instead of a cut "M…".
-  // Measured with fractional widths: scrollWidth / clientWidth are rounded and
-  // miss a text cut by less than a pixel (still drawn with an ellipsis).
+  // The status pill (the risk level) goes right after the title only when the whole title and its whole label fit
+  // on that row; otherwise on its own line under the subtitle (data-wrap). It shows as its colored dot (beside the
+  // title) when the banner has no room for that line above its sand strip, when the label does not fit even alone,
+  // and on a card of 200 px or less, instead of a cut "M…". Measured with fractional widths: scrollWidth /
+  // clientWidth are rounded and miss a text cut by less than a pixel (still drawn with an ellipsis).
   _fitLabel() {
     const { label: classic, pill, header } = this._els;
     const banner = this._config.illustration;
@@ -1111,9 +1105,15 @@ class UvIndexCard extends HTMLElement {
     label.removeAttribute("role");
     label.removeAttribute("aria-label");
     if (label.hidden || !label.getBoundingClientRect) return;
-    // The banner's pill that does not fit after the title (cut to 4 characters) goes on its own line first.
-    if (banner && !this._pillBeside(label)) header.toggleAttribute("data-wrap", true);
-    const dot = !this._labelFits(label);
+    const width = this._els.card.getBoundingClientRect?.().width;
+    let dot = !banner && width > 0 && width <= 200;
+    if (!dot && !this._pillBeside(label)) {
+      header.toggleAttribute("data-wrap", true);
+      if (!this._labelFits(label) || (banner && this._pillOut())) {
+        header.toggleAttribute("data-wrap", false);
+        dot = true;
+      }
+    }
     label.toggleAttribute("data-dot", dot);
     // A dot is an image named by the level; the text names itself otherwise.
     if (dot) {
@@ -1122,17 +1122,30 @@ class UvIndexCard extends HTMLElement {
     }
   }
 
-  // Whether the banner's whole pill fits on the title row beside the title cut down to four characters.
+  // Whether the whole title and the pill's whole label fit on the title row.
   _pillBeside(pill) {
     const row = pill.parentElement;
     const name = this._els.name;
     const shown = name && !name.hidden && getComputedStyle(name).display !== "none";
     const gap = parseFloat(getComputedStyle(row).columnGap) || 0;
-    const title = shown ? Math.min(name.scrollWidth, Math.max(parseFloat(getComputedStyle(name).minWidth) || 0, fourChars(name))) + gap : 0;
+    name.style.flex = "none";
+    const title = shown ? name.getBoundingClientRect().width + gap : 0;
+    name.style.flex = "";
     pill.style.width = "max-content";
     const need = pill.getBoundingClientRect().width;
     pill.style.width = "";
-    return title + need <= row.getBoundingClientRect().width + 0.5;
+    return title + need <= row.getBoundingClientRect().width + 0.01;
+  }
+
+  // Whether the banner's titles (the pill on its own line) run below the top of the sand strip or out of the banner.
+  _pillOut() {
+    const { header, name, sub, pill } = this._els;
+    const b = header.getBoundingClientRect();
+    const floor = b.bottom - 10 + 0.5;
+    return [name, sub, pill].some((e) => {
+      const r = e.getBoundingClientRect();
+      return !e.hidden && r.height && (r.bottom > floor || r.top < b.top - 0.5 || r.right > b.right + 0.5);
+    });
   }
 
   // Whether the label shows its whole text where it is.
@@ -1225,8 +1238,9 @@ class UvIndexCard extends HTMLElement {
     const name = el("div", "name", trow);
     const pill = el("span", "pill", trow);
     const pillText = el("span", "txt", pill);
+    // The classic header's pill, on the same title row.
+    const label = el("div", "label", trow);
     const sub = el("div", "sub", titles);
-    const label = el("div", "label", header);
     // The illustration (shown by the banner styles only) and its sand strip.
     this._uid ||= ++uvUid;
     const scene = el("div", "uv-scene", header);
@@ -1400,6 +1414,7 @@ class UvIndexCard extends HTMLElement {
       const rounded = Math.max(0, Math.round(maxRaw));
       const at = formatTime(maxObj.attributes?.time, this._hass, lang);
       sub.textContent = `${localize("max_uv", lang)} ${rounded}${at ? ` · ${at}` : ""}`;
+      sub.setAttribute("title", sub.textContent);
       card.style.setProperty("--uv-max-angle", `${gaugeAngle(rounded).toFixed(2)}deg`);
     } else {
       sub.textContent = "";

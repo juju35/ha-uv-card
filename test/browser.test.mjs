@@ -142,20 +142,21 @@ test("the risk level switches between text and dot in a card without a fixed hei
       await frames(4);
       seen.push(label.hasAttribute("data-dot"));
     }
-    // A level change is re-fitted too: at 200px the header (badge, 4 characters
-    // of title, pill) has room for "Niski", not for "Bardzo wysoki".
-    box.style.width = "200px";
+    // A level change is re-fitted too: at 210px the title row has room for "Niski" beside the title, while
+    // "Bardzo wysoki" goes on its own line under it (whole).
+    box.style.width = "210px";
     await frames(4);
+    const header = el.shadowRoot.querySelector(".header");
     el.hass = { language: "pl", states: { "sensor.uv": { state: "1", attributes: {} } } };
     await frames(4);
-    seen.push(label.hasAttribute("data-dot"));
+    seen.push(label.hasAttribute("data-dot"), header.hasAttribute("data-wrap"));
     el.hass = { language: "pl", states: { "sensor.uv": { state: "9", attributes: {} } } };
     await frames(4);
-    seen.push(label.hasAttribute("data-dot"));
+    seen.push(label.hasAttribute("data-dot"), header.hasAttribute("data-wrap"));
     return seen;
   });
-  // "Bardzo wysoki" fits at 300px, not at 80px nor 200px; "Niski" fits at 200px.
-  assert.deepEqual(dots, [false, true, false, true, false, false, true]);
+  // "Bardzo wysoki" fits at 300px; at 80px (200 px or less) the pill is its dot alone.
+  assert.deepEqual(dots, [false, true, false, true, false, false, false, false, true]);
   assert.deepEqual(await p.errors(), []);
   await p.close();
 });
@@ -232,9 +233,8 @@ test("the GIF comparison sees colors in every frame", async (t) => {
   assert.equal(await sameGifPixels(gif(["red"]), gif(["blue"])), false, "red vs blue");
 });
 
-// The illustrated header's status pill: the whole risk level from 245 to 500 px, right after the title whenever it fits
-// there beside the title cut down to 4 characters (always for "UV index" from 360 px, the README width), else on its
-// own line under the subtitle; the title keeps at least 4 characters.
+// The illustrated header's status pill: the whole risk level from 245 to 500 px, right after the title or on its own
+// line under the subtitle (the rule in every language: pill-layout.test.mjs), next to a readable title.
 test("status pill shows its whole label in the banner, next to a readable title", async (t) => {
   const p = await page(t);
   if (!p) return;
@@ -263,14 +263,7 @@ test("status pill shows its whole label in the banner, next to a readable title"
         if (tb.width < 24) out.push(`${tag}: title ${Math.round(tb.width)}px`);
         const pb = pill.getBoundingClientRect();
         const onRow = Math.abs(pb.top + pb.height / 2 - (tb.top + tb.height / 2)) < 3;
-        const ctx = document.createElement("canvas").getContext("2d");
-        const cs = getComputedStyle(title);
-        ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-        const four = Math.min(title.scrollWidth, ctx.measureText(`${title.textContent.trim().slice(0, 4)}…`).width);
-        const banner = r.querySelector(".banner");
-        const room = banner.getBoundingClientRect().right - parseFloat(getComputedStyle(banner).paddingRight) - tb.left;
-        if (!onRow && four + 8 + pb.width <= room - 1) out.push(`${tag}: pill under the subtitle although it fits beside the title`);
-        if (!onRow && name === "UV index" && width >= 360) out.push(`${tag}: pill not beside the title`);
+        // Beside the whole title or under the subtitle, in every language: pill-layout.test.mjs.
         if (onRow && pb.left - tb.right > 10.5) out.push(`${tag}: pill ${Math.round(pb.left - tb.right)}px after the title`);
         const card = r.querySelector("ha-card").getBoundingClientRect();
         if (pb.right > card.right - 4) out.push(`${tag}: pill past the card`);
