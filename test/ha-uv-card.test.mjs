@@ -1159,7 +1159,7 @@ test("illustrated header: banner, MDI badge (or the icon option), animated icon 
   assert.equal(root.querySelector(".status").hidden, true);
 });
 
-test("illustrated header: night from illustration_theme, else sun.sun, else the dark theme", () => {
+test("illustrated header: night from illustration_theme, else sun.sun below the horizon or the dark theme", () => {
   const ctx = sandbox();
   vm.runInContext(source, ctx);
   const el = new (ctx.customElements.get("ha-uv-card"))();
@@ -1169,11 +1169,15 @@ test("illustrated header: night from illustration_theme, else sun.sun, else the 
   el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("below_horizon") } };
   assert.equal(cls(), "header banner night");
   el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("above_horizon") }, themes: { darkMode: true } };
-  assert.equal(cls(), "header banner", "sun.sun wins over the dark theme");
+  assert.equal(cls(), "header banner night", "the dark theme gives the night even while the sun is up");
+  el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("above_horizon") }, themes: { darkMode: false } };
+  assert.equal(cls(), "header banner", "a light theme with the sun up: day");
   el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} } }, themes: { darkMode: true } };
   assert.equal(cls(), "header banner night", "no sun.sun: the dark theme");
   el.setConfig({ entity: "sensor.uv", illustration_theme: "day" });
   assert.equal(cls(), "header banner");
+  el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("above_horizon") }, themes: { darkMode: true } };
+  assert.equal(cls(), "header banner", "forced day wins over the dark theme");
   el.setConfig({ entity: "sensor.uv", illustration_theme: "night" });
   el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("above_horizon") } };
   assert.equal(cls(), "header banner night");
