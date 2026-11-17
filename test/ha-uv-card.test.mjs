@@ -1164,7 +1164,7 @@ test("illustrated header: banner, MDI badge (or the icon option), animated icon 
   assert.equal(root.querySelector("ha-card").getAttribute("data-illustration"), null);
 });
 
-test("illustrated header: night from illustration_theme, else sun.sun below the horizon or the dark theme", () => {
+test("illustrated header: night from illustration_theme, else the dark theme alone", () => {
   const ctx = sandbox();
   vm.runInContext(source, ctx);
   const el = new (ctx.customElements.get("ha-uv-card"))();
@@ -1172,6 +1172,8 @@ test("illustrated header: night from illustration_theme, else sun.sun below the 
   const sun = (state) => ({ "sun.sun": { state, attributes: {} } });
   el.setConfig({ entity: "sensor.uv" });
   el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("below_horizon") } };
+  assert.equal(cls(), "header banner", "a light theme after sunset: day");
+  el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("below_horizon") }, themes: { darkMode: true } };
   assert.equal(cls(), "header banner night");
   el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("above_horizon") }, themes: { darkMode: true } };
   assert.equal(cls(), "header banner night", "the dark theme gives the night even while the sun is up");
