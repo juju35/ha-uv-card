@@ -21,7 +21,7 @@ Lovelace card for Home Assistant that shows the current **UV index** on a half-c
 - Half-circle gauge from 0 to 11+ in the five WHO bands (green 0–2, yellow 3–5, orange 6–7, red 8–10, violet 11+): the bands above the current value are dimmed, a marker glides along the arc to the new value and pulses gently at Very high and Extreme
 - Big value in the centre and WHO risk level pill (Low, Moderate, High, Very high, Extreme) in the level's colour
 - Short WHO sun protection advice per level (e.g. "SPF 30+ · hat · shade at noon"), can be hidden
-- Illustrated header: a beach scene (rolling sea, sand strip, parasol) with the card's animated UV icon in the sky, a sun glow and a heat haze that grow with the risk level, a night picture (when `sun.sun` is below the horizon or with the dark theme), the risk level as a status pill after the title (the gauge below shows the index), next to a badge icon in the level's colour; `illustration: false` keeps the classic header
+- Illustrated header: a beach scene (rolling sea, sand strip, parasol) with the card's animated UV icon in the sky, a sun glow and a heat haze that grow with the risk level, a night picture (with a dark Home Assistant theme), the risk level as a status pill after the title (the gauge below shows the index), next to a badge icon in the level's colour; `illustration: false` keeps the classic header
 - Animated icon for every UV index from 0 to 11+ (Meteocons), bundled in the card file; in the classic header's badge it can be replaced by an icon of your choice
 - Optional daily max UV (subtitle "Max 10 · 13:20" and a tick on the gauge) and sun protection window footer, highlighted while it is on (e.g. from OpenUV)
 - Vertical (default) or horizontal layout, transparent mode, top alignment for stacks; band colours themable
@@ -74,7 +74,7 @@ entity: sensor.uv_index
 | `show_advice`| boolean | `true`               | Show the WHO sun protection advice under the value.      |
 | `icon`       | string  | animated icon        | An icon for the header badge (e.g. `mdi:sun-wireless`). Illustrated header: replaces the badge's sun (the animated icon stays in the scene); classic header: replaces the animated Meteocons icon of the current index. |
 | `illustration` | boolean | `true`             | Illustrated header (beach scene, 90 px). `false` keeps the classic header with the risk level pill. |
-| `illustration_theme` | string | `auto`        | `auto` (night picture when `sun.sun` is below the horizon or with a dark theme, even while the sun is up), `day` or `night`. |
+| `illustration_theme` | string | `auto`        | `auto` (follows the Home Assistant theme: night with a dark theme, day with a light theme), `day` or `night`. |
 | `layout`     | string  | `vertical`           | `vertical` (value in the gauge, advice under it) or `horizontal` (gauge on the left, value and advice on the right; stacked like `vertical` when the card is narrower than 300 px). |
 | `transparent`| boolean | `false`              | Remove the card background, border and shadow.           |
 | `align`      | string  | `center`             | `center` or `top`. Vertical alignment of the content inside the card, which fills its cell in the sections view — use `top` to line the card up with others in a `horizontal-stack`. |
