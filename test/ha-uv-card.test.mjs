@@ -922,16 +922,22 @@ test("a protection sensor without times shows only while on", () => {
 test("the footer is hidden without a protection entity, and the grid size fits it when set", () => {
   const { el, extra } = extraCard({}, undefined, { max_entity: undefined, protection_entity: undefined });
   assert.equal(extra.hidden, true);
+  // The illustrated header (default) takes one more row than the classic one.
+  assert.deepEqual({ ...el.getGridOptions() }, { columns: 6, min_columns: 4, rows: 5, min_rows: 5 });
+  const classic = { entity: "sensor.uv", illustration: false };
+  el.setConfig(classic);
   assert.deepEqual({ ...el.getGridOptions() }, { columns: 6, min_columns: 4, rows: 4, min_rows: 4 });
   // The max UV goes to the subtitle: no extra row.
-  el.setConfig({ entity: "sensor.uv", max_entity: "sensor.max_uv" });
+  el.setConfig({ ...classic, max_entity: "sensor.max_uv" });
   assert.equal(el.getGridOptions().rows, 4);
-  el.setConfig({ entity: "sensor.uv", protection_entity: "binary_sensor.protection" });
+  el.setConfig({ ...classic, protection_entity: "binary_sensor.protection" });
   assert.equal(el.getGridOptions().rows, 5);
-  el.setConfig({ entity: "sensor.uv", layout: "horizontal" });
+  el.setConfig({ ...classic, layout: "horizontal" });
   assert.deepEqual({ ...el.getGridOptions() }, { columns: 9, min_columns: 6, rows: 3, min_rows: 3 });
-  el.setConfig({ entity: "sensor.uv", layout: "horizontal", protection_entity: "binary_sensor.protection" });
+  el.setConfig({ ...classic, layout: "horizontal", protection_entity: "binary_sensor.protection" });
   assert.equal(el.getGridOptions().rows, 4);
+  el.setConfig({ entity: "sensor.uv", layout: "horizontal", protection_entity: "binary_sensor.protection" });
+  assert.equal(el.getGridOptions().rows, 5);
 });
 
 test("the subtitle and the tick update when the max sensor changes", () => {
@@ -1102,7 +1108,7 @@ test("the layout defaults to vertical, horizontal on request", () => {
 test("the header holds the badge icon, the title, the subtitle and the status pill", () => {
   const root = render(4, { show_title: false });
   const header = root.querySelector(".header");
-  assert.deepEqual(header.children.map((c) => c.className), ["badge", "titles", "label"]);
+  assert.deepEqual(header.children.map((c) => c.className), ["badge", "titles", "label", "uv-scene", "uv-ground"]);
   assert.equal(root.querySelector(".name").hidden, true);
   assert.equal(root.querySelector(".sub").hidden, true, "no max sensor: no subtitle");
 });
@@ -1111,7 +1117,7 @@ test("the icon option replaces the animated icon in the badge", () => {
   const ctx = sandbox();
   vm.runInContext(svgSource, ctx);
   const el = new (ctx.customElements.get("ha-uv-card"))();
-  el.setConfig({ entity: "sensor.uv", icon: "mdi:weather-sunny" });
+  el.setConfig({ entity: "sensor.uv", icon: "mdi:weather-sunny", illustration: false });
   el.hass = hassWith(4);
   const icon = el.shadowRoot.querySelector(".icon");
   assert.equal(icon.querySelector("svg"), null);
@@ -1119,8 +1125,74 @@ test("the icon option replaces the animated icon in the badge", () => {
   const writes = icon.htmlWrites;
   el.hass = hassWith(9);
   assert.equal(icon.htmlWrites, writes, "a custom icon is not redrawn with the value");
-  el.setConfig({ entity: "sensor.uv" });
+  el.setConfig({ entity: "sensor.uv", illustration: false });
   assert.notEqual(icon.querySelector("svg"), null, "back to the animated icon");
+});
+
+test("illustrated header: banner, MDI badge (or the icon option), animated icon in the scene, status line", () => {
+  const ctx = sandbox();
+  vm.runInContext(svgSource, ctx);
+  const el = new (ctx.customElements.get("ha-uv-card"))();
+  el.setConfig({ entity: "sensor.uv" });
+  el.hass = hassWith(9);
+  const root = el.shadowRoot;
+  assert.equal(root.querySelector(".header").className, "header banner");
+  assert.equal(root.querySelector("ha-card").getAttribute("data-illustration"), "");
+  assert.notEqual(root.querySelector(".icon").querySelector("svg"), null, "the animated icon stays (in the sky)");
+  assert.notEqual(root.querySelector(".mdi").querySelector("svg"), null, "MDI sun in the badge");
+  assert.notEqual(root.querySelector(".uv-scene").querySelector("svg"), null, "beach scene");
+  assert.equal(root.querySelector(".status").textContent, "Very high · 9");
+  assert.equal(root.querySelector(".status").hidden, false);
+  el.setConfig({ entity: "sensor.uv", icon: "mdi:sun-wireless", show_value: false });
+  assert.equal(root.querySelector(".mdi").querySelector("ha-icon").getAttribute("icon"), "mdi:sun-wireless");
+  assert.notEqual(root.querySelector(".icon").querySelector("svg"), null, "the icon option goes to the badge only");
+  assert.equal(root.querySelector(".status").textContent, "Very high");
+  el.setConfig({ entity: "sensor.uv", illustration: false });
+  assert.equal(root.querySelector(".header").className, "header");
+  assert.equal(root.querySelector("ha-card").getAttribute("data-illustration"), null);
+  assert.equal(root.querySelector(".status").hidden, true);
+});
+
+test("illustrated header: night from illustration_theme, else sun.sun, else the dark theme", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const el = new (ctx.customElements.get("ha-uv-card"))();
+  const cls = () => el.shadowRoot.querySelector(".header").className;
+  const sun = (state) => ({ "sun.sun": { state, attributes: {} } });
+  el.setConfig({ entity: "sensor.uv" });
+  el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("below_horizon") } };
+  assert.equal(cls(), "header banner night");
+  el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("above_horizon") }, themes: { darkMode: true } };
+  assert.equal(cls(), "header banner", "sun.sun wins over the dark theme");
+  el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} } }, themes: { darkMode: true } };
+  assert.equal(cls(), "header banner night", "no sun.sun: the dark theme");
+  el.setConfig({ entity: "sensor.uv", illustration_theme: "day" });
+  assert.equal(cls(), "header banner");
+  el.setConfig({ entity: "sensor.uv", illustration_theme: "night" });
+  el.hass = { language: "en", states: { "sensor.uv": { state: "0", attributes: {} }, ...sun("above_horizon") } };
+  assert.equal(cls(), "header banner night");
+});
+
+test("illustrated header: unique gradient ids per card", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const Card = ctx.customElements.get("ha-uv-card");
+  const ids = [new Card(), new Card()].map((el) => {
+    el.setConfig({ entity: "sensor.uv" });
+    el.hass = hassWith(5);
+    return el.shadowRoot.querySelector(".uv-scene").innerHTML.match(/id="([^"]+)"/)[1];
+  });
+  assert.notEqual(ids[0], ids[1]);
+});
+
+test("the editor offers the illustration and its theme", () => {
+  const ctx = sandbox();
+  vm.runInContext(source, ctx);
+  const form = ctx.customElements.get("ha-uv-card").getConfigForm();
+  const byName = Object.fromEntries(form.schema.filter((s) => s.name).map((s) => [s.name, s]));
+  assert.equal(byName.illustration.default, true);
+  assert.deepEqual([...byName.illustration_theme.selector.select.options.map((o) => o.value)], ["auto", "day", "night"]);
+  assert.equal(form.computeLabel(byName.illustration_theme), "Illustration theme");
 });
 
 test("the editor offers show_advice and the icon", () => {

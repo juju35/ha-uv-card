@@ -133,7 +133,7 @@ test("the risk level switches between text and dot in a card without a fixed hei
     const box = document.getElementById("root").appendChild(document.createElement("div"));
     box.style.width = "300px";
     const el = box.appendChild(document.createElement("ha-uv-card"));
-    el.setConfig({ entity: "sensor.uv" });
+    el.setConfig({ entity: "sensor.uv", illustration: false }); // the pill is in the classic header
     el.hass = { language: "pl", states: { "sensor.uv": { state: "9", attributes: {} } } };
     const label = el.shadowRoot.querySelector(".label");
     const seen = [];
