@@ -29,6 +29,18 @@ Lovelace card for Home Assistant that shows the current **UV index** on a half-c
 - Tap to open the sensor's more-info dialog
 - 22 languages, following Home Assistant's language setting
 
+## Supported integrations
+
+The card reads a UV index from any Home Assistant entity that has one, for example:
+
+| Integration | Entities used |
+|---|---|
+| [OpenUV](https://www.home-assistant.io/integrations/openuv/) | `sensor.*_current_uv_index` as `entity`, `sensor.*_max_uv_index` as `max_entity`, `binary_sensor.*_protection_window` as `protection_entity` |
+| [Met.no](https://www.home-assistant.io/integrations/met/) | the `weather` entity (its `uv_index` attribute) |
+| [OpenWeatherMap](https://www.home-assistant.io/integrations/openweathermap/) | the `weather` entity or its UV index sensor |
+| [AccuWeather](https://www.home-assistant.io/integrations/accuweather/) | the `weather` entity or its UV index sensor |
+| Any other integration | a sensor whose state is the UV index, or a `weather` entity with a `uv_index` attribute |
+
 ## Prerequisites
 
 - Home Assistant 2024.11 or later
