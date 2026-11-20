@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.11.2 - 2026-11-20
+
+### Maintenance
+- README: a `## Supported integrations` section (OpenUV, Met.no, OpenWeatherMap, AccuWeather and any UV sensor or weather entity with a `uv_index` attribute), as the other cards have.
+
 ## 1.11.1 - 2026-11-18
 
 ### Fixes
