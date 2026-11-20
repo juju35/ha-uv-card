@@ -10,6 +10,13 @@
 
 <p align="center"><img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/images/icon.svg" alt="UV Index Card" width="120"></p>
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/images/openuv.png" alt="OpenUV" width="64">&nbsp;&nbsp;
+  <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/images/met.png" alt="Met.no" width="64">&nbsp;&nbsp;
+  <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/images/openweathermap.png" alt="OpenWeatherMap" width="64">&nbsp;&nbsp;
+  <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/images/accuweather.png" alt="AccuWeather" width="64">
+</p>
+
 Lovelace card for Home Assistant that shows the current **UV index** on a half-circle gauge split into the five WHO risk bands, with the WHO risk level (Low → Extreme), a short sun protection advice and an animated weather-style icon.
 
 [![Open your Home Assistant instance and open a repository inside the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=juju35&repository=ha-uv-card&category=plugin)
