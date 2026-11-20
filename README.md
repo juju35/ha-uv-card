@@ -10,6 +10,13 @@
 
 <p align="center"><img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/images/icon.svg" alt="UV Index Card" width="120"></p>
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/images/openuv.png" alt="OpenUV" width="64">&nbsp;&nbsp;
+  <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/images/met.png" alt="Met.no" width="64">&nbsp;&nbsp;
+  <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/images/openweathermap.png" alt="OpenWeatherMap" width="64">&nbsp;&nbsp;
+  <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/images/accuweather.png" alt="AccuWeather" width="64">
+</p>
+
 Lovelace card for Home Assistant that shows the current **UV index** on a half-circle gauge split into the five WHO risk bands, with the WHO risk level (Low → Extreme), a short sun protection advice and an animated weather-style icon.
 
 [![Open your Home Assistant instance and open a repository inside the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=juju35&repository=ha-uv-card&category=plugin)
@@ -28,6 +35,18 @@ Lovelace card for Home Assistant that shows the current **UV index** on a half-c
 - Sections view support, card picker entry with preview, visual editor
 - Tap to open the sensor's more-info dialog
 - 22 languages, following Home Assistant's language setting
+
+## Supported integrations
+
+The card reads a UV index from any Home Assistant entity that has one, for example:
+
+| Integration | Entities used |
+|---|---|
+| [OpenUV](https://www.home-assistant.io/integrations/openuv/) | `sensor.*_current_uv_index` as `entity`, `sensor.*_max_uv_index` as `max_entity`, `binary_sensor.*_protection_window` as `protection_entity` |
+| [Met.no](https://www.home-assistant.io/integrations/met/) | the `weather` entity (its `uv_index` attribute) |
+| [OpenWeatherMap](https://www.home-assistant.io/integrations/openweathermap/) | the `weather` entity or its UV index sensor |
+| [AccuWeather](https://www.home-assistant.io/integrations/accuweather/) | the `weather` entity or its UV index sensor |
+| Any other integration | a sensor whose state is the UV index, or a `weather` entity with a `uv_index` attribute |
 
 ## Prerequisites
 

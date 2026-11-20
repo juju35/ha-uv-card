@@ -17,7 +17,11 @@ let chromium;
 try {
   ({ chromium } = await import("playwright"));
 } catch {}
-const browser = await chromium?.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}).catch(() => null);
+const browser = await chromium?.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}).catch((err) => {
+  // In Validate (REQUIRE_BROWSER=1) the browser must start: a missing Chromium fails the job instead of skipping.
+  if (process.env.REQUIRE_BROWSER === "1") throw err;
+  return null;
+});
 
 const LANGS = ["en", "fr", "de", "hu", "el", "ru"];
 const WIDTHS = [190, 245, 300, 400, 460, 500];
