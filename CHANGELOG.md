@@ -4,6 +4,7 @@
 
 ### Maintenance
 - README: a `## Supported integrations` section (OpenUV, Met.no, OpenWeatherMap, AccuWeather and any UV sensor or weather entity with a `uv_index` attribute), as the other cards have.
+- CI: Validate runs in a Debian 12 container with Chromium, so the browser tests (rendering, status pill placement) now run on every pull request instead of being skipped; a missing browser fails the job.
 
 ## 1.11.1 - 2026-11-18
 
