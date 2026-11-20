@@ -62,9 +62,10 @@ jobs:
       - name: Install Chromium for the browser tests
         run: npx playwright install chromium
 
-      - name: Install Chromium system deps
+      # ffmpeg too: the GIF comparison test of the screenshots needs it.
+      - name: Install Chromium system deps and ffmpeg
         timeout-minutes: 12
-        run: .github/scripts/install-chromium-deps.sh
+        run: .github/scripts/install-chromium-deps.sh ffmpeg
 
       - name: Build and check the card
         run: npm run check
