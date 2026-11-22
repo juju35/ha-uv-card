@@ -1460,7 +1460,7 @@ if (!customElements.get("ha-uv-card")) {
     type: "ha-uv-card",
     name: "UV Index Card",
     description: "Displays the current UV index on a WHO-coloured gauge, with the risk level and protection advice.",
-    preview: true,
+    preview: false,
     documentationURL: "https://github.com/juju35/ha-uv-card",
   });
 
