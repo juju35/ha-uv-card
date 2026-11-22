@@ -127,11 +127,11 @@ layout: horizontal
 
 | Icon | UV index | Level     | Color  | Advice |
 | ---- | -------- | --------- | ------ | ------ |
-| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-1.svg" width="32" />  | 0–2  | Low       | green  | No protection needed |
-| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-4.svg" width="32" />  | 3–5  | Moderate  | yellow | Sunglasses · SPF 30+ at midday |
-| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-7.svg" width="32" />  | 6–7  | High      | orange | SPF 30+ · hat · shade at noon |
-| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-9.svg" width="32" />  | 8–10 | Very high | red    | Avoid the sun 11:00–16:00 |
-| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-11.svg" width="32" /> | 11+  | Extreme   | violet | Stay inside if possible |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-1.svg" alt="UV index low icon" width="32" />  | 0–2  | Low       | green  | No protection needed |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-4.svg" alt="UV index moderate icon" width="32" />  | 3–5  | Moderate  | yellow | Sunglasses · SPF 30+ at midday |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-7.svg" alt="UV index high icon" width="32" />  | 6–7  | High      | orange | SPF 30+ · hat · shade at noon |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-9.svg" alt="UV index very high icon" width="32" />  | 8–10 | Very high | red    | Avoid the sun 11:00–16:00 |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/icons/uv-index-11.svg" alt="UV index extreme icon" width="32" /> | 11+  | Extreme   | violet | Stay inside if possible |
 
 ### Theme variables
 
