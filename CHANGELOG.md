@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.11.5 - 2026-11-22
+
+### Maintenance
+- README: alternative text on the five UV risk band icons of the levels table.
+
 ## 1.11.4 - 2026-11-22
 
 ### Performance
