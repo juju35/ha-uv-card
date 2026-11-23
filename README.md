@@ -42,10 +42,10 @@ The card reads a UV index from any Home Assistant entity that has one, for examp
 
 | Integration | Entities used |
 |---|---|
-| [OpenUV](https://www.home-assistant.io/integrations/openuv/) | `sensor.*_current_uv_index` as `entity`, `sensor.*_max_uv_index` as `max_entity`, `binary_sensor.*_protection_window` as `protection_entity` |
-| [Met.no](https://www.home-assistant.io/integrations/met/) | the `weather` entity (its `uv_index` attribute) |
-| [OpenWeatherMap](https://www.home-assistant.io/integrations/openweathermap/) | the `weather` entity or its UV index sensor |
-| [AccuWeather](https://www.home-assistant.io/integrations/accuweather/) | the `weather` entity or its UV index sensor |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/images/openuv.png" alt="" width="16"> [OpenUV](https://www.home-assistant.io/integrations/openuv/) | `sensor.*_current_uv_index` as `entity`, `sensor.*_max_uv_index` as `max_entity`, `binary_sensor.*_protection_window` as `protection_entity` |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/images/met.png" alt="" width="16"> [Met.no](https://www.home-assistant.io/integrations/met/) | the `weather` entity (its `uv_index` attribute) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/images/openweathermap.png" alt="" width="16"> [OpenWeatherMap](https://www.home-assistant.io/integrations/openweathermap/) | the `weather` entity or its UV index sensor |
+| <img src="https://raw.githubusercontent.com/juju35/ha-uv-card/main/images/accuweather.png" alt="" width="16"> [AccuWeather](https://www.home-assistant.io/integrations/accuweather/) | the `weather` entity or its UV index sensor |
 | Any other integration | a sensor whose state is the UV index, or a `weather` entity with a `uv_index` attribute |
 
 ## Prerequisites
