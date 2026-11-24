@@ -182,6 +182,8 @@ npm run gifs         # records the README GIFs, the marker animation per risk ba
 
 The **Screenshots** workflow re-renders the screenshots and GIFs on every pull request that touches `src/`, `icons/`, `scripts/` or the Playwright version (`package.json`, `package-lock.json`) and commits them back onto the PR branch (pull requests from forks are only rendered, not committed; a manual run uploads them as an artifact). The `pull_request` runs created by that bot commit are left waiting for approval (they show as failed with no job once the PR is merged), so after committing the workflow dispatches Lint, Validate and HACS on the PR branch to check the new commit.
 
+The source is split into ES modules under `src/` (entry `src/index.js`); `npm run build` assembles them (`scripts/bundle.mjs`) into the single file the Marketplace serves.
+
 `dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where the Marketplace installs it from.
 
 ### Releasing
