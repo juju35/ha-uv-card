@@ -1,12 +1,13 @@
-// Unit tests for src/ha-uv-card.js, run with `node --test` (no dependencies).
+// Unit tests for the bundled card source (test/source.mjs), run with `node --test` (no dependencies).
 // The source is a browser script with build placeholders, so it is evaluated in
 // a small sandbox that stubs the few DOM APIs it uses.
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import vm from "node:vm";
+import { source as bundledSource } from "./source.mjs";
 
-const source = readFileSync(new URL("../src/ha-uv-card.js", import.meta.url), "utf8")
+const source = bundledSource
   .replace("__VERSION__", "test")
   .replace("__ICONS__", "{}");
 
@@ -554,7 +555,7 @@ test("the risk value, label and badge icon are readable in light and dark themes
 });
 
 // Each test icon is a bare <svg> so the fake DOM exposes it to querySelector.
-const svgSource = readFileSync(new URL("../src/ha-uv-card.js", import.meta.url), "utf8")
+const svgSource = bundledSource
   .replace("__VERSION__", "test")
   .replace("__ICONS__", () => JSON.stringify({ default: "<svg></svg>", ...Object.fromEntries([...Array(12).keys()].map((i) => [i, "<svg></svg>"])) }));
 

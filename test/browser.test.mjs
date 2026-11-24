@@ -4,10 +4,10 @@
 // REQUIRE_BROWSER=1 (the screenshots job, which installs it): there a missing
 // browser fails instead of skipping.
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { after, before, test } from "node:test";
+import { source as bundledSource } from "./source.mjs";
 
-const source = readFileSync(new URL("../src/ha-uv-card.js", import.meta.url), "utf8")
+const source = bundledSource
   .replace("__VERSION__", () => "test")
   .replace("__ICONS__", () => "{}");
 
