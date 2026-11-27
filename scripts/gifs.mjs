@@ -28,6 +28,13 @@ const BANDS = [
   { file: "uv-extreme", value: 11 },
 ];
 
+const setFrame = (page, t) =>
+  page.evaluate((time) => {
+    window.__uvSvg.setCurrentTime(time);
+    // The transitions start after a short hold at 0; the pulse runs from the first frame.
+    for (const a of window.__uvAnims) a.currentTime = (a instanceof CSSTransition ? time - 0.5 : time) * 1000;
+  }, t);
+
 const captureGif = (file, value) => async (page, clip) => {
   await page.evaluate((states) => {
     const el = document.querySelector("ha-uv-card");
@@ -44,11 +51,12 @@ const captureGif = (file, value) => async (page, clip) => {
   const dir = mkdtempSync(join(tmpdir(), "uv-frames-"));
   const frames = FPS * SECONDS;
   for (let i = 0; i < frames; i++) {
-    await page.evaluate((t) => {
-      window.__uvSvg.setCurrentTime(t);
-      // The transitions start after a short hold at 0; the pulse runs from the first frame.
-      for (const a of window.__uvAnims) a.currentTime = (a instanceof CSSTransition ? t - 0.5 : t) * 1000;
-    }, (i * SECONDS) / frames);
+    const t = (i * SECONDS) / frames;
+    // Set, let two frames render (paused SVG clocks are only sampled at the next rendering), set again, then capture:
+    // otherwise a frame can still show the previous time and the GIF changes without any change to the card.
+    await setFrame(page, t);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    await setFrame(page, t);
     await page.screenshot({ path: join(dir, `f${String(i).padStart(3, "0")}.png`), clip });
   }
   // deviceScaleFactor is 2: scale back to CSS pixels and build a palette for a small, clean GIF.
