@@ -66,6 +66,8 @@ Or manually:
 3. Open **UV Index Card** and click **Install**
 4. Reload the browser
 
+The Marketplace registers the dashboard resource for you: `/local/community/ha-uv-card/ha-uv-card.js`.
+
 ### Manual
 
 1. Download `ha-uv-card.js` and the `ha-uv-card.i18n.*.js` translation files from the [latest release](https://github.com/juju35/ha-uv-card/releases/latest) (icons included)
